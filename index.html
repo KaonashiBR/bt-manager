@@ -255,17 +255,15 @@
 
 <div class="board" id="board">
     <div class="column" id="col-pool">
-        <div class="column-header">
+        <div class="column-header" onclick="moveSelectedToGroup('pool')">
             <span>Banco de Reservas</span>
             <div style="display:flex; gap:10px; align-items:center;">
-                <button onclick="distributePlayers()" class="btn-distribute">🚀 Distribuir</button>
+                <button onclick="distributePlayers(); event.stopPropagation();" class="btn-distribute">🚀 Distribuir</button>
                 <span id="count-pool" style="font-size:0.9em; background:rgba(0,0,0,0.3); padding:4px 10px; border-radius:15px;">0</span>
             </div>
         </div>
+        
         <div class="player-pool" id="pool-list" ondrop="drop(event, 'pool')" ondragover="allowDrop(event)"></div>
-        <div style="padding:10px; text-align:center; color:#555; font-size:0.9em; background:#e9ecef; border-top:1px solid #ccc; font-weight:600;">
-            Arraste os jogadores para os grupos abaixo
-        </div>
     </div>
     </div>
 
