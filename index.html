@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Arena - V71 (Visual Torneios)</title>
+    <title>BT Arena - V72</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -36,7 +36,7 @@
         @media(min-width: 600px) { .user-name { display: block; } }
 
         /* TELAS */
-        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; box-sizing: border-box; }
+        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 50px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
 
         /* GRID CARDS */
@@ -60,17 +60,12 @@
         .card-title { font-weight: 700; font-size: 1.1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
         .card-subtitle { font-size: 0.75em; opacity: 0.8; margin-top: 2px; }
         
-        /* ESTILOS DE CATEGORIA & TORNEIO (SEM FOTO) */
+        /* CATEGORIA VISUAL */
         .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
         .bg-masc { background: var(--blue-masc); }
         .bg-fem { background: var(--pink-fem); }
         .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
-        
-        /* NOVO: Estilo do Torneio (Gradiente Laranja/Azul) */
-        .bg-tourney { 
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            display: flex; justify-content: center; align-items: center;
-        }
+        .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
         .bg-tourney .material-icons { font-size: 4em; color: white; opacity: 0.3; }
 
         /* AÇÕES CARD */
@@ -82,12 +77,21 @@
         }
 
         .btn-add-float {
-            position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px;
+            position: fixed; bottom: 50px; right: 20px; width: 56px; height: 56px; /* Bottom adjusted for footer */
             background: var(--primary); color: white; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             font-size: 2em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4);
             border: none; cursor: pointer; z-index: 900;
         }
+
+        /* FOOTER */
+        .app-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #111; color: #888; text-align: center;
+            padding: 8px 0; font-size: 0.75em; font-weight: 600;
+            border-top: 1px solid #333; z-index: 1000;
+        }
+        .app-footer a { color: var(--primary); text-decoration: none; }
 
         /* MODAL */
         #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
@@ -103,7 +107,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* RANKING TABLE */
+        /* RANKING */
         .rank-table { width: 100%; border-collapse: collapse; background: white; }
         .rank-table th { background: #333; color: white; padding: 8px; font-size: 0.8em; }
         .rank-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
@@ -112,7 +116,7 @@
         .rank-2 .rank-pos { background: #C0C0C0; color: #000; }
         .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
 
-        /* APP STYLES */
+        /* APP */
         .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
         .header-controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
         .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; justify-content: center; }
@@ -214,6 +218,7 @@
         </div>
         <div style="display:flex; align-items:center; gap:5px;">
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
+            <button onclick="shareLink()" id="btn-share" style="background:transparent; border:none; color:white; cursor:pointer; display:flex; align-items:center;"><span class="material-icons">link</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
         </div>
     </div>
@@ -221,7 +226,8 @@
     
     <div class="admin-only" style="background:white; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
         <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <input type="text" id="pName" class="inp-std auth-input" style="margin:0;" placeholder="Nome...">
+            <input type="text" id="pName" list="player-suggestions" class="inp-std auth-input" style="margin:0;" placeholder="Nome...">
+            <datalist id="player-suggestions"></datalist>
             <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
             <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
         </div>
@@ -243,6 +249,10 @@
         </div>
         <div id="groups-container" style="display:contents;"></div>
     </div>
+</div>
+
+<div class="app-footer">
+    Criado por <a href="https://instagram.com/lsibie" target="_blank">@LSIBIE</a>
 </div>
 
 <div id="modal-overlay">
@@ -314,6 +324,7 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+    // --- SEU EMAIL ---
     const SUPER_ADMIN = "lucas.sibie@gmail.com"; 
 
     const firebaseConfig = {
@@ -339,6 +350,22 @@
     let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
     let selectedPid = null;
 
+    // --- INIT ---
+    window.onload = () => {
+        // Deep Linking Check
+        const hash = window.location.hash.substring(1);
+        if(hash && hash.includes('/')) {
+            const [a, c, t] = hash.split('/');
+            // Load hierarchy silently to enable back buttons
+            curArenaId = a; curCatId = c; curTourneyId = t;
+            // Fetch Names for Headers
+            get(ref(db, `arenas/${a}`)).then(s => { if(s.exists()) document.getElementById('title-arena').innerText = s.val().name });
+            get(ref(db, `categories/${a}/${c}`)).then(s => { if(s.exists()) { document.getElementById('title-cat').innerText = s.val().name; curCatData = s.val(); }});
+            get(ref(db, `tournaments_meta/${c}/${t}`)).then(s => { if(s.exists()) enterApp(t, s.val().name, s.val().pwd, s.val().owner); });
+        }
+    }
+
+    // --- AUTH ---
     onAuthStateChanged(auth, (u) => {
         document.getElementById('loading').style.display = 'none';
         user = u;
@@ -347,6 +374,8 @@
             document.getElementById('nav-username').innerText = user.displayName.split(' ')[0];
             document.getElementById('btn-add-arena').style.display = 'flex'; 
             document.getElementById('msg-login').style.display = 'none';
+            // Load Autocomplete
+            loadGlobalPlayers();
         } else {
             document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = "Visitante";
@@ -359,6 +388,21 @@
     window.handleLoginClick = async () => {
         if(user) { if(confirm(`Sair da conta ${user.displayName}?`)) signOut(auth); } 
         else { try { await signInWithPopup(auth, googleProvider); } catch(e) { alert("Erro Google: " + e.message); } }
+    }
+
+    // --- GLOBAL PLAYERS ---
+    function loadGlobalPlayers() {
+        onValue(ref(db, 'all_players'), (snap) => {
+            const dl = document.getElementById('player-suggestions');
+            dl.innerHTML = '';
+            if(snap.exists()) {
+                Object.keys(snap.val()).forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    dl.appendChild(opt);
+                });
+            }
+        });
     }
 
     // --- UTIL ---
@@ -501,10 +545,8 @@
             const bgClass = `bg-${imgOrClass.type}`;
             content = `<div class="cat-card-content ${bgClass}">${imgOrClass.short}</div>`;
         } else if (type === 'tournament') {
-            // NOVO: CARD DE TORNEIO SEM FOTO (GRADIENTE)
             content = `<div class="cat-card-content bg-tourney"><span class="material-icons">emoji_events</span></div>`;
         } else {
-            // ARENA (COM FOTO)
             content = `<img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">`;
         }
 
@@ -564,7 +606,6 @@
                 const d = data[key];
                 const isOwner = user && (user.uid === d.owner || user.email === SUPER_ADMIN);
                 const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : '');
-                // Passando 'tournament' no type para ativar o gradiente
                 list.appendChild(createCard(key, d.name, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub));
             });
         });
@@ -608,6 +649,11 @@
 
     window.exitApp = () => { if(appRef) off(appRef); showScreen('screen-tournaments'); }
     
+    window.shareLink = () => {
+        const url = `${window.location.origin}${window.location.pathname}#${curArenaId}/${curCatId}/${curTourneyId}`;
+        navigator.clipboard.writeText(url).then(() => alert("Link copiado! Envie no WhatsApp."));
+    }
+
     // --- RANKING LOGIC ---
     window.openFinalsModal = () => {
         document.getElementById('modal-finals').style.display = 'flex';
@@ -651,7 +697,18 @@
     window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
     function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
-    window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); }
+    
+    window.addPlayer = () => { 
+        const n=document.getElementById('pName').value.trim(); if(!n)return; 
+        appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); 
+        
+        // AUTOCOMPLETE SAVE
+        const safeKey = n.replace(/[.#$/[\]]/g, "");
+        update(ref(db, 'all_players'), { [safeKey]: true });
+
+        document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); 
+    }
+
     window.addGroup = () => { appState.groupCount++; appState.groups.push({id:'g'+Date.now(), name: "GRUPO "+String.fromCharCode(64+appState.groupCount)}); save(); }
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
     window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); } }
