@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V52 (PC Compacto)</title>
+    <title>BT Manager - V53</title>
     <style>
         /* --- ESTILO V45 ORIGINAL --- */
         :root {
@@ -62,22 +62,34 @@
         }
         button:active { transform: scale(0.96); }
 
+        /* Cores Específicas */
         .btn-save { background-color: var(--secondary-dark) !important; font-size: 0.8em; padding: 8px; } 
         .btn-load { background-color: #d35400 !important; font-size: 0.8em; padding: 8px; } 
-        .btn-finals { background-color: #4a148c !important; width: 100%; margin-top: 5px; } 
-        .btn-add-player { background-color: var(--primary) !important; flex:1; }
-        .btn-add-group { background-color: var(--secondary) !important; flex:1; }
+        .btn-finals { background-color: #4a148c !important; } 
+        .btn-add-player { background-color: var(--primary) !important; }
+        .btn-add-group { background-color: var(--secondary) !important; }
         .btn-gen { background-color: #2e7d32 !important; width: 100%; } 
         .btn-manual { background-color: #0277bd !important; width: 100%; } 
         .btn-check-tie { background-color: var(--success-dark) !important; width: 100%; padding: 15px; }
         .btn-distribute { background-color: #fff !important; color: var(--secondary-dark) !important; text-shadow: none !important; border: 2px solid var(--secondary-dark) !important; font-size: 0.8em; padding: 5px 10px; }
         
+        /* CORREÇÃO 1: Botão OK do Editar (Alto Contraste) */
+        .btn-confirm { background-color: #28a745 !important; border: 1px solid #1e7e34 !important; min-width: 80px; }
+
         /* --- LAYOUT --- */
         .header-controls { 
             background: var(--bg-card); padding: 15px; border-radius: var(--border-radius); 
             box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid #ccc;
         }
+        
         .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; margin-bottom: 10px; justify-content: center;}
+        
+        /* CORREÇÃO 2: Botões Iniciais não esticarem */
+        .header-controls button { 
+            flex: 0 0 auto; /* Não cresce infinitamente */
+            min-width: 100px; /* Tamanho mínimo */
+            max-width: 200px; /* Tamanho máximo */
+        }
         
         h2 { margin: 0; color: #000; font-weight: 900; font-size: 1.6em; text-transform: uppercase; text-align: center; width:100%; }
 
@@ -94,7 +106,8 @@
             background: var(--bg-card); flex: 1 1 100%; border-radius: 8px; 
             display: flex; flex-direction: column; box-shadow: var(--shadow); border: 1px solid #999;
         }
-        
+        @media(min-width: 768px) { .column { flex: 1 1 48%; } }
+
         .column-header { 
             background: #e2e6ea; color: #000; padding: 15px; font-weight: 900; 
             display: flex; justify-content: space-between; align-items: center; 
@@ -185,7 +198,7 @@
 
 <div id="loading-overlay">
     <div style="font-size:3em; margin-bottom:10px;">🎾</div>
-    <div style="font-weight:bold; color:#555;">Carregando V52...</div>
+    <div style="font-weight:bold; color:#555;">Carregando V53...</div>
 </div>
 
 <div class="status-bar">
@@ -274,7 +287,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'tournament_v52'); // NOVA CHAVE V52
+    const dbRef = ref(db, 'tournament_v53'); // NOVA CHAVE V53
 
     let appState = { mode: 'individual', players: [], groups: [], matches: [], groupCounter: 0, tieMatches: [], fixedPairs: [], bracket: [] };
     let selectedPlayerId = null;
@@ -338,7 +351,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
         const anchor = document.createElement('a');
         anchor.setAttribute("href", dataStr);
-        anchor.setAttribute("download", "BT_Backup_V52_" + new Date().toISOString().slice(0,10) + ".json");
+        anchor.setAttribute("download", "BT_Backup_V53_" + new Date().toISOString().slice(0,10) + ".json");
         document.body.appendChild(anchor);
         anchor.click(); anchor.remove();
     }
@@ -689,7 +702,7 @@
             ${!m.saved ? `<button class="btn-edit-match admin-only" onclick="toggleEditPlayers('${m.mid}')">✎</button>` : ''}
             <div class="match-teams" id="t-${m.mid}">${label}</div>
             <div id="e-${m.mid}" style="display:none; text-align:center; margin-bottom:5px;">
-                ${editHtml} <br><button onclick="toggleEditPlayers('${m.mid}')" style="margin-top:5px; font-size:0.8em;">OK</button>
+                ${editHtml} <br><button class="btn-confirm" onclick="toggleEditPlayers('${m.mid}')" style="margin-top:5px; font-size:0.8em; color:white;">✅ OK</button>
             </div>
             <div class="match-inputs" id="in-${m.mid}">
                 <input type="tel" id="s1-${m.mid}" value="${m.s1}" class="score-input" ${m.saved?'disabled':''}>
