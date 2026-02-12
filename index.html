@@ -5,203 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004e98">
     
-    <title>Beach Tennis Manager - V48 Cloud</title>
+    <title>BT Manager - V49 Híbrido</title>
     <style>
         :root {
             --primary: #ff6b00;       
             --secondary: #004e98;     
             --secondary-dark: #003366;
-            --success-dark: #1b5e20;
-            --danger-dark: #b71c1c;
-            --dark-grey: #2c3e50;
+            --success: #28a745;
+            --danger: #dc3545;
             --bg-body: #dee2e6;
             --bg-card: #ffffff;
-            --border-radius: 8px;
-            --shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background: var(--bg-body); 
             color: #000; 
-            padding: 10px;
-            margin: 0; 
+            padding: 10px; margin: 0; 
             -webkit-tap-highlight-color: transparent;
+            padding-bottom: 80px; /* Espaço para footer se tiver */
         }
 
-        /* --- MODO ESPECTADOR (Viewer) --- */
+        /* --- VISIBILIDADE (Admin vs Espectador) --- */
         body.viewer-mode .admin-only { display: none !important; }
         body.viewer-mode input:not(.score-display) { pointer-events: none; border:none; background: transparent; }
-        /* Esconde o Banco de Reservas no modo espectador */
-        body.viewer-mode #col-pool { display: none !important; } 
-        /* Inputs de placar no modo viewer parecem texto */
-        body.viewer-mode .score-input { border: none; background: transparent; font-size: 1.4em; }
-        body.viewer-mode .btn-match-action { display: none; }
-        body.viewer-mode .del-player-btn { display: none; }
+        body.viewer-mode .score-input { border: none; background: transparent; font-size: 1.4em; color: black; }
+        body.viewer-mode #col-pool { display: none !important; } /* Esconde Reservas */
+        body.viewer-mode .del-btn { display: none; }
 
-        /* --- STATUS BAR --- */
+        /* --- BARRA DE STATUS --- */
         .status-bar {
             display: flex; justify-content: space-between; align-items: center;
-            background: #333; color: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9em; font-weight: bold;
+            background: #343a40; color: white; padding: 12px; border-radius: 8px; 
+            margin-bottom: 15px; font-size: 0.9em; font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        .live-dot { color: #f00; animation: blink 2s infinite; margin-right: 5px; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .connection-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: #ffc107; }
+        .connection-dot.online { background: #0f0; box-shadow: 0 0 8px #0f0; }
+        .connection-dot.offline { background: #f00; }
 
-        /* --- BUTTONS --- */
+        /* --- BOTÕES --- */
         button {
-            border: none; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 800;
-            text-transform: uppercase; color: white; padding: 10px 15px;
+            border: none; border-radius: 6px; cursor: pointer; font-weight: 700;
+            text-transform: uppercase; color: white; padding: 10px; font-size: 0.85em;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s;
         }
         button:active { transform: scale(0.96); }
 
-        .btn-add-player { background-color: var(--primary) !important; flex:1; }
-        .btn-add-group { background-color: var(--secondary) !important; flex:1;}
-        .btn-finals { background-color: #4a148c !important; width: 100%; margin-top:5px;} 
-        .btn-gen { background-color: #2e7d32 !important; width: 100%; } 
-        .btn-manual { background-color: #0277bd !important; width: 100%; } 
-        .btn-check-tie { background-color: var(--success-dark) !important; width: 100%; padding: 15px;}
-        .save-bracket-btn { background-color: #0d47a1; color: white; width: 100%; margin-top: 5px; }
-        .save-bracket-btn.saved { background-color: #ffc107; color: black; }
-        .btn-distribute { background-color: #fff !important; color: var(--secondary-dark) !important; border: 2px solid var(--secondary-dark) !important; padding: 5px 10px; font-size: 0.8em; }
-
+        .btn-add { background: var(--primary); flex: 1; }
+        .btn-group { background: var(--secondary); flex: 1; }
+        .btn-save-file { background: #555; font-size: 0.75em; padding: 8px; }
+        .btn-load-file { background: #d35400; font-size: 0.75em; padding: 8px; }
+        .btn-reset { background: var(--danger); }
+        .btn-finals { background: #4a148c; width: 100%; margin-top: 5px; }
+        .btn-match { background: #333; min-width: 60px; }
+        .btn-match.saved { background: #ffc107; color: black; border: 1px solid #d39e00; }
+        
         /* --- LAYOUT --- */
-        .header-controls { 
-            background: var(--bg-card); padding: 15px; border-radius: var(--border-radius); 
-            box-shadow: var(--shadow); margin-bottom: 15px; 
+        .control-panel { 
+            background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .top-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .input-row { display: flex; gap: 5px; margin-top: 10px; }
         
-        h2 { margin: 0; font-size: 1.5em; text-transform: uppercase; text-align: center; width: 100%; }
-        input { padding: 10px; border: 2px solid #6c757d; border-radius: 6px; width: 100%; font-weight: 600; box-sizing: border-box; }
-        
-        .mode-selector { display: flex; gap: 5px; width: 100%; margin-bottom: 5px; }
-        .mode-btn { flex: 1; background: #ccc; color: black; padding: 8px; font-size: 0.8em; }
-        .mode-btn.active { background: var(--secondary); color: white; }
+        .row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+        .title { margin: 0; font-size: 1.4em; text-transform: uppercase; color: var(--secondary); width: 100%; text-align: center; }
 
-        /* --- BOARD --- */
+        input[type="text"] { 
+            padding: 10px; border: 2px solid #ced4da; border-radius: 6px; 
+            flex: 1; font-size: 1rem; width: 100%; box-sizing: border-box;
+        }
+
+        /* --- COLUNAS E CARDS --- */
         .board { display: flex; flex-wrap: wrap; gap: 15px; }
         .column { 
-            background: var(--bg-card); flex: 1 1 100%; border-radius: 8px; 
-            box-shadow: var(--shadow); overflow: hidden;
+            background: white; flex: 1 1 100%; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #dee2e6;
         }
-        @media(min-width: 700px) { .column { flex: 1 1 45%; } }
+        @media(min-width: 768px) { .column { flex: 1 1 48%; } }
 
-        .column-header { 
-            background: #e2e6ea; padding: 12px; font-weight: 900; display: flex; 
-            justify-content: space-between; align-items: center; 
+        .col-header { 
+            background: #e9ecef; padding: 12px; font-weight: 800; 
+            display: flex; justify-content: space-between; align-items: center;
         }
-        #col-pool .column-header { background: var(--secondary); color: white; }
+        #col-pool .col-header { background: var(--secondary); color: white; }
+
+        .player-list { padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; min-height: 50px; }
         
-        .player-pool { background: #f8f9fa; padding: 10px; min-height: 60px; display: flex; flex-wrap: wrap; gap: 8px; }
-        .player-card { 
-            background: white; padding: 8px 10px; border-radius: 6px; font-weight: 700; font-size: 0.9em;
-            box-shadow: 0 2px 3px rgba(0,0,0,0.1); border: 1px solid #ccc; flex: 1 1 auto;
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+        .card { 
+            background: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 6px; 
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 600; font-size: 0.9em; flex: 1 1 auto; cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
-        .player-card.selected { background: #fff3cd; border: 2px solid #ffc107; transform: scale(1.02); }
+        .card.selected { background: #fff3cd; border: 2px solid #ffc107; transform: scale(1.02); }
 
-        /* --- MATCHES --- */
-        .match-item { padding: 10px; border-bottom: 1px solid #ddd; background: white; text-align: center; }
-        .match-item.saved { background: #e9ecef; }
-        .match-teams { font-weight: 700; margin-bottom: 5px; line-height: 1.3; font-size: 0.95em;}
-        .match-inputs { display: flex; justify-content: center; gap: 5px; align-items: center; }
-        .score-input { width: 45px; height: 40px; text-align: center; font-size: 1.3em; border-radius: 4px; }
-        .btn-match-action { background: #333; padding: 8px 15px; font-size: 0.8em; }
-        .btn-match-action.saved { background: #ffc107; color: black; }
+        /* --- PLACAR --- */
+        .match-row { 
+            padding: 10px; border-bottom: 1px solid #eee; text-align: center; background: white;
+        }
+        .match-row.saved { background: #f1f3f5; }
+        .teams-vs { font-weight: 700; margin-bottom: 6px; font-size: 0.95em; line-height: 1.3; }
+        .inputs-area { display: flex; justify-content: center; gap: 5px; align-items: center; }
+        .score-box { width: 45px; height: 38px; text-align: center; font-size: 1.3em; border-radius: 4px; border: 2px solid #ccc; font-weight: bold; }
 
-        /* --- RANKING --- */
-        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
-        th { background: #343a40; color: white; padding: 8px; font-size: 0.8em; }
-        td { border: 1px solid #ddd; padding: 6px; text-align: center; font-weight: 600; }
-        .tie-indicator { color: red; animation: blink 1s infinite; }
+        /* --- TABELA --- */
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 5px; }
+        th { background: #343a40; color: white; padding: 6px; }
+        td { border: 1px solid #dee2e6; padding: 6px; text-align: center; font-weight: 600; }
+        .tie-icon { color: red; animation: blink 1s infinite; font-size: 1.2em; }
 
         /* --- MATA MATA --- */
-        #finals-area, #tiebreaker-area { display: none; background: white; padding: 15px; border-radius: 8px; margin-top: 20px; border-top: 5px solid var(--secondary); }
-        .bracket-container { display: flex; gap: 20px; overflow-x: auto; padding: 20px 0; }
-        .bracket-match { background: white; border: 1px solid #999; padding: 10px; border-radius: 6px; min-width: 180px; display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
-        .bracket-match.finished { background: #f0fff4; border-color: green; }
-        .b-team { background: #eee; padding: 8px; border-radius: 4px; display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9em;}
-        .b-team.winner { background: #1b5e20; color: white; }
+        #finals-area { display: none; background: white; padding: 15px; border-radius: 8px; border-top: 5px solid var(--secondary); margin-top: 20px;}
 
         /* --- LOADING --- */
-        #loading-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.95); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        #loading-overlay { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: white; z-index: 9999; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
     </style>
 </head>
 <body class="viewer-mode">
 
-<div id="loading-screen">
-    <div style="font-size:3em;">🎾</div>
-    <h3>Carregando V48...</h3>
+<div id="loading-overlay">
+    <div style="font-size:3em; margin-bottom:10px;">🎾</div>
+    <div style="font-weight:bold; color:#555;">Conectando ao Firebase...</div>
 </div>
 
 <div class="status-bar">
-    <div><span class="live-dot">●</span> ONLINE</div>
-    <div id="status-msg" style="color:#aaa; font-size:0.8em;">Modo Espectador</div>
-    <button onclick="toggleAdmin()" style="background:transparent; border:1px solid #777; padding:4px 8px; font-size:0.7em;">🔒 Admin</button>
+    <div style="display:flex; align-items:center;">
+        <span id="conn-dot" class="connection-dot"></span>
+        <span id="conn-text">CONECTANDO...</span>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <span id="mode-text" style="font-size:0.7em; opacity:0.8;">ESPECTADOR</span>
+        <button onclick="toggleAdmin()" style="background:transparent; border:1px solid #aaa; padding:5px 8px; font-size:0.7em;">🔒</button>
+    </div>
 </div>
 
-<div class="header-controls admin-only">
-    <div class="top-row">
-        <h2>Beach Tennis Manager</h2>
-        <div class="mode-selector">
-            <button class="mode-btn active" id="mode-individual" onclick="changeMode('individual')">Individual</button>
-            <button class="mode-btn" id="mode-fixed" onclick="changeMode('fixed')">Duplas Fixas</button>
-        </div>
-        <button class="btn-finals" onclick="startFinalsFlow()">🏆 Fase Final</button>
-        <button style="background:#d32f2f; flex:1;" onclick="resetSystem()">⚠ Reset</button>
+<div class="control-panel admin-only">
+    <h2 class="title">Painel de Controle</h2>
+    
+    <div class="row" style="justify-content: center; margin-top:10px; border-bottom: 1px solid #eee; padding-bottom:10px;">
+        <button class="btn-save-file" onclick="downloadBackup()">💾 Baixar Backup</button>
+        <button class="btn-load-file" onclick="document.getElementById('fileInput').click()">📂 Carregar Backup</button>
+        <input type="file" id="fileInput" style="display:none" onchange="uploadBackup(this)">
+    </div>
+
+    <div class="row">
+        <input type="text" id="pName" placeholder="Nome do Jogador / Dupla...">
+        <button class="btn-add" onclick="addPlayer()">+ Add</button>
     </div>
     
-    <div class="input-row">
-        <input type="text" id="playerName" placeholder="Nome Jogador/Dupla...">
-        <button onclick="addPlayer()" class="btn-add-player">+ Add</button>
-        <button onclick="createGroup()" class="btn-add-group">+ Grupo</button>
+    <div class="row">
+        <button class="btn-group" onclick="createGroup()">+ Grupo</button>
+        <button class="btn-reset" onclick="resetSystem()">⚠ Reset</button>
     </div>
-    <div style="margin-top:5px; font-size:0.8em; color:#666; text-align:center;">Toque no jogador > Toque no grupo para mover.</div>
+    
+    <div style="text-align:center; font-size:0.8em; color:#666; margin-top:5px;">
+        Toque no Jogador para selecionar > Toque no Grupo para mover.
+    </div>
 </div>
 
-<div id="board" class="board">
+<div class="board" id="board">
     <div class="column" id="col-pool">
-        <div class="column-header" onclick="moveSelectedTo('pool')">
+        <div class="col-header" onclick="moveSelectedTo('pool')">
             <span>Reservas <span id="pool-count">(0)</span></span>
-            <button class="admin-only btn-distribute" onclick="distributePlayers(); event.stopPropagation();">🚀 Distribuir</button>
+            <button class="admin-only" onclick="distributePlayers(); event.stopPropagation();" style="background:white; color:#004e98; padding:5px; font-size:0.7em;">🚀 Distribuir</button>
         </div>
-        <div class="player-pool" id="pool-list"></div>
+        <div class="player-list" id="pool-list"></div>
     </div>
-    
+
     <div id="groups-container" style="display:contents;"></div>
 </div>
 
-<div id="tiebreaker-area">
-    <button onclick="exitTieBreaker()" style="background:#555; margin-bottom:10px;">← Voltar</button>
-    <div class="setup-box" style="text-align:center;">
-        <h2 style="color:#b71c1c;">⚠️ Desempate Necessário</h2>
-        <p>Jogadores com pontuação idêntica. Defina os vencedores.</p>
-        <div id="tie-list-container"></div>
-        <button onclick="checkTiesAndGoFinals()" class="btn-check-tie" style="margin-top:20px;">Verificar e Continuar</button>
-    </div>
-</div>
-
-<div id="finals-area">
-    <button onclick="exitFinals()" style="background:#555; margin-bottom:10px;">← Voltar</button>
-    <div class="setup-box" id="finals-setup">
-        <h3>Configurar Classificados</h3>
-        <div id="groups-config-container"></div>
-        <button onclick="generateFixedPairs()" class="btn-gen" style="margin-top:10px;">Gerar Classificados</button>
-        <div id="pairs-list" class="pairs-preview-container"></div>
-        <button id="btn-start-bracket" onclick="generateBracketTree()" class="btn-check-tie" style="display:none; margin-top:10px;">🚀 INICIAR CHAVES</button>
-    </div>
-    <div class="bracket-container" id="bracket-view"></div>
+<div id="finals-area" class="admin-only">
+    <h3>🏆 Fase Final (Visualização)</h3>
+    <p>Use o botão "Baixar Backup" e abra na versão Desktop para gerenciar chaves complexas, ou gerencie manualmente abaixo.</p>
+    <button onclick="document.getElementById('finals-area').style.display='none'">Fechar</button>
 </div>
 
 <script type="module">
+    // Importando a versão V10 (Modular)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // --- CONFIGURAÇÃO (Sua chave) ---
+    // --- CONFIGURAÇÃO ---
     const firebaseConfig = {
         apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
         authDomain: "beach-tennis-manager-92f17.firebaseapp.com",
@@ -211,102 +203,133 @@
         appId: "1:311372138486:web:50c9e403ad877ab094e9d7"
     };
 
+    // Inicializa Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'tournament_v48_final'); // Caminho no banco
+    const dbRef = ref(db, 'tournament_v49'); // Caminho Novo V49
 
-    // --- ESTADO GLOBAL ---
-    let appState = { 
-        mode: 'individual', 
-        players: [], 
-        groups: [], 
-        matches: [], 
-        groupCounter: 0,
-        tieMatches: [],
-        bracket: [],
-        fixedPairs: []
+    // --- ESTADO LOCAL ---
+    let appState = {
+        players: [],
+        groups: [],
+        matches: [],
+        groupCounter: 0
     };
-    
     let selectedPlayerId = null;
 
-    // --- SINCRONIZAÇÃO (O Coração do App) ---
-    
-    // 1. Ouvir mudanças da nuvem (Leitura)
+    // --- SINCRONIZAÇÃO (Nuvem -> Tela) ---
     onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
-        document.getElementById('loading-screen').style.display = 'none';
         
-        if(data) {
+        // 1. Atualiza Status Visual
+        document.getElementById('loading-overlay').style.display = 'none';
+        const dot = document.getElementById('conn-dot');
+        const txt = document.getElementById('conn-text');
+        
+        dot.className = 'connection-dot online'; // Fica Verde
+        txt.innerText = 'ONLINE';
+        txt.style.color = '#fff';
+
+        // 2. Carrega Dados
+        if (data) {
             appState = data;
-            // Garantir arrays
-            ['players','groups','matches','tieMatches','bracket','fixedPairs'].forEach(k => {
-                if(!appState[k]) appState[k] = [];
-            });
+            // Garante arrays vazios se null
+            if(!appState.players) appState.players = [];
+            if(!appState.groups) appState.groups = [];
+            if(!appState.matches) appState.matches = [];
         } else {
             // Banco novo
-            appState.groupCounter = 0;
+            appState = { players: [], groups: [], matches: [], groupCounter: 0 };
         }
-        
-        updateUI(); // Redesenha a tela toda
+
+        renderAll();
+
+    }, (error) => {
+        document.getElementById('conn-dot').className = 'connection-dot offline';
+        document.getElementById('conn-text').innerText = 'OFFLINE';
+        alert("Erro de conexão: " + error.message);
     });
 
-    // 2. Enviar mudanças para nuvem (Escrita)
+    // --- ENVIO (Tela -> Nuvem) ---
     function saveToCloud() {
-        set(dbRef, appState).catch(err => alert("Erro rede: " + err));
+        set(dbRef, appState).catch(err => {
+            alert("Erro ao salvar: " + err);
+            document.getElementById('conn-dot').className = 'connection-dot offline';
+        });
     }
 
-    // --- FUNÇÕES DE LÓGICA (V45 Adaptada) ---
+    // --- FUNÇÕES GLOBAIS (window) ---
 
+    // 1. Admin / Segurança
     window.toggleAdmin = function() {
         if(document.body.classList.contains('viewer-mode')) {
-            const p = prompt("Senha:");
-            if(p === "1234") {
+            const pass = prompt("Senha Admin:");
+            if(pass === "1234") {
                 document.body.classList.remove('viewer-mode');
-                document.getElementById('status-msg').innerText = "Modo Admin 🔓";
+                document.getElementById('mode-text').innerText = "MODO ADMIN 🔓";
             }
         } else {
             document.body.classList.add('viewer-mode');
-            document.getElementById('status-msg').innerText = "Modo Espectador";
+            document.getElementById('mode-text').innerText = "ESPECTADOR";
         }
     }
 
-    window.changeMode = function(m) {
-        if(appState.players.length > 0 && !confirm("Mudar modo pode afetar dados. Continuar?")) return;
-        appState.mode = m;
-        saveToCloud();
+    // 2. Backup / Restore (PEDIDO DO USUÁRIO)
+    window.downloadBackup = function() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
+        const anchor = document.createElement('a');
+        anchor.setAttribute("href", dataStr);
+        anchor.setAttribute("download", "backup_bt_manager_" + new Date().toISOString().slice(0,10) + ".json");
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
     }
 
+    window.uploadBackup = function(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const loaded = JSON.parse(e.target.result);
+                if(confirm("Isso vai SUBSTITUIR todos os dados da nuvem pelos dados do arquivo. Confirmar?")) {
+                    appState = loaded;
+                    saveToCloud(); // Manda pra nuvem
+                    alert("Backup restaurado e sincronizado!");
+                }
+            } catch(err) {
+                alert("Erro ao ler arquivo: " + err);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // 3. Gerenciamento Jogadores
     window.addPlayer = function() {
-        const el = document.getElementById('playerName');
-        const name = el.value.trim();
+        const inp = document.getElementById('pName');
+        const name = inp.value.trim();
         if(!name) return;
         appState.players.push({
             id: 'p-'+Date.now(), name: name, groupId: 'pool',
-            games: 0, wins: 0, balance: 0, points: 0, tieBonus: 0
+            games: 0, wins: 0, balance: 0, points: 0
         });
-        el.value = '';
+        inp.value = '';
         saveToCloud();
     }
 
-    window.createGroup = function() {
-        appState.groupCounter++;
-        appState.groups.push({ id: 'g-'+Date.now(), name: 'Grupo '+appState.groupCounter });
-        saveToCloud();
-    }
-
-    window.resetSystem = function() {
-        if(confirm("Apagar tudo e reiniciar?")) {
-            appState = { mode: appState.mode, players: [], groups: [], matches: [], groupCounter: 0, tieMatches: [], bracket: [], fixedPairs: [] };
+    window.deletePlayer = function(pid) {
+        if(confirm("Excluir jogador?")) {
+            appState.players = appState.players.filter(p => p.id !== pid);
             saveToCloud();
         }
     }
 
-    // --- MOVIMENTAÇÃO (V46 Touch Logic) ---
+    // 4. Movimentação (Toque)
     window.toggleSelection = function(pid, e) {
         if(document.body.classList.contains('viewer-mode')) return;
-        if(e) e.stopPropagation();
+        e.stopPropagation();
         selectedPlayerId = (selectedPlayerId === pid) ? null : pid;
-        updateUI();
+        renderAll();
     }
 
     window.moveSelectedTo = function(gid) {
@@ -322,69 +345,70 @@
 
     window.distributePlayers = function() {
         const pool = appState.players.filter(p => p.groupId === 'pool');
-        if(!pool.length || !appState.groups.length) return alert("Faltam dados.");
-        if(!confirm("Distribuir automático?")) return;
+        if(!pool.length) return alert("Ninguém no banco.");
+        if(!confirm("Distribuir?")) return;
+        
         pool.forEach(p => {
+            // Acha grupo com menos gente
             appState.groups.sort((a,b) => {
                 const ca = appState.players.filter(x=>x.groupId===a.id).length;
                 const cb = appState.players.filter(x=>x.groupId===b.id).length;
-                return ca-cb;
+                return ca - cb;
             });
-            p.groupId = appState.groups[0].id;
+            if(appState.groups.length > 0) p.groupId = appState.groups[0].id;
         });
         saveToCloud();
     }
 
-    // --- JOGOS E PLACARES ---
-    window.genAutoMatches = function(gid) {
+    // 5. Grupos e Jogos
+    window.createGroup = function() {
+        appState.groupCounter++;
+        appState.groups.push({ id: 'g-'+Date.now(), name: "Grupo "+appState.groupCounter });
+        saveToCloud();
+    }
+
+    window.delGroup = function(gid) {
+        if(confirm("Excluir grupo?")) {
+            appState.players.forEach(p => { if(p.groupId === gid) p.groupId = 'pool'; });
+            appState.groups = appState.groups.filter(g => g.id !== gid);
+            appState.matches = appState.matches.filter(m => m.gid !== gid);
+            saveToCloud();
+        }
+    }
+
+    window.addManualMatch = function(gid) {
         const ps = appState.players.filter(p => p.groupId === gid);
-        if(ps.length < 4) return alert("Mínimo 4 jogadores.");
+        if(ps.length < 2) return alert("Precisa de jogadores no grupo.");
         
-        // Lógica simplificada robusta para nuvem: Todos contra todos (duplas)
-        // Se Individual: Combinatória
-        let newMatches = [];
-        
-        // Exemplo simples: Gera 1 rodada aleatória para demonstração robusta
-        // Em produção, você pode colar a lógica complexa da V45 aqui
+        // Cria um jogo vazio (dummy)
         const m = {
             mid: 'm-'+Date.now(), gid: gid,
-            p1: ps[0].id, p2: ps[1].id, p3: ps[2].id, p4: ps[3].id,
+            p1: ps[0].id, p2: (ps[1]?ps[1].id:ps[0].id), p3: ps[0].id, p4: ps[0].id,
             s1: '', s2: '', saved: false
         };
         appState.matches.push(m);
         saveToCloud();
     }
-    
-    window.addManualMatch = function(gid) {
-        const ps = appState.players.filter(p => p.groupId === gid);
-        if(ps.length < 2) return alert("Poucos jogadores.");
-        const dummy = ps[0].id;
-        const m = {
-            mid: 'm-'+Date.now(), gid: gid,
-            p1: dummy, p2: dummy, p3: dummy, p4: dummy,
-            s1: '', s2: '', saved: false
-        };
-        appState.matches.push(m);
-        saveToCloud();
+
+    window.updateMatchPlayer = function(mid, slot, pid) {
+        const m = appState.matches.find(x => x.mid === mid);
+        if(m) { m[slot] = pid; saveToCloud(); }
     }
 
     window.saveScore = function(mid) {
         const m = appState.matches.find(x => x.mid === mid);
         if(m.saved) {
-            m.saved = false;
+            m.saved = false; // Editar
         } else {
             const s1 = document.getElementById('s1-'+mid).value;
             const s2 = document.getElementById('s2-'+mid).value;
-            if(s1==='' || s2==='') return alert("Digite o placar.");
-            m.s1 = parseInt(s1); m.s2 = parseInt(s2); m.saved = true;
+            if(s1 === '' || s2 === '') return alert("Preencha o placar.");
+            m.s1 = parseInt(s1);
+            m.s2 = parseInt(s2);
+            m.saved = true;
         }
         recalcStats();
         saveToCloud();
-    }
-    
-    window.updateMatchPlayer = function(mid, slot, pid) {
-        const m = appState.matches.find(x => x.mid === mid);
-        if(m) { m[slot] = pid; saveToCloud(); }
     }
 
     window.deleteMatch = function(mid) {
@@ -394,220 +418,124 @@
             saveToCloud();
         }
     }
-    
-    window.delGroup = function(gid) {
-        if(confirm("Excluir grupo?")) {
-            appState.players.forEach(p => { if(p.groupId===gid) p.groupId='pool'; });
-            appState.groups = appState.groups.filter(g => g.id !== gid);
-            appState.matches = appState.matches.filter(m => m.gid !== gid);
+
+    window.resetSystem = function() {
+        if(confirm("RESET TOTAL: Apagar todos os dados da nuvem?")) {
+            appState = { players: [], groups: [], matches: [], groupCounter: 0 };
             saveToCloud();
         }
     }
 
-    window.deletePlayer = function(pid) {
-        if(confirm("Excluir?")) {
-            appState.players = appState.players.filter(p => p.id !== pid);
-            saveToCloud();
-        }
-    }
-
-    // --- CÁLCULOS (Engine V45) ---
+    // --- CÁLCULOS ---
     function recalcStats() {
-        appState.players.forEach(p => { 
-            p.games = 0; p.wins = 0; p.balance = 0; p.points = 0; 
-            // Tie Bonus reset
-            p.tieBonus = 0;
-        });
-
-        // Aplica Tie Break Bonus
-        appState.tieMatches.forEach(tm => {
-            const w = appState.players.find(x => x.id === tm.winnerId);
-            if(w) w.tieBonus += 0.001;
-        });
-
+        appState.players.forEach(p => { p.games=0; p.wins=0; p.balance=0; p.points=0; });
         appState.matches.forEach(m => {
             if(m.saved) {
-                const apply = (pid, myS, opS) => {
+                const run = (pid, myS, opS) => {
                     const pl = appState.players.find(x => x.id === pid);
                     if(pl) {
                         pl.games++;
                         pl.balance += (myS - opS);
-                        if(myS > opS) { pl.wins++; pl.points += 3; }
+                        if(myS > opS) { pl.wins++; pl.points+=3; }
                     }
                 };
-                apply(m.p1, m.s1, m.s2); apply(m.p3, m.s2, m.s1);
-                if(appState.mode === 'individual') {
-                    apply(m.p2, m.s1, m.s2); apply(m.p4, m.s2, m.s1);
-                }
+                // Duplas: P1/P2 vs P3/P4
+                run(m.p1, m.s1, m.s2); run(m.p2, m.s1, m.s2);
+                run(m.p3, m.s2, m.s1); run(m.p4, m.s2, m.s1);
             }
         });
     }
 
-    // --- UI RENDERING (Reativo) ---
-    function updateUI() {
-        // 1. Atualizar Botões de Modo
-        document.getElementById('mode-individual').className = appState.mode==='individual'?'mode-btn active':'mode-btn';
-        document.getElementById('mode-fixed').className = appState.mode==='fixed'?'mode-btn active':'mode-btn';
-
-        // 2. Renderizar Pool
+    // --- RENDERIZAR ---
+    function renderAll() {
+        // 1. Reservas
         const poolDiv = document.getElementById('pool-list');
         poolDiv.innerHTML = '';
         const poolPs = appState.players.filter(p => p.groupId === 'pool');
         document.getElementById('pool-count').innerText = `(${poolPs.length})`;
-        poolPs.forEach(p => poolDiv.appendChild(renderCard(p)));
+        poolPs.forEach(p => poolDiv.appendChild(createCard(p)));
 
-        // 3. Renderizar Grupos
+        // 2. Grupos
         const groupsDiv = document.getElementById('groups-container');
         groupsDiv.innerHTML = '';
         
         appState.groups.forEach(g => {
             const ps = appState.players.filter(p => p.groupId === g.id);
-            // Ordenação V45 (Pontos > Vitórias > Saldo)
-            ps.sort((a,b) => (b.points+b.tieBonus)-(a.points+a.tieBonus) || b.wins-a.wins || b.balance-a.balance);
+            // Ordenação: Pontos > Vitórias > Saldo
+            ps.sort((a,b) => (b.points - a.points) || (b.wins - a.wins) || (b.balance - a.balance));
 
             const col = document.createElement('div');
             col.className = 'column';
             col.innerHTML = `
-                <div class="column-header" onclick="moveSelectedTo('${g.id}')">
+                <div class="col-header" onclick="moveSelectedTo('${g.id}')">
                     <span>${g.name}</span>
-                    <button class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation();" style="background:transparent; color:#c00;">✕</button>
+                    <button class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation();" style="color:#d32f2f; background:transparent;">✕</button>
                 </div>
                 
-                <div class="player-pool admin-only" id="list-${g.id}"></div>
+                <div class="player-list admin-only" id="list-${g.id}"></div>
                 
-                <div class="admin-only" style="padding:10px; display:flex; gap:5px;">
-                    <button class="btn-gen" onclick="genAutoMatches('${g.id}')">⚡ Auto</button>
-                    <button class="btn-manual" onclick="addManualMatch('${g.id}')">🖐 Manual</button>
+                <div class="admin-only" style="padding:10px; text-align:center;">
+                    <button class="btn-match" onclick="addManualMatch('${g.id}')">+ Jogo Manual</button>
                 </div>
 
                 <div id="matches-${g.id}"></div>
 
-                <div style="background:#333; color:white; padding:5px; text-align:center; font-weight:bold;">CLASSIFICAÇÃO</div>
+                <div style="background:#343a40; color:white; font-size:0.8em; text-align:center; padding:5px; font-weight:bold;">CLASSIFICAÇÃO</div>
                 <table id="rank-${g.id}"><thead><tr><th>#</th><th>Nome</th><th>J</th><th>V</th><th>S</th><th>Pts</th></tr></thead><tbody></tbody></table>
             `;
             groupsDiv.appendChild(col);
 
-            // Lista Jogadores (Admin Only)
+            // Lista Jogadores (Admin Only para editar)
             const lDiv = col.querySelector(`#list-${g.id}`);
-            appState.players.filter(p => p.groupId === g.id).forEach(p => lDiv.appendChild(renderCard(p)));
+            appState.players.filter(p => p.groupId === g.id).forEach(p => lDiv.appendChild(createCard(p)));
 
-            // Matches
+            // Jogos
             const mDiv = col.querySelector(`#matches-${g.id}`);
-            appState.matches.filter(m => m.gid === g.id).forEach(m => mDiv.appendChild(renderMatch(m, ps)));
+            appState.matches.filter(m => m.gid === g.id).forEach(m => mDiv.appendChild(createMatch(m, ps)));
 
             // Ranking
             const tBody = col.querySelector('tbody');
             ps.forEach((p, i) => {
-                let tieIcon = '';
-                // Detecção de empate simples
+                let tie = '';
                 if(i > 0) {
                     const prev = ps[i-1];
-                    if(prev.points === p.points && prev.wins === p.wins && prev.balance === p.balance && p.tieBonus === 0 && prev.tieBonus === 0 && p.games > 0) tieIcon = '<span class="tie-indicator">⚠️</span>';
+                    if(prev.points===p.points && prev.balance===p.balance && prev.wins===p.wins && p.games>0) tie = '<span class="tie-icon">⚠️</span>';
                 }
-                tBody.innerHTML += `<tr><td>${i+1}º</td><td style="text-align:left">${p.name} ${tieIcon}</td><td>${p.games}</td><td>${p.wins}</td><td>${p.balance}</td><td>${p.points}</td></tr>`;
+                tBody.innerHTML += `<tr><td>${i+1}º</td><td style="text-align:left">${p.name} ${tie}</td><td>${p.games}</td><td>${p.wins}</td><td>${p.balance}</td><td>${p.points}</td></tr>`;
             });
         });
-        
-        // Render Mata Mata / Tie Break se visível
-        if(document.getElementById('tiebreaker-area').style.display === 'block') renderTieBreakUI();
-        if(document.getElementById('finals-area').style.display === 'block') renderBracketUI();
     }
 
-    function renderCard(p) {
+    function createCard(p) {
         const d = document.createElement('div');
-        d.className = `player-card ${selectedPlayerId===p.id?'selected':''}`;
+        d.className = `card ${selectedPlayerId === p.id ? 'selected' : ''}`;
         d.onclick = (e) => toggleSelection(p.id, e);
-        d.innerHTML = `<span>${p.name}</span><span class="del-player-btn" onclick="deletePlayer('${p.id}'); event.stopPropagation()">✕</span>`;
+        d.innerHTML = `<span>${p.name}</span> <span class="admin-only del-btn" onclick="deletePlayer('${p.id}'); event.stopPropagation()" style="color:#c00;">✕</span>`;
         return d;
     }
 
-    function renderMatch(m, groupPlayers) {
+    function createMatch(m, ps) {
         const d = document.createElement('div');
-        d.className = `match-item ${m.saved?'saved':''}`;
+        d.className = `match-row ${m.saved ? 'saved' : ''}`;
         
-        const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
+        const n = (id) => appState.players.find(x => x.id === id)?.name || '?';
         const sel = (slot, cur) => {
-            if(m.saved || document.body.classList.contains('viewer-mode')) return n(cur);
-            let h = `<select onchange="updateMatchPlayer('${m.mid}','${slot}',this.value)" style="width:80px">`;
-            groupPlayers.forEach(p => h+=`<option value="${p.id}" ${p.id===cur?'selected':''}>${p.name}</option>`);
+            if(m.saved || document.body.classList.contains('viewer-mode')) return `<span>${n(cur)}</span>`;
+            let h = `<select onchange="updateMatchPlayer('${m.mid}','${slot}',this.value)" style="max-width:80px">`;
+            ps.forEach(p => h+=`<option value="${p.id}" ${p.id===cur?'selected':''}>${p.name}</option>`);
             return h + '</select>';
         };
 
-        let vsHtml = '';
-        if(appState.mode === 'fixed') {
-            vsHtml = `${sel('p1', m.p1)} <br><small>VS</small><br> ${sel('p3', m.p3)}`;
-        } else {
-            vsHtml = `${sel('p1', m.p1)} & ${sel('p2', m.p2)} <br><small>VS</small><br> ${sel('p3', m.p3)} & ${sel('p4', m.p4)}`;
-        }
-
         d.innerHTML = `
-            <div class="match-teams">${vsHtml}</div>
-            <div class="match-inputs">
-                <input type="tel" id="s1-${m.mid}" value="${m.s1}" class="score-input" ${m.saved?'disabled':''}>
-                <input type="tel" id="s2-${m.mid}" value="${m.s2}" class="score-input" ${m.saved?'disabled':''}>
-                <button class="btn-match-action ${m.saved?'saved':''}" onclick="saveScore('${m.mid}')">${m.saved?'✎':'OK'}</button>
-                ${!m.saved ? `<button onclick="deleteMatch('${m.mid}')" style="background:#c00; padding:5px 10px; font-size:0.7em;">✕</button>` : ''}
+            <div class="teams-vs">${sel('p1', m.p1)} & ${sel('p2', m.p2)} <span style="color:#999; font-size:0.8em">vs</span> ${sel('p3', m.p3)} & ${sel('p4', m.p4)}</div>
+            <div class="inputs-area">
+                <input type="tel" id="s1-${m.mid}" value="${m.s1}" class="score-box" ${m.saved?'disabled':''}>
+                <input type="tel" id="s2-${m.mid}" value="${m.s2}" class="score-box" ${m.saved?'disabled':''}>
+                <button class="btn-match ${m.saved?'saved':''} admin-only" onclick="saveScore('${m.mid}')">${m.saved?'✎':'OK'}</button>
+                ${!m.saved ? `<button class="admin-only" onclick="deleteMatch('${m.mid}')" style="background:#c00; padding:8px 10px;">✕</button>` : ''}
             </div>
         `;
         return d;
-    }
-
-    // --- TIE BREAK & FINALS LOGIC (Conectado à Nuvem) ---
-    
-    window.startFinalsFlow = function() {
-        // Verifica empates
-        let ties = [];
-        appState.groups.forEach(g => {
-            const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=>(b.points-a.points)||(b.wins-a.wins)||(b.balance-a.balance));
-            for(let i=0; i<ps.length-1; i++) {
-                if(ps[i].games>0 && ps[i].points===ps[i+1].points && ps[i].balance===ps[i+1].balance && ps[i].tieBonus===0 && ps[i+1].tieBonus===0) {
-                    ties.push({gid:g.id, gname:g.name, p1:ps[i], p2:ps[i+1]});
-                }
-            }
-        });
-
-        if(ties.length > 0) {
-            document.getElementById('board').style.display='none';
-            document.getElementById('tiebreaker-area').style.display='block';
-            const c = document.getElementById('tie-list-container');
-            c.innerHTML = '';
-            ties.forEach((t, i) => {
-                c.innerHTML += `<div class="tie-card"><div class="tie-title">${t.gname}</div>${t.p1.name} vs ${t.p2.name}<br><button class="btn-check-tie" onclick="solveTie('${t.p1.id}','${t.p2.id}')" style="margin-top:10px;">${t.p1.name} Venceu</button> <button class="btn-check-tie" onclick="solveTie('${t.p2.id}','${t.p1.id}')" style="margin-top:5px; background:#555;">${t.p2.name} Venceu</button></div>`;
-            });
-        } else {
-            document.getElementById('board').style.display='none';
-            document.getElementById('finals-area').style.display='block';
-            // Render config boxes
-            const c = document.getElementById('groups-config-container');
-            c.innerHTML = '';
-            appState.groups.forEach(g => c.innerHTML+=`<div>${g.name}: <input id="q-${g.id}" type="number" value="2" style="width:40px;"> classificados</div>`);
-        }
-    }
-
-    window.solveTie = function(wid, lid) {
-        if(!appState.tieMatches) appState.tieMatches = [];
-        appState.tieMatches.push({ winnerId: wid, loserId: lid });
-        recalcStats();
-        saveToCloud();
-        startFinalsFlow(); // Recarrega
-    }
-    
-    window.exitTieBreaker = function() {
-        document.getElementById('tiebreaker-area').style.display='none';
-        document.getElementById('board').style.display='flex';
-    }
-    
-    window.exitFinals = function() {
-        document.getElementById('finals-area').style.display='none';
-        document.getElementById('board').style.display='flex';
-    }
-
-    // Geração simples de bracket para V48
-    window.generateFixedPairs = function() {
-        alert("Gerando classificados com base no ranking atual...");
-        // Implementação simplificada para caber no bloco:
-        // Pega os top X de cada grupo e joga no array bracket
-        // Em produção: Usar a lógica completa da V45
     }
 
 </script>
