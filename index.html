@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Arena - V76 (Login Celular)</title>
+    <title>BT Arena - V78 (Favoritos)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -18,6 +18,7 @@
             --text-dark: #333;
             --blue-masc: #2196F3;
             --pink-fem: #E91E63;
+            --fav-color: #ff3b30;
         }
 
         body { 
@@ -42,7 +43,7 @@
         .nav-user:active { background: #eee; }
         .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd; object-fit: cover; }
         .user-name { font-size: 0.8em; font-weight: 600; color: #555; display: none; }
-        @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.2em; } }
+        @media(min-width: 600px) { .user-name { display: block; } }
 
         /* TELAS */
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
@@ -77,13 +78,22 @@
         .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
         .bg-tourney .material-icons { font-size: 4em; color: white; opacity: 0.3; }
 
-        /* AÇÕES CARD */
+        /* AÇÕES CARD (EDIT/DELETE) */
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
         .btn-icon-circle {
             width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.9);
             color: #333; display: flex; justify-content: center; align-items: center;
             font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer;
         }
+
+        /* FAVORITO HEART */
+        .card-fav {
+            position: absolute; top: 10px; left: 10px; z-index: 10;
+            color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-size: 1.5em; transition: transform 0.2s;
+        }
+        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        .card-fav:active { transform: scale(0.9); }
 
         .btn-add-float {
             position: fixed; bottom: 60px; right: 20px; width: 56px; height: 56px; 
@@ -102,8 +112,8 @@
         }
         .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
 
-        /* MODAL GERAL */
-        #modal-overlay, #modal-login { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        /* MODAL */
+        #modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
         .modal-title { margin: 0 0 20px; font-size: 1.3em; color: var(--secondary); text-align: center; }
         .modal-label { font-size: 0.9em; color: #666; margin-bottom: 5px; display: block; font-weight: 600; margin-top: 10px; text-align: left; }
@@ -116,7 +126,6 @@
             color: white; font-size: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .btn-google { background: #db4437; }
-        .btn-phone { background: #25D366; } /* Cor WhatsApp/Phone */
         .btn-logout { background: #555; }
 
         /* TABS */
@@ -175,8 +184,6 @@
     <b>Carregando...</b>
 </div>
 
-<div id="recaptcha-container"></div>
-
 <div class="navbar">
     <div class="nav-logo">
         <span>🎾</span>
@@ -185,7 +192,7 @@
             <small style="font-weight:400; color:#666;">por Lucas Sibie</small>
         </div>
     </div>
-    <div class="nav-user" onclick="openLoginModal()">
+    <div class="nav-user" onclick="doGoogleLogin()">
         <span id="nav-username" class="user-name">Visitante</span>
         <img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
     </div>
@@ -283,42 +290,6 @@
     Desenvolvido por <a href="https://instagram.com/lsibie" target="_blank">@LSIBIE</a>
 </div>
 
-<div id="modal-login">
-    <div class="modal-box">
-        <h3 class="modal-title">Entrar no BT Arena</h3>
-        
-        <div id="login-view-main">
-            <button class="btn-login-opt btn-google" onclick="doGoogleLogin()">
-                <span style="background:white; color:#db4437; border-radius:50%; width:20px; height:20px; display:flex; justify-content:center; align-items:center; font-weight:900;">G</span> 
-                Google (Gmail)
-            </button>
-            
-            <button class="btn-login-opt btn-phone" onclick="showPhoneInput()">
-                <span class="material-icons">smartphone</span> 
-                Celular (SMS)
-            </button>
-
-            <button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button>
-        </div>
-
-        <div id="login-view-phone" style="display:none;">
-            <label class="modal-label">Seu Número com DDD</label>
-            <input type="tel" id="inp-phone-num" class="inp-std auth-input" placeholder="+55 43 99999-9999" style="font-size:1.2em; text-align:center;">
-            <p style="font-size:0.8em; color:#777;">Enviaremos um SMS com o código.</p>
-            <button class="btn-std btn-green" onclick="sendPhoneCode()">Enviar SMS</button>
-            <button class="btn-std btn-red" onclick="resetLoginView()" style="margin-top:10px;">Voltar</button>
-        </div>
-
-        <div id="login-view-code" style="display:none;">
-            <label class="modal-label">Código SMS</label>
-            <input type="number" id="inp-phone-code" class="inp-std auth-input" placeholder="123456" style="font-size:1.5em; text-align:center; letter-spacing:5px;">
-            <button class="btn-std btn-green" onclick="verifyPhoneCode()">Confirmar</button>
-            <button class="btn-std btn-red" onclick="resetLoginView()" style="margin-top:10px;">Cancelar</button>
-        </div>
-
-    </div>
-</div>
-
 <div id="modal-overlay">
     <div class="modal-box">
         <h3 class="modal-title" id="modal-h3">Criar</h3>
@@ -385,7 +356,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, RecaptchaVerifier, signInWithPhoneNumber, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
@@ -401,7 +372,6 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    auth.useDeviceLanguage(); // Usa idioma do celular para o SMS
     const db = getDatabase(app);
     const googleProvider = new GoogleAuthProvider();
 
@@ -413,18 +383,10 @@
     let appRef = null;
     let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
     let selectedPid = null;
+    let favorites = {}; // Store user favorites
 
     // --- INIT ---
     window.onload = () => {
-        // Setup Recaptcha Invisible
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-            'size': 'invisible',
-            'callback': (response) => {
-                // reCAPTCHA solved, allow signInWithPhoneNumber.
-            }
-        });
-
-        // Deep Link
         const hash = window.location.hash.substring(1);
         if(hash && hash.includes('/')) {
             const [a, c, t] = hash.split('/');
@@ -441,76 +403,48 @@
         user = u;
         if(user) {
             document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-            let display = user.displayName;
-            if(!display && user.phoneNumber) display = user.phoneNumber;
-            if(!display) display = "Usuário";
-            document.getElementById('nav-username').innerText = display;
+            document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : "Usuário";
             document.getElementById('btn-add-arena').style.display = 'flex'; 
             document.getElementById('msg-login').style.display = 'none';
             if(curArenaId) loadArenaPlayers(curArenaId);
+            
+            // Load Favorites
+            onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
+                favorites = snap.val() || {};
+                // If on arenas screen, refresh to show heart status
+                if(document.getElementById('screen-arenas').classList.contains('active')) loadArenas();
+            });
+
         } else {
             document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = "Visitante";
             document.getElementById('btn-add-arena').style.display = 'none';
             document.getElementById('msg-login').style.display = 'block';
+            favorites = {};
+            loadArenas(); 
         }
-        loadArenas(); 
     });
 
-    window.openLoginModal = () => {
+    window.doGoogleLogin = async () => {
         if(user) { 
-            if(confirm(`Sair da conta?`)) signOut(auth); 
+            if(confirm("Sair da conta?")) signOut(auth); 
         } else {
-            resetLoginView();
-            document.getElementById('modal-login').style.display = 'flex';
+            try { await signInWithPopup(auth, googleProvider); } 
+            catch(e) { alert("Erro Google: " + e.message); }
         }
     }
-    window.closeLoginModal = () => { document.getElementById('modal-login').style.display = 'none'; }
 
-    // LOGIN GOOGLE
-    window.doGoogleLogin = async () => {
-        try { await signInWithPopup(auth, googleProvider); closeLoginModal(); } 
-        catch(e) { alert("Erro Google: " + e.message); }
-    }
-
-    // LOGIN PHONE LOGIC
-    window.resetLoginView = () => {
-        document.getElementById('login-view-main').style.display = 'block';
-        document.getElementById('login-view-phone').style.display = 'none';
-        document.getElementById('login-view-code').style.display = 'none';
-    }
-    window.showPhoneInput = () => {
-        document.getElementById('login-view-main').style.display = 'none';
-        document.getElementById('login-view-phone').style.display = 'block';
-    }
-    
-    window.sendPhoneCode = () => {
-        const phone = document.getElementById('inp-phone-num').value;
-        if(!phone) return alert("Digite o número com DDD (ex: +5543...)");
+    // --- FAVORITES SYSTEM ---
+    window.toggleFavorite = (id, e) => {
+        e.stopPropagation();
+        if(!user) return alert("Faça login para favoritar.");
         
-        const appVerifier = window.recaptchaVerifier;
-        signInWithPhoneNumber(auth, phone, appVerifier)
-            .then((confirmationResult) => {
-                window.confirmationResult = confirmationResult;
-                document.getElementById('login-view-phone').style.display = 'none';
-                document.getElementById('login-view-code').style.display = 'block';
-            }).catch((error) => {
-                alert("Erro ao enviar SMS: " + error.message);
-                console.error(error);
-                appVerifier.render().then(function(widgetId) { grecaptcha.reset(widgetId); });
-            });
-    }
-
-    window.verifyPhoneCode = () => {
-        const code = document.getElementById('inp-phone-code').value;
-        if(!code) return alert("Digite o código.");
-        
-        window.confirmationResult.confirm(code).then((result) => {
-            closeLoginModal();
-            // User signed in
-        }).catch((error) => {
-            alert("Código inválido!");
-        });
+        const isFav = favorites[id] ? null : true; // Toggle
+        update(ref(db, `users/${user.uid}/favorites`), { [id]: isFav });
+        // The listener on 'favorites' will trigger UI refresh automatically if needed, 
+        // but for immediate feedback on the icon:
+        e.target.classList.toggle('active');
+        e.target.innerText = isFav ? 'favorite' : 'favorite_border';
     }
 
     // --- SCOPED AUTOCOMPLETE ---
@@ -651,7 +585,15 @@
             const list = document.getElementById('grid-arenas'); list.innerHTML = '';
             const data = snap.val();
             if(!data) return; 
-            Object.keys(data).forEach(key => {
+            
+            // Sort keys based on Favorites (Favs first)
+            const keys = Object.keys(data).sort((a,b) => {
+                const favA = favorites[a] ? 1 : 0;
+                const favB = favorites[b] ? 1 : 0;
+                return favB - favA; // Higher first
+            });
+
+            keys.forEach(key => {
                 const d = data[key];
                 const isOwner = user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email));
                 list.appendChild(createCard(key, d.name, d.img, isOwner, 'arena', () => enterArena(key, d)));
@@ -673,8 +615,14 @@
             content = `<img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">`;
         }
 
+        // Favorites Icon Logic (Only for Arena/Tourney usually, putting on all for now)
+        const isFav = favorites[id];
+        const heartIcon = isFav ? 'favorite' : 'favorite_border';
+        const heartClass = isFav ? 'card-fav active' : 'card-fav';
+
         div.innerHTML = `
             ${content}
+            <span class="material-icons ${heartClass}" onclick="toggleFavorite('${id}', event)">${heartIcon}</span>
             <div class="card-overlay">
                 <div class="card-title">${name}</div>
                 ${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}
@@ -694,7 +642,7 @@
         document.getElementById('btn-add-cat').style.display = user ? 'flex' : 'none';
         showScreen('screen-categories');
         loadCategories(id);
-        if(user) loadArenaPlayers(id); // Load autocomplete
+        if(user) loadArenaPlayers(id);
     }
 
     function loadCategories(arenaId) {
