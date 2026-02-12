@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Arena - V67 (Edição Completa)</title>
+    <title>BT Arena - V68</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -41,37 +41,39 @@
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
 
-        /* --- ARENAS --- */
-        .arenas-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        /* --- CARDS GRID (Usado em Arenas, Categorias e Torneios) --- */
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
-        
-        .arenas-grid { 
+        .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-bottom: 15px;}
+
+        .grid-container { 
             display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
             gap: 15px; width: 100%;
         }
         
-        .arena-card {
+        .std-card {
             background: white; border-radius: 12px; overflow: hidden; position: relative;
             aspect-ratio: 1 / 1; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s;
         }
-        .arena-card:active { transform: scale(0.97); }
-        .arena-img { width: 100%; height: 100%; object-fit: cover; }
-        .arena-overlay {
+        .std-card:active { transform: scale(0.97); }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        .card-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
             padding: 30px 10px 10px; color: white;
         }
-        .arena-name { font-weight: 700; font-size: 1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .card-title { font-weight: 700; font-size: 1.1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
+        .card-subtitle { font-size: 0.75em; opacity: 0.8; margin-top: 2px; }
         
-        /* Botões de Ação na Arena */
-        .arena-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
+        /* Actions (Edit/Del) */
+        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
         .btn-icon-circle {
             width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.9);
             color: #333; display: flex; justify-content: center; align-items: center;
             font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer;
         }
-        
+
         .btn-add-float {
             position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px;
             background: var(--primary); color: white; border-radius: 50%;
@@ -80,27 +82,27 @@
             border: none; cursor: pointer; z-index: 900;
         }
 
-        /* --- MODAL EDITAR --- */
+        /* --- MODAL UNIVERSAL --- */
         #modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 2000; display: none;
             justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
         }
         .modal-box {
-            background: white; width: 100%; max-width: 400px; padding: 20px;
+            background: white; width: 100%; max-width: 400px; padding: 25px;
             border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
-        .modal-title { margin: 0 0 15px; font-size: 1.2em; color: var(--secondary); }
-        .modal-label { font-size: 0.9em; color: #666; margin-bottom: 5px; display: block; }
-        .preview-img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background: #eee; }
+        .modal-title { margin: 0 0 20px; font-size: 1.3em; color: var(--secondary); text-align: center; }
+        .modal-label { font-size: 0.9em; color: #666; margin-bottom: 5px; display: block; font-weight: 600;}
         
-        /* --- RESTO (Lobby/App) --- */
-        .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; }
-        .arena-hero { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .hero-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+        .preview-img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background: #eee; border: 1px solid #ddd;}
         
-        .t-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #ccc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 10px; }
-        .t-card.my-t { border-left-color: var(--primary); background: #fffdfa; }
+        /* --- TELA APP --- */
+        .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
+        .conn-dot { width: 8px; height: 8px; background: #0f0; border-radius: 50%; display: inline-block; box-shadow: 0 0 5px #0f0; margin-right: 5px; }
+        
+        .header-controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
+        .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; justify-content: center; }
         
         button.btn-std { border: none; border-radius: 4px; padding: 10px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.85em; width: 100%; }
         .btn-org { background: var(--primary); }
@@ -110,7 +112,6 @@
         
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 15px; }
 
-        /* Tabela App */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
         .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; }
         .gh-0 { background: #00b050 !important; color: white !important; }
@@ -146,35 +147,45 @@
 </div>
 
 <div id="screen-arenas" class="screen active">
-    <div class="arenas-header">
+    <div class="header-bar">
         <h2 class="section-title">Arenas</h2>
     </div>
-    <div id="arenas-grid" class="arenas-grid"></div>
-    <button id="btn-add-arena" class="btn-add-float" onclick="openModalArena()" style="display:none;">+</button>
+    <div id="grid-arenas" class="grid-container"></div>
+    <button id="btn-add-arena" class="btn-add-float" onclick="openModal('arena')" style="display:none;">+</button>
+    <div style="text-align:center; margin-top:50px; color:#999; font-size:0.8em;" id="msg-login">Toque no ícone de usuário para Login.</div>
 </div>
 
-<div id="screen-lobby" class="screen">
-    <div class="back-bar" onclick="showScreen('screen-arenas')">
-        <span class="material-icons">arrow_back</span> Voltar
-    </div>
-    <div class="arena-hero">
-        <img id="lobby-arena-img" class="hero-img" src="">
+<div id="screen-categories" class="screen">
+    <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Arenas</div>
+    <div class="header-bar">
         <div>
-            <h2 id="lobby-arena-name" style="margin:0; font-size:1.4em;">Arena</h2>
+            <h2 class="section-title" id="title-arena">Nome Arena</h2>
+            <div style="font-size:0.8em; color:#777;">Categorias</div>
+        </div>
+    </div>
+    <div id="grid-categories" class="grid-container"></div>
+    <button id="btn-add-cat" class="btn-add-float" onclick="openModal('category')" style="display:none;">+</button>
+</div>
+
+<div id="screen-tournaments" class="screen">
+    <div class="back-btn" onclick="showScreen('screen-categories')"><span class="material-icons">arrow_back</span> Voltar para Categorias</div>
+    <div class="header-bar">
+        <div>
+            <h2 class="section-title" id="title-cat">Nome Categoria</h2>
             <div style="font-size:0.8em; color:#777;">Torneios</div>
         </div>
     </div>
-    <button id="btn-create-tourney" onclick="createTournament()" class="btn-std btn-org" style="margin-bottom:20px; display:none;">+ CRIAR TORNEIO</button>
-    <div id="tournament-list" class="tournament-list"></div>
+    <div id="grid-tournaments" class="grid-container"></div>
+    <button id="btn-add-tourney" class="btn-add-float" onclick="openModal('tournament')" style="display:none;">+</button>
 </div>
 
 <div id="screen-app" class="screen">
-    <div style="background:#333; color:white; padding:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <div onclick="exitTournament()" style="cursor:pointer; display:flex; align-items:center; font-size:0.9em; font-weight:bold;">
+    <div class="status-bar">
+        <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;">
             <span class="material-icons" style="font-size:1.1em;">arrow_back</span> Sair
         </div>
         <div style="display:flex; align-items:center; gap:5px;">
-            <span style="width:8px; height:8px; background:#0f0; border-radius:50%; display:block;"></span>
+            <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
         </div>
     </div>
@@ -207,25 +218,27 @@
 
 <div id="modal-overlay">
     <div class="modal-box">
-        <h3 class="modal-title">Editar Arena</h3>
-        <input type="hidden" id="edit-id">
+        <h3 class="modal-title" id="modal-h3">Criar</h3>
+        <input type="hidden" id="modal-type"> <input type="hidden" id="modal-id"> <label class="modal-label" id="lbl-name">Nome</label>
+        <input type="text" id="inp-name" class="inp-std auth-input">
         
-        <label class="modal-label">Nome da Arena</label>
-        <input type="text" id="edit-name" class="inp-std auth-input">
-        
-        <label class="modal-label">Foto da Capa</label>
-        <img id="edit-preview" class="preview-img" src="">
-        
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Carregar Foto</button>
-            <input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+        <div id="field-pwd" style="display:none;">
+            <label class="modal-label">Senha Admin (Opcional)</label>
+            <input type="text" id="inp-pwd" class="inp-std auth-input" placeholder="1234">
         </div>
-        
-        <div style="font-size:0.8em; color:#999; margin-bottom:15px; text-align:center;">Ou cole o link abaixo:</div>
-        <input type="text" id="edit-url" class="inp-std auth-input" placeholder="https://..." oninput="updatePreview(this.value)">
+
+        <div id="field-img">
+            <label class="modal-label">Imagem de Capa</label>
+            <img id="img-preview" class="preview-img" src="">
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Upload</button>
+                <input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+            </div>
+            <input type="text" id="inp-url" class="inp-std auth-input" placeholder="Ou cole o link..." oninput="updatePreview(this.value)">
+        </div>
 
         <div style="display:flex; gap:10px;">
-            <button class="btn-std btn-green" onclick="saveArena()">Salvar</button>
+            <button class="btn-std btn-green" onclick="saveModal()">Salvar</button>
             <button class="btn-std btn-red" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
@@ -236,7 +249,7 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, off, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // --- COLOQUE SEU EMAIL AQUI ---
+    // --- SEU EMAIL (COM O PONTO) ---
     const SUPER_ADMIN = "lucas.sibie@gmail.com"; 
 
     const firebaseConfig = {
@@ -254,8 +267,13 @@
     const googleProvider = new GoogleAuthProvider();
 
     let user = null;
-    let currentArenaId = null;
-    let tourneyRef = null;
+    
+    // Ponteiros de Navegação
+    let curArenaId = null;
+    let curCatId = null;
+    let curTourneyId = null;
+    
+    let appRef = null;
     let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
     let selectedPid = null;
 
@@ -267,10 +285,12 @@
             document.getElementById('nav-avatar').src = user.photoURL;
             document.getElementById('nav-username').innerText = user.displayName.split(' ')[0];
             document.getElementById('btn-add-arena').style.display = 'flex'; 
+            document.getElementById('msg-login').style.display = 'none';
         } else {
             document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = "Visitante";
             document.getElementById('btn-add-arena').style.display = 'none';
+            document.getElementById('msg-login').style.display = 'block';
         }
         loadArenas(); 
     });
@@ -280,12 +300,7 @@
         else { try { await signInWithPopup(auth, googleProvider); } catch(e) { alert("Erro Google: " + e.message); } }
     }
 
-    window.showScreen = (id) => {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
-
-    // --- ARENAS & EDIÇÃO ---
+    // --- UTIL: DRIVE FIX ---
     function fixDriveLink(url) {
         if (url && url.includes('drive.google.com') && url.includes('/file/d/')) {
             const id = url.match(/\/d\/(.*?)\//)[1];
@@ -294,135 +309,192 @@
         return url;
     }
 
-    function loadArenas() {
-        onValue(ref(db, 'arenas'), (snap) => {
-            const list = document.getElementById('arenas-grid'); list.innerHTML = '';
-            const data = snap.val();
-            if(!data) { list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#999;">Nenhuma arena.</div>'; return; }
-            
-            Object.keys(data).forEach(key => {
-                const a = data[key];
-                const isOwner = user && (user.uid === a.owner || user.email === SUPER_ADMIN);
-                
-                const card = document.createElement('div');
-                card.className = 'arena-card';
-                card.innerHTML = `
-                    <img src="${a.img || 'https://via.placeholder.com/150'}" class="arena-img">
-                    <div class="arena-overlay">
-                        <div class="arena-name">${a.name}</div>
-                    </div>
-                    ${isOwner ? `
-                    <div class="arena-actions">
-                        <div class="btn-icon-circle" onclick="openModalArena('${key}', '${a.name.replace(/'/g, "\\'")}', '${a.img || ''}'); event.stopPropagation()">✎</div>
-                        <div class="btn-icon-circle" style="color:red;" onclick="delArena('${key}'); event.stopPropagation()">✕</div>
-                    </div>` : ''}
-                `;
-                card.onclick = () => enterArena(key, a);
-                list.appendChild(card);
-            });
-        });
-    }
-
-    // MODAL LOGIC
-    window.openModalArena = (id = '', name = '', img = '') => {
+    // --- MODAL SYSTEM ---
+    window.openModal = (type, id='', name='', img='', pwd='') => {
+        const titleMap = { 'arena': 'Arena', 'category': 'Categoria', 'tournament': 'Torneio' };
+        document.getElementById('modal-h3').innerText = (id ? 'Editar ' : 'Nova ') + titleMap[type];
         document.getElementById('modal-overlay').style.display = 'flex';
-        document.getElementById('edit-id').value = id;
-        document.getElementById('edit-name').value = name;
-        document.getElementById('edit-url').value = img;
+        
+        document.getElementById('modal-type').value = type;
+        document.getElementById('modal-id').value = id;
+        document.getElementById('inp-name').value = name;
+        document.getElementById('inp-url').value = img;
         updatePreview(img || 'https://via.placeholder.com/150');
+
+        // Configura campos específicos
+        if(type === 'tournament') {
+            document.getElementById('field-pwd').style.display = 'block';
+            document.getElementById('inp-pwd').value = pwd;
+        } else {
+            document.getElementById('field-pwd').style.display = 'none';
+        }
     }
 
     window.closeModal = () => { document.getElementById('modal-overlay').style.display = 'none'; }
+    window.updatePreview = (url) => { document.getElementById('img-preview').src = fixDriveLink(url); }
 
-    window.updatePreview = (url) => { document.getElementById('edit-preview').src = fixDriveLink(url); }
-
-    // FILE UPLOAD COMPRESSION LOGIC
     window.handleFileSelect = (input) => {
-        const file = input.files[0];
-        if(!file) return;
-        
+        const file = input.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                // Resize max 600px
-                const MAX_W = 600;
-                const scale = MAX_W / img.width;
-                canvas.width = MAX_W;
-                canvas.height = img.height * scale;
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                
-                // Compress JPEG 0.7
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                document.getElementById('edit-url').value = dataUrl;
-                updatePreview(dataUrl);
+                const cvs = document.createElement('canvas');
+                const ctx = cvs.getContext('2d');
+                const scale = 500 / img.width;
+                cvs.width = 500; cvs.height = img.height * scale;
+                ctx.drawImage(img, 0, 0, cvs.width, cvs.height);
+                const data = cvs.toDataURL('image/jpeg', 0.7);
+                document.getElementById('inp-url').value = data;
+                updatePreview(data);
             };
             img.src = e.target.result;
         };
         reader.readAsDataURL(file);
     }
 
-    window.saveArena = () => {
+    window.saveModal = () => {
         if(!user) return;
-        const id = document.getElementById('edit-id').value;
-        const name = document.getElementById('edit-name').value;
-        const img = fixDriveLink(document.getElementById('edit-url').value);
-        
+        const type = document.getElementById('modal-type').value;
+        const id = document.getElementById('modal-id').value;
+        const name = document.getElementById('inp-name').value.trim();
+        const img = fixDriveLink(document.getElementById('inp-url').value);
+        const pwd = document.getElementById('inp-pwd').value || "1234";
+
         if(!name) return alert("Nome obrigatório");
 
-        if(id) {
-            // Edit
-            update(ref(db, `arenas/${id}`), { name, img });
+        let path = '';
+        let data = {};
+
+        if (type === 'arena') {
+            path = 'arenas';
+            data = { name, img, owner: user.uid };
+        } else if (type === 'category') {
+            path = `categories/${curArenaId}`;
+            data = { name, img, owner: user.uid };
+        } else if (type === 'tournament') {
+            path = `tournaments_meta/${curCatId}`;
+            data = { name, img, owner: user.uid, pwd, date: Date.now() };
+        }
+
+        if (id) {
+            update(ref(db, `${path}/${id}`), data);
         } else {
-            // Create
-            push(ref(db, 'arenas'), { name, img, owner: user.uid, createdAt: Date.now() });
+            data.createdAt = Date.now();
+            const newRef = push(ref(db, path), data);
+            
+            // Se for torneio, inicializa os dados do app
+            if(type === 'tournament') {
+                set(ref(db, `tournaments_data/${newRef.key}`), {
+                    mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: pwd, owner: user.uid
+                });
+            }
         }
         closeModal();
     }
 
-    window.delArena = (id) => { if(confirm("Apagar arena e seus torneios?")) { remove(ref(db, `arenas/${id}`)); remove(ref(db, `tournaments_meta/${id}`)); remove(ref(db, `tournaments_data/${id}`)); } }
+    window.deleteItem = (type, id) => {
+        if(!confirm("Tem certeza? Isso apaga TUDO dentro!")) return;
+        if(type === 'arena') {
+            remove(ref(db, `arenas/${id}`));
+            remove(ref(db, `categories/${id}`)); // Filhos
+            // Nota: Apagar torneios recursivamente seria ideal, mas complexo. Fica órfão por enquanto.
+        } else if (type === 'category') {
+            remove(ref(db, `categories/${curArenaId}/${id}`));
+            remove(ref(db, `tournaments_meta/${id}`));
+        } else if (type === 'tournament') {
+            remove(ref(db, `tournaments_meta/${curCatId}/${id}`));
+            remove(ref(db, `tournaments_data/${id}`));
+        }
+    }
 
-    // --- LOBBY & APP (Mantido V65 Logic) ---
+    // --- NAVIGATION ---
+    window.showScreen = (id) => {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    // --- LEVEL 1: ARENAS ---
+    function loadArenas() {
+        onValue(ref(db, 'arenas'), (snap) => {
+            const list = document.getElementById('grid-arenas'); list.innerHTML = '';
+            const data = snap.val();
+            if(!data) return; 
+            
+            Object.keys(data).forEach(key => {
+                const d = data[key];
+                const isOwner = user && (user.uid === d.owner || user.email === SUPER_ADMIN);
+                list.appendChild(createCard(key, d.name, d.img, isOwner, 'arena', () => enterArena(key, d)));
+            });
+        });
+    }
+
+    function createCard(id, name, img, isOwner, type, onClick) {
+        const div = document.createElement('div');
+        div.className = 'std-card';
+        div.innerHTML = `
+            <img src="${img || 'https://via.placeholder.com/300'}" class="card-img">
+            <div class="card-overlay"><div class="card-title">${name}</div></div>
+            ${isOwner ? `<div class="card-actions">
+                <div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${img||''}'); event.stopPropagation()">✎</div>
+                <div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div>
+            </div>` : ''}`;
+        div.onclick = onClick;
+        return div;
+    }
+
+    // --- LEVEL 2: CATEGORIAS ---
     window.enterArena = (id, data) => {
-        currentArenaId = id;
-        document.getElementById('lobby-arena-name').innerText = data.name;
-        document.getElementById('lobby-arena-img').src = data.img || "https://via.placeholder.com/60";
-        document.getElementById('btn-create-tourney').style.display = user ? 'block' : 'none';
-        showScreen('screen-lobby');
+        curArenaId = id;
+        document.getElementById('title-arena').innerText = data.name;
+        document.getElementById('btn-add-cat').style.display = user ? 'flex' : 'none';
+        showScreen('screen-categories');
+        loadCategories(id);
+    }
+
+    function loadCategories(arenaId) {
+        onValue(ref(db, `categories/${arenaId}`), (snap) => {
+            const list = document.getElementById('grid-categories'); list.innerHTML = '';
+            const data = snap.val();
+            if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; }
+            Object.keys(data).forEach(key => {
+                const d = data[key];
+                const isOwner = user && (user.uid === d.owner || user.email === SUPER_ADMIN);
+                list.appendChild(createCard(key, d.name, d.img, isOwner, 'category', () => enterCategory(key, d)));
+            });
+        });
+    }
+
+    // --- LEVEL 3: TORNEIOS ---
+    window.enterCategory = (id, data) => {
+        curCatId = id;
+        document.getElementById('title-cat').innerText = data.name;
+        document.getElementById('btn-add-tourney').style.display = user ? 'flex' : 'none';
+        showScreen('screen-tournaments');
         loadTournaments(id);
     }
 
-    function loadTournaments(arenaId) {
-        onValue(ref(db, `tournaments_meta/${arenaId}`), (snap) => {
-            const list = document.getElementById('tournament-list'); list.innerHTML = '';
+    function loadTournaments(catId) {
+        onValue(ref(db, `tournaments_meta/${catId}`), (snap) => {
+            const list = document.getElementById('grid-tournaments'); list.innerHTML = '';
             const data = snap.val();
-            if(!data) { list.innerHTML = '<div style="color:#999; text-align:center;">Nenhum torneio.</div>'; return; }
-            Object.keys(data).reverse().forEach(key => {
-                const t = data[key];
-                const isOwner = user && t.owner === user.uid;
-                const div = document.createElement('div');
-                div.className = `t-card ${isOwner?'my-t':''}`;
-                div.innerHTML = `<div><div class="t-name">${t.name}</div><div class="t-date">${new Date(t.date).toLocaleDateString('pt-BR')} ${isOwner?'(MEU)':''}</div></div><div>➔</div>`;
-                div.onclick = () => enterApp(key, t.name, t.pwd, t.owner);
+            if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; }
+            Object.keys(data).forEach(key => {
+                const d = data[key];
+                const isOwner = user && (user.uid === d.owner || user.email === SUPER_ADMIN);
+                // Card de Torneio tem data extra
+                const div = createCard(key, d.name, d.img, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner));
+                // Add date info
+                const sub = document.createElement('div');
+                sub.className = 'card-subtitle';
+                sub.innerText = new Date(d.date).toLocaleDateString('pt-BR');
+                div.querySelector('.card-overlay').appendChild(sub);
                 list.appendChild(div);
             });
         });
     }
 
-    window.createTournament = () => {
-        if(!user) return;
-        const name = prompt("Nome do Torneio:");
-        if(!name) return;
-        const pwd = prompt("Senha Admin:", "1234");
-        const newRef = push(ref(db, `tournaments_meta/${currentArenaId}`));
-        const tId = newRef.key;
-        set(newRef, { name, owner: user.uid, pwd, date: Date.now() });
-        set(ref(db, `tournaments_data/${tId}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: pwd, owner: user.uid })
-        .then(() => enterApp(tId, name, pwd, user.uid));
-    }
-
+    // --- LEVEL 4: APP ---
     window.enterApp = (tId, name, pwd, ownerId) => {
         document.getElementById('t-title-header').innerText = name;
         showScreen('screen-app');
@@ -430,10 +502,10 @@
         if(isOwner) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; } 
         else { document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; }
 
-        if(tourneyRef) off(tourneyRef);
-        tourneyRef = ref(db, `tournaments_data/${tId}`);
+        if(appRef) off(appRef);
+        appRef = ref(db, `tournaments_data/${tId}`);
         document.getElementById('loading').style.display = 'flex';
-        onValue(tourneyRef, (snap) => {
+        onValue(appRef, (snap) => {
             document.getElementById('loading').style.display = 'none';
             const d = snap.val();
             if(d) { appState = d; ['players','groups','matches'].forEach(k => {if(!appState[k]) appState[k]=[]}); }
@@ -442,14 +514,15 @@
         });
     }
 
-    window.exitTournament = () => { if(tourneyRef) off(tourneyRef); showScreen('screen-lobby'); }
+    window.exitApp = () => { if(appRef) off(appRef); showScreen('screen-tournaments'); }
     window.tryAdmin = () => {
         if(!document.body.classList.contains('viewer-mode')) return;
         const p = prompt("Senha:");
         if(p === appState.pwd || (user && user.email === SUPER_ADMIN)) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; } else alert("Senha incorreta");
     }
-    function save() { if(tourneyRef) set(tourneyRef, appState); }
+    function save() { if(appRef) set(appRef, appState); }
 
+    // --- APP LOGIC (Mesma da V67) ---
     const pInput = document.getElementById('pName');
     if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
 
@@ -482,7 +555,7 @@
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
-        poolPs.forEach(p => { const d = document.createElement('div'); d.className=`card ${selectedPid===p.id?'selected':''}`; d.onclick=(e)=>window.toggleSel(p.id,e); d.innerHTML = `<span>${p.name}</span> <b style="color:red" class="admin-only" onclick="delPlayer('${p.id}');event.stopPropagation()">✕</b>`; pl.appendChild(d); });
+        poolPs.forEach(p => { const d = document.createElement('div'); d.className=`std-card ${selectedPid===p.id?'selected':''}`; d.style.aspectRatio='auto'; d.style.padding='10px'; d.onclick=(e)=>window.toggleSel(p.id,e); d.innerHTML = `<span>${p.name}</span> <b style="color:red; float:right;" class="admin-only" onclick="delPlayer('${p.id}');event.stopPropagation()">✕</b>`; pl.appendChild(d); });
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
