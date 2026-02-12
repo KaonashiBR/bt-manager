@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Arena - V66 (Drive Fix)</title>
+    <title>BT Arena - V67 (Edição Completa)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -41,7 +41,7 @@
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
 
-        /* --- TELA 1: ARENAS --- */
+        /* --- ARENAS --- */
         .arenas-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
         
@@ -60,9 +60,17 @@
         .arena-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-            padding: 20px 10px 10px; color: white;
+            padding: 30px 10px 10px; color: white;
         }
         .arena-name { font-weight: 700; font-size: 1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        
+        /* Botões de Ação na Arena */
+        .arena-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; }
+        .btn-icon-circle {
+            width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.9);
+            color: #333; display: flex; justify-content: center; align-items: center;
+            font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer;
+        }
         
         .btn-add-float {
             position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px;
@@ -72,59 +80,54 @@
             border: none; cursor: pointer; z-index: 900;
         }
 
-        /* --- TELA 2: LOBBY --- */
-        .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; }
-        .arena-hero { 
-            background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; 
-            display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        /* --- MODAL EDITAR --- */
+        #modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 2000; display: none;
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
         }
+        .modal-box {
+            background: white; width: 100%; max-width: 400px; padding: 20px;
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .modal-title { margin: 0 0 15px; font-size: 1.2em; color: var(--secondary); }
+        .modal-label { font-size: 0.9em; color: #666; margin-bottom: 5px; display: block; }
+        .preview-img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background: #eee; }
+        
+        /* --- RESTO (Lobby/App) --- */
+        .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; }
+        .arena-hero { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .hero-img { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
         
-        .tournament-list { display: flex; flex-direction: column; gap: 10px; }
-        .t-card {
-            background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #ccc;
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
+        .t-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #ccc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 10px; }
         .t-card.my-t { border-left-color: var(--primary); background: #fffdfa; }
-        .t-name { font-weight: 700; color: #333; }
-        .t-date { font-size: 0.75em; color: #888; }
-
-        /* --- TELA 3: APP --- */
-        .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
-        .conn-dot { width: 8px; height: 8px; background: #0f0; border-radius: 50%; display: inline-block; box-shadow: 0 0 5px #0f0; margin-right: 5px; }
         
-        .header-controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
-        .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; justify-content: center; }
-        
-        button.btn-std { border: none; border-radius: 4px; padding: 8px 12px; font-weight: 700; text-transform: uppercase; color: white; font-size: 0.75em; cursor: pointer; }
+        button.btn-std { border: none; border-radius: 4px; padding: 10px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.85em; width: 100%; }
         .btn-org { background: var(--primary); }
         .btn-blue { background: var(--secondary); }
         .btn-red { background: #d32f2f; }
-        .btn-green { background: #2e7d32; width: 100%; margin-top:5px;}
+        .btn-green { background: #2e7d32; }
         
-        input.inp-std { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
+        input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 15px; }
 
-        /* Tabela */
+        /* Tabela App */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
-        .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; font-size: 1.1em; }
+        .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; }
         .gh-0 { background: #00b050 !important; color: white !important; }
         .gh-1 { background: #00b0f0 !important; color: black !important; }
         .gh-2 { background: #ffff00 !important; color: black !important; }
         .gh-3 { background: #ff0000 !important; color: white !important; }
         .bt-table td { border: 1px solid #999; padding: 4px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #eef; }
+        .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         
-        .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; font-size: 1.1em; background: white; color: black; }
-        .tbl-input:disabled { border: none; background: transparent; }
-
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
         
         .board { display: flex; flex-direction: column; gap: 15px; }
         @media(min-width: 900px) { .board { flex-direction: row; flex-wrap: wrap; } .column { flex: 1 1 40%; } }
         
-        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column;}
+        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index: 3000; display: flex; justify-content: center; align-items: center; flex-direction: column;}
     </style>
 </head>
 <body class="viewer-mode">
@@ -147,8 +150,7 @@
         <h2 class="section-title">Arenas</h2>
     </div>
     <div id="arenas-grid" class="arenas-grid"></div>
-    <button id="btn-add-arena" class="btn-add-float" onclick="addArena()" style="display:none;">+</button>
-    <div style="text-align:center; margin-top:50px; color:#999; font-size:0.8em;">Toque no ícone de usuário para Login.</div>
+    <button id="btn-add-arena" class="btn-add-float" onclick="openModalArena()" style="display:none;">+</button>
 </div>
 
 <div id="screen-lobby" class="screen">
@@ -162,49 +164,80 @@
             <div style="font-size:0.8em; color:#777;">Torneios</div>
         </div>
     </div>
-    <button id="btn-create-tourney" onclick="createTournament()" class="btn-std btn-org" style="width:100%; padding:15px; font-size:1em; margin-bottom:20px; display:none;">+ CRIAR TORNEIO</button>
+    <button id="btn-create-tourney" onclick="createTournament()" class="btn-std btn-org" style="margin-bottom:20px; display:none;">+ CRIAR TORNEIO</button>
     <div id="tournament-list" class="tournament-list"></div>
 </div>
 
 <div id="screen-app" class="screen">
-    <div class="status-bar">
-        <div onclick="exitTournament()" style="cursor:pointer; display:flex; align-items:center;">
-            <span class="material-icons" style="font-size:1.2em;">arrow_back</span> Sair
+    <div style="background:#333; color:white; padding:10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div onclick="exitTournament()" style="cursor:pointer; display:flex; align-items:center; font-size:0.9em; font-weight:bold;">
+            <span class="material-icons" style="font-size:1.1em;">arrow_back</span> Sair
         </div>
         <div style="display:flex; align-items:center; gap:5px;">
-            <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
-            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; margin-left:10px;">🔒</button>
+            <span style="width:8px; height:8px; background:#0f0; border-radius:50%; display:block;"></span>
+            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
         </div>
     </div>
     <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
-    <div class="header-controls admin-only">
-        <div class="row">
-            <input type="text" id="pName" class="inp-std auth-input" placeholder="Nome Jogador...">
-            <button class="btn-std btn-org" onclick="addPlayer()">+ Add</button>
-            <button class="btn-std btn-blue" onclick="addGroup()">+ Grupo</button>
+    
+    <div class="admin-only" style="background:white; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <input type="text" id="pName" class="inp-std auth-input" style="margin:0;" placeholder="Nome...">
+            <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
+            <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
         </div>
-        <div class="row">
-            <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std btn-blue">Individual</button>
-            <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std btn-blue">Fixas</button>
-            <button onclick="resetT()" class="btn-std btn-red">⚠ Reset</button>
+        <div style="display:flex; gap:5px;">
+            <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std">Individual</button>
+            <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std">Fixas</button>
+            <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
         </div>
     </div>
+
     <div class="board">
         <div class="column" id="col-pool" style="background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:10px;">
             <div style="background:var(--secondary); color:white; padding:10px; font-weight:bold; display:flex; justify-content:space-between;">
                 <span>RESERVAS (<span id="pool-cnt">0</span>)</span>
-                <button class="admin-only btn-std" style="background:white; color:var(--secondary); padding:2px 8px;" onclick="distribute()">Distribuir</button>
+                <button class="admin-only btn-std" style="background:white; color:var(--secondary); width:auto; padding:2px 8px;" onclick="distribute()">Distribuir</button>
             </div>
-            <div id="pool-list" class="player-pool"></div>
+            <div id="pool-list" style="padding:10px; display:flex; flex-wrap:wrap; gap:5px;"></div>
         </div>
         <div id="groups-container" style="display:contents;"></div>
+    </div>
+</div>
+
+<div id="modal-overlay">
+    <div class="modal-box">
+        <h3 class="modal-title">Editar Arena</h3>
+        <input type="hidden" id="edit-id">
+        
+        <label class="modal-label">Nome da Arena</label>
+        <input type="text" id="edit-name" class="inp-std auth-input">
+        
+        <label class="modal-label">Foto da Capa</label>
+        <img id="edit-preview" class="preview-img" src="">
+        
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Carregar Foto</button>
+            <input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+        </div>
+        
+        <div style="font-size:0.8em; color:#999; margin-bottom:15px; text-align:center;">Ou cole o link abaixo:</div>
+        <input type="text" id="edit-url" class="inp-std auth-input" placeholder="https://..." oninput="updatePreview(this.value)">
+
+        <div style="display:flex; gap:10px;">
+            <button class="btn-std btn-green" onclick="saveArena()">Salvar</button>
+            <button class="btn-std btn-red" onclick="closeModal()">Cancelar</button>
+        </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, off, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, set, push, onValue, off, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    // --- COLOQUE SEU EMAIL AQUI ---
+    const SUPER_ADMIN = "lucas.sibie@gmail.com"; 
 
     const firebaseConfig = {
         apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
@@ -214,9 +247,6 @@
         messagingSenderId: "311372138486",
         appId: "1:311372138486:web:50c9e403ad877ab094e9d7"
     };
-
-    // --- COLOQUE SEU EMAIL AQUI ---
-    const SUPER_ADMIN = "lucas.sibie@gmail.com"; 
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -229,11 +259,12 @@
     let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
     let selectedPid = null;
 
+    // --- AUTH ---
     onAuthStateChanged(auth, (u) => {
         document.getElementById('loading').style.display = 'none';
         user = u;
         if(user) {
-            document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+            document.getElementById('nav-avatar').src = user.photoURL;
             document.getElementById('nav-username').innerText = user.displayName.split(' ')[0];
             document.getElementById('btn-add-arena').style.display = 'flex'; 
         } else {
@@ -246,7 +277,7 @@
 
     window.handleLoginClick = async () => {
         if(user) { if(confirm(`Sair da conta ${user.displayName}?`)) signOut(auth); } 
-        else { try { await signInWithPopup(auth, googleProvider); } catch(e) { alert("Erro Google (Ative o domínio no Firebase): " + e.message); } }
+        else { try { await signInWithPopup(auth, googleProvider); } catch(e) { alert("Erro Google: " + e.message); } }
     }
 
     window.showScreen = (id) => {
@@ -254,7 +285,7 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // --- HELPER: GOOGLE DRIVE FIX ---
+    // --- ARENAS & EDIÇÃO ---
     function fixDriveLink(url) {
         if (url && url.includes('drive.google.com') && url.includes('/file/d/')) {
             const id = url.match(/\/d\/(.*?)\//)[1];
@@ -263,7 +294,6 @@
         return url;
     }
 
-    // --- ARENAS ---
     function loadArenas() {
         onValue(ref(db, 'arenas'), (snap) => {
             const list = document.getElementById('arenas-grid'); list.innerHTML = '';
@@ -272,32 +302,89 @@
             
             Object.keys(data).forEach(key => {
                 const a = data[key];
+                const isOwner = user && (user.uid === a.owner || user.email === SUPER_ADMIN);
+                
                 const card = document.createElement('div');
                 card.className = 'arena-card';
                 card.innerHTML = `
                     <img src="${a.img || 'https://via.placeholder.com/150'}" class="arena-img">
                     <div class="arena-overlay">
                         <div class="arena-name">${a.name}</div>
-                        ${(user && (user.uid === a.owner || user.email === SUPER_ADMIN)) ? `<div style="font-size:0.7em; color:#f88;" onclick="delArena('${key}'); event.stopPropagation()">[EXCLUIR]</div>` : ''}
-                    </div>`;
+                    </div>
+                    ${isOwner ? `
+                    <div class="arena-actions">
+                        <div class="btn-icon-circle" onclick="openModalArena('${key}', '${a.name.replace(/'/g, "\\'")}', '${a.img || ''}'); event.stopPropagation()">✎</div>
+                        <div class="btn-icon-circle" style="color:red;" onclick="delArena('${key}'); event.stopPropagation()">✕</div>
+                    </div>` : ''}
+                `;
                 card.onclick = () => enterArena(key, a);
                 list.appendChild(card);
             });
         });
     }
 
-    window.addArena = () => {
-        if(!user) return alert("Login necessário");
-        const name = prompt("Nome da Arena:");
-        if(!name) return;
-        let img = prompt("Link da Foto (URL ou Google Drive):", "https://images.unsplash.com/photo-1596726673193-47a323793268?w=400");
-        img = fixDriveLink(img); // AUTO FIX AQUI
-        
-        push(ref(db, 'arenas'), { name: name, img: img, owner: user.uid, createdAt: Date.now() });
+    // MODAL LOGIC
+    window.openModalArena = (id = '', name = '', img = '') => {
+        document.getElementById('modal-overlay').style.display = 'flex';
+        document.getElementById('edit-id').value = id;
+        document.getElementById('edit-name').value = name;
+        document.getElementById('edit-url').value = img;
+        updatePreview(img || 'https://via.placeholder.com/150');
     }
 
-    window.delArena = (id) => { if(confirm("Apagar arena?")) { remove(ref(db, `arenas/${id}`)); remove(ref(db, `tournaments/${id}`)); } }
+    window.closeModal = () => { document.getElementById('modal-overlay').style.display = 'none'; }
 
+    window.updatePreview = (url) => { document.getElementById('edit-preview').src = fixDriveLink(url); }
+
+    // FILE UPLOAD COMPRESSION LOGIC
+    window.handleFileSelect = (input) => {
+        const file = input.files[0];
+        if(!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                // Resize max 600px
+                const MAX_W = 600;
+                const scale = MAX_W / img.width;
+                canvas.width = MAX_W;
+                canvas.height = img.height * scale;
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Compress JPEG 0.7
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                document.getElementById('edit-url').value = dataUrl;
+                updatePreview(dataUrl);
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    window.saveArena = () => {
+        if(!user) return;
+        const id = document.getElementById('edit-id').value;
+        const name = document.getElementById('edit-name').value;
+        const img = fixDriveLink(document.getElementById('edit-url').value);
+        
+        if(!name) return alert("Nome obrigatório");
+
+        if(id) {
+            // Edit
+            update(ref(db, `arenas/${id}`), { name, img });
+        } else {
+            // Create
+            push(ref(db, 'arenas'), { name, img, owner: user.uid, createdAt: Date.now() });
+        }
+        closeModal();
+    }
+
+    window.delArena = (id) => { if(confirm("Apagar arena e seus torneios?")) { remove(ref(db, `arenas/${id}`)); remove(ref(db, `tournaments_meta/${id}`)); remove(ref(db, `tournaments_data/${id}`)); } }
+
+    // --- LOBBY & APP (Mantido V65 Logic) ---
     window.enterArena = (id, data) => {
         currentArenaId = id;
         document.getElementById('lobby-arena-name').innerText = data.name;
@@ -312,7 +399,6 @@
             const list = document.getElementById('tournament-list'); list.innerHTML = '';
             const data = snap.val();
             if(!data) { list.innerHTML = '<div style="color:#999; text-align:center;">Nenhum torneio.</div>'; return; }
-
             Object.keys(data).reverse().forEach(key => {
                 const t = data[key];
                 const isOwner = user && t.owner === user.uid;
@@ -386,7 +472,6 @@
         else { let pairs=[]; for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id}); } if(!pairs.length) return alert("Sem combinações."); pairs.sort(()=>Math.random()-0.5); let count=0; while(pairs.length) { let pA=pairs[0], found=false; for(let k=1; k<pairs.length; k++) { let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); if(all.size===4) { addM(gid,pA.p1,pA.p2,pB.p1,pB.p2); pairs.splice(k,1); pairs.splice(0,1); found=true; count++; break; } } if(!found) pairs.splice(0,1); } if(!count) alert("Não consegui casar."); }
         save();
     }
-    
     function addM(gid,p1,p2,p3,p4) { appState.matches.push({mid:'m'+Date.now()+Math.random(), gid, p1,p2,p3,p4, s1:'', s2:'', saved:false}); }
     window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addM(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id); save(); }
     window.saveS = (mid) => { const m = appState.matches.find(x=>x.mid===mid), s1=document.getElementById(`s1-${mid}`).value, s2=document.getElementById(`s2-${mid}`).value; if(m.saved) { m.saved=false; } else { if(s1===''||s2==='') return; m.s1=parseInt(s1); m.s2=parseInt(s2); m.saved=true; } recalc(); save(); }
