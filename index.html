@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V61</title>
+    <title>BT Manager - V62 (Login Fixed)</title>
     <style>
         :root {
             --primary: #ff6b00;
@@ -36,7 +36,15 @@
         #auth-screen { justify-content: center; align-items: center; background: linear-gradient(135deg, var(--secondary) 0%, #002244 100%); color: white; padding: 20px; }
         .auth-box { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 350px; text-align: center; color: black; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         
-        .auth-input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        /* CORREÇÃO DO BLOQUEIO: Classe específica para input de auth */
+        .auth-input { 
+            width: 100%; padding: 12px; margin: 8px 0; 
+            border: 1px solid #ccc; border-radius: 6px; 
+            box-sizing: border-box; font-size: 1rem;
+            pointer-events: auto !important; /* Força o desbloqueio */
+            background: white !important;
+            color: black !important;
+        }
         
         .divider { display: flex; align-items: center; margin: 15px 0; color: #777; font-size: 0.8em; }
         .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #ddd; }
@@ -112,9 +120,13 @@
         .card { background: white; border: 1px solid #ccc; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9em; display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .card.selected { background: #fff3cd; border-color: #ffc107; }
 
-        /* Visibilidade */
+        /* --- CORREÇÃO IMPORTANTE: VISIBILIDADE --- */
+        /* O seletor abaixo foi corrigido para NÃO bloquear os inputs de Login (.auth-input) */
         body.viewer-mode .admin-only { display: none !important; }
-        body.viewer-mode input:not(.score-display) { pointer-events: none; border:none; background: transparent; }
+        
+        /* Bloqueia inputs SOMENTE se NÃO forem de login (.auth-input) */
+        body.viewer-mode input:not(.score-display):not(.auth-input) { pointer-events: none; border:none; background: transparent; }
+        
         body.viewer-mode .tbl-input { border: none; background: transparent; font-size: 1.2em; color: black; padding: 0;}
         body.viewer-mode #col-pool { display: none !important; } 
         body.viewer-mode .tbl-actions { display: none; }
@@ -133,7 +145,7 @@
 
 <div id="loading-overlay">
     <div style="font-size:3em;">🎾</div>
-    <div>Carregando V61...</div>
+    <div>Carregando V62...</div>
 </div>
 
 <div id="auth-screen" class="screen active">
@@ -245,7 +257,6 @@
     let appState = { mode:'individual', players:[], groups:[], matches:[], groupCounter:0, adminPassword:'' };
     let selectedPlayerId = null;
 
-    // --- AUTH PROVIDER ---
     const googleProvider = new GoogleAuthProvider();
 
     // --- AUTH FLOW ---
@@ -253,11 +264,9 @@
         document.getElementById('loading-overlay').style.display = 'none';
         if (user) {
             currentUser = user;
-            // Update UI
             document.getElementById('user-display').innerText = user.displayName || user.email || "Visitante";
             if(user.photoURL) document.getElementById('user-avatar').src = user.photoURL;
             
-            // Anon Logic
             if(user.isAnonymous) {
                 document.getElementById('create-area').style.display = 'none';
                 document.getElementById('anon-msg').style.display = 'block';
@@ -286,7 +295,7 @@
         try { await createUserWithEmailAndPassword(auth, e, p); } catch(err) { alert("Erro: " + err.message); }
     }
     window.doGoogleLogin = async () => {
-        try { await signInWithPopup(auth, googleProvider); } catch(err) { alert("Erro Google: " + err.message); }
+        try { await signInWithPopup(auth, googleProvider); } catch(err) { alert("Erro Google: Verifique se o domínio foi autorizado no Firebase! " + err.message); }
     }
     window.doAnonLogin = async () => {
         try { await signInAnonymously(auth); } catch(err) { alert("Erro Anônimo: " + err.message); }
