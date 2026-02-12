@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V56 (Tabela Smart)</title>
+    <title>BT Manager - V57 (Multi-Torneios)</title>
     <style>
         :root {
             --primary: #ff6b00;
@@ -20,8 +20,11 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background: var(--bg-body); 
             color: #000; 
-            padding: 10px; margin: 0; padding-bottom: 80px;
+            margin: 0; 
             -webkit-tap-highlight-color: transparent;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* --- VISIBILIDADE --- */
@@ -32,30 +35,39 @@
         body.viewer-mode .del-btn { display: none; }
         body.viewer-mode .tbl-actions { display: none; }
 
+        /* --- TELAS (LOBBY vs APP) --- */
+        #app-area { display: none; padding: 10px; padding-bottom: 80px; overflow-y: auto; flex:1;}
+        #landing-area { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; height: 100%; overflow-y: auto; }
+
+        /* --- LOBBY STYLES --- */
+        .lobby-card { 
+            background: white; width: 100%; max-width: 400px; padding: 20px; 
+            border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            border-left: 6px solid var(--secondary); transition: transform 0.1s;
+        }
+        .lobby-card:active { transform: scale(0.98); background: #f0f0f0; }
+        .lobby-title { font-weight: 800; font-size: 1.2em; color: #333; }
+        .lobby-date { font-size: 0.8em; color: #777; }
+        .btn-create { 
+            background: var(--primary); color: white; border: none; padding: 15px; 
+            width: 100%; max-width: 400px; border-radius: 12px; font-size: 1.1em; 
+            font-weight: 900; text-transform: uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            margin-bottom: 20px; cursor: pointer;
+        }
+
         /* --- ESTILO TABELA --- */
         .bt-table { 
             width: 100%; border-collapse: collapse; font-size: 0.85rem; 
             margin-bottom: 15px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             border: 2px solid #000;
         }
-        
-        .bt-table th { 
-            text-transform: uppercase; font-weight: 900; padding: 8px; 
-            border: 1px solid #000; color: black; font-size: 1.1em;
-        }
-        
-        /* Cores dos Grupos */
+        .bt-table th { text-transform: uppercase; font-weight: 900; padding: 8px; border: 1px solid #000; color: black; font-size: 1.1em; }
         .g-header-0 { background-color: #00b050 !important; color: white !important; }
         .g-header-1 { background-color: #00b0f0 !important; color: black !important; }
         .g-header-2 { background-color: #ffff00 !important; color: black !important; }
         .g-header-3 { background-color: #ff0000 !important; color: white !important; }
-
-        .bt-table td { 
-            border: 1px solid #000; padding: 6px 2px; text-align: center; 
-            vertical-align: middle; font-weight: 700;
-        }
-
-        /* Linhas Zebradas */
+        .bt-table td { border: 1px solid #000; padding: 6px 2px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background-color: #daeef3; } 
         .bt-table tr:nth-child(odd) { background-color: #ffffff; }
         
@@ -65,17 +77,12 @@
             background: rgba(255,255,255,0.8);
         }
         .tbl-input:disabled { border: none; background: transparent; color: black; }
-
         .team-name { font-size: 0.95em; line-height: 1.1; max-width: 100px; word-wrap: break-word; }
         .vs-col { font-size: 0.8em; color: #555; font-weight: 900; padding: 0 2px !important; }
-        
-        .btn-ok-mini { 
-            background: #28a745; color: white; border: none; border-radius: 3px; 
-            padding: 4px 6px; font-size: 0.7em; font-weight: bold; cursor: pointer;
-        }
+        .btn-ok-mini { background: #28a745; color: white; border: none; border-radius: 3px; padding: 4px 6px; font-size: 0.7em; font-weight: bold; cursor: pointer; }
         .btn-ok-mini.saved { background: #ffc107; color: black; }
 
-        /* --- LAYOUT --- */
+        /* --- RESTO DO LAYOUT --- */
         .status-bar {
             display: flex; justify-content: space-between; align-items: center;
             background: #343a40; color: white; padding: 10px; border-radius: 8px; 
@@ -88,10 +95,7 @@
         .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; justify-content: center; }
         h2 { margin: 0; text-align: center; text-transform: uppercase; font-size: 1.4em; width: 100%; margin-bottom: 10px; }
         
-        button { 
-            border: none; border-radius: 4px; padding: 8px 12px; font-weight: 700; 
-            text-transform: uppercase; color: white; cursor: pointer; font-size: 0.8em;
-        }
+        button { border: none; border-radius: 4px; padding: 8px 12px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.8em; }
         .btn-add { background: var(--primary); flex: 1; }
         .btn-group { background: var(--secondary); flex: 1; }
         .btn-reset { background: #dc3545; }
@@ -109,7 +113,8 @@
         .card.selected { background: #fff3cd; border-color: #ffc107; }
 
         @media(min-width: 1024px) {
-            body { max-width: 1200px; margin: 0 auto; }
+            body { max-width: 1200px; margin: 0 auto; height: auto; }
+            #landing-area { height: auto; }
             .board { flex-direction: row; flex-wrap: wrap; }
             .column { flex: 1 1 45%; }
             .bt-table { font-size: 1rem; }
@@ -123,48 +128,70 @@
 
 <div id="loading-overlay">
     <div style="font-size:3em;">🎾</div>
-    <div><strong>Carregando V56...</strong></div>
+    <div><strong>Carregando...</strong></div>
 </div>
 
-<div class="status-bar">
-    <div><span id="conn-dot" class="connection-dot"></span> <span id="conn-text">CONECTANDO</span></div>
-    <button onclick="toggleAdmin()" style="background:transparent; border:1px solid #aaa; padding:2px 6px; font-size:0.7em;">🔒</button>
+<div id="landing-area">
+    <div style="text-align:center; margin-bottom:30px;">
+        <h1 style="color:var(--secondary); font-size:2.5em; margin:0;">BT MANAGER</h1>
+        <p style="color:#666;">Selecione um torneio ou crie um novo</p>
+    </div>
+
+    <button class="btn-create" onclick="createNewTournament()">+ CRIAR NOVO TORNEIO</button>
+
+    <div style="width:100%; max-width:400px; text-align:left; font-weight:bold; color:#555; margin-bottom:10px;">TORNEIOS DISPONÍVEIS:</div>
+    <div id="lobby-list" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+        <div style="color:#999;">Carregando lista...</div>
+    </div>
 </div>
 
-<div class="header-controls admin-only">
-    <h2>Beach Tennis Manager</h2>
-    <div class="row">
-        <button onclick="downloadBackup()" style="background:#555;">💾 Backup</button>
-        <button onclick="document.getElementById('fileInput').click()" style="background:#d35400;">📂 Restaurar</button>
-        <input type="file" id="fileInput" style="display:none" onchange="uploadBackup(this)">
-    </div>
-    <div class="row">
-        <input type="text" id="pName" placeholder="Nome do Jogador..." autofocus>
-        <button class="btn-add" onclick="addPlayer()">+ Add</button>
-        <button class="btn-group" onclick="createGroup()">+ Grupo</button>
-    </div>
-    <div class="row">
-        <button onclick="setMode('individual')" id="btn-ind" style="background:#ccc; color:black;">Individual</button>
-        <button onclick="setMode('fixed')" id="btn-fix" style="background:#ccc; color:black;">Fixas</button>
-        <button class="btn-reset" onclick="resetSystem()">⚠ Reset</button>
-    </div>
-    <div style="text-align:center; font-size:0.8em; color:#666; margin-top:5px;">Toque no jogador para selecionar.</div>
-</div>
-
-<div class="board" id="board">
-    <div class="column" id="col-pool">
-        <div class="column-header" onclick="moveSelectedTo('pool')">
-            <span>RESERVAS (<span id="pool-count">0</span>)</span>
-            <button class="admin-only" onclick="distributePlayers(); event.stopPropagation();" style="background:white; color:#004e98; padding:3px 8px; font-size:0.8em;">Distribuir</button>
+<div id="app-area">
+    <div class="status-bar">
+        <div>
+            <button onclick="exitTournament()" style="background:#555; margin-right:5px;">⬅ Sair</button>
+            <span id="conn-dot" class="connection-dot"></span> <span id="conn-text">ONLINE</span>
         </div>
-        <div class="player-pool" id="pool-list"></div>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <span id="tournament-title-display" style="color:#ccc; font-size:0.8em; margin-right:5px; text-transform:uppercase;"></span>
+            <button onclick="toggleAdmin()" style="background:transparent; border:1px solid #aaa; padding:2px 6px; font-size:0.7em;">🔒</button>
+        </div>
     </div>
-    <div id="groups-container" style="display:contents;"></div>
+
+    <div class="header-controls admin-only">
+        <h2 id="tournament-title-header">Torneio Atual</h2>
+        <div class="row">
+            <button onclick="downloadBackup()" style="background:#555;">💾 Backup</button>
+            <button onclick="document.getElementById('fileInput').click()" style="background:#d35400;">📂 Restaurar</button>
+            <input type="file" id="fileInput" style="display:none" onchange="uploadBackup(this)">
+        </div>
+        <div class="row">
+            <input type="text" id="pName" placeholder="Nome do Jogador..." autofocus>
+            <button class="btn-add" onclick="addPlayer()">+ Add</button>
+            <button class="btn-group" onclick="createGroup()">+ Grupo</button>
+        </div>
+        <div class="row">
+            <button onclick="setMode('individual')" id="btn-ind" style="background:#ccc; color:black;">Individual</button>
+            <button onclick="setMode('fixed')" id="btn-fix" style="background:#ccc; color:black;">Fixas</button>
+            <button class="btn-reset" onclick="resetSystem()">⚠ Reset</button>
+        </div>
+        <div style="text-align:center; font-size:0.8em; color:#666; margin-top:5px;">Toque no jogador para selecionar.</div>
+    </div>
+
+    <div class="board" id="board">
+        <div class="column" id="col-pool">
+            <div class="column-header" onclick="moveSelectedTo('pool')">
+                <span>RESERVAS (<span id="pool-count">0</span>)</span>
+                <button class="admin-only" onclick="distributePlayers(); event.stopPropagation();" style="background:white; color:#004e98; padding:3px 8px; font-size:0.8em;">Distribuir</button>
+            </div>
+            <div class="player-pool" id="pool-list"></div>
+        </div>
+        <div id="groups-container" style="display:contents;"></div>
+    </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, set, push, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
@@ -177,31 +204,118 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'tournament_v56'); // NOVA CHAVE V56
-
+    
+    // Referência para a lista de torneios
+    const lobbyRef = ref(db, 'tournaments_lobby');
+    
+    let currentTournamentRef = null;
     let appState = { mode: 'individual', players: [], groups: [], matches: [], groupCounter: 0 };
     let selectedPlayerId = null;
+    let currentTournamentId = null;
+
+    // --- LOBBY LOGIC ---
+    
+    // Carregar lista de torneios ao abrir
+    onValue(lobbyRef, (snapshot) => {
+        const data = snapshot.val();
+        const listDiv = document.getElementById('lobby-list');
+        listDiv.innerHTML = '';
+        document.getElementById('loading-overlay').style.display = 'none';
+
+        if(data) {
+            const keys = Object.keys(data);
+            if(keys.length === 0) listDiv.innerHTML = '<div style="color:#999; margin-top:20px;">Nenhum torneio criado.</div>';
+            
+            // Ordenar mais recente primeiro (opcional)
+            keys.reverse().forEach(key => {
+                const t = data[key];
+                const card = document.createElement('div');
+                card.className = 'lobby-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="lobby-title">${t.name}</div>
+                        <div class="lobby-date">${new Date(t.createdAt).toLocaleDateString('pt-BR')}</div>
+                    </div>
+                    <div style="font-size:1.5em; color:#ccc;">➔</div>
+                `;
+                card.onclick = () => enterTournament(key, t.name);
+                listDiv.appendChild(card);
+            });
+        } else {
+            listDiv.innerHTML = '<div style="color:#999; margin-top:20px;">Nenhum torneio criado.</div>';
+        }
+    });
+
+    window.createNewTournament = function() {
+        const pass = prompt("Senha de Admin para criar:");
+        if(pass !== "1234") return alert("Senha incorreta!");
+        
+        const name = prompt("Nome do Novo Torneio (ex: Copa Verão):");
+        if(!name) return;
+
+        const newRef = push(lobbyRef);
+        const newId = newRef.key;
+        
+        // Salva no Lobby
+        set(newRef, {
+            name: name,
+            createdAt: Date.now()
+        }).then(() => {
+            // Entra no torneio recém criado
+            enterTournament(newId, name);
+        });
+    }
+
+    window.enterTournament = function(id, name) {
+        currentTournamentId = id;
+        document.getElementById('landing-area').style.display = 'none';
+        document.getElementById('app-area').style.display = 'block';
+        document.getElementById('tournament-title-header').innerText = name;
+        document.getElementById('tournament-title-display').innerText = name;
+        
+        // Conectar ao nó específico deste torneio
+        if(currentTournamentRef) off(currentTournamentRef); // Desliga listener anterior se houver
+        currentTournamentRef = ref(db, 'tournaments_data/' + id);
+        
+        document.getElementById('loading-overlay').style.display = 'flex';
+        
+        onValue(currentTournamentRef, (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('loading-overlay').style.display = 'none';
+            const dot = document.getElementById('conn-dot');
+            dot.className = 'connection-dot online';
+
+            if (data) {
+                appState = data;
+                ['players','groups','matches'].forEach(k => { if(!appState[k]) appState[k] = []; });
+            } else {
+                appState = { mode:'individual', players: [], groups: [], matches: [], groupCounter: 0 };
+            }
+            renderAll();
+        });
+    }
+
+    window.exitTournament = function() {
+        if(confirm("Sair deste torneio e voltar para a lista?")) {
+            // Reset UI
+            document.getElementById('app-area').style.display = 'none';
+            document.getElementById('landing-area').style.display = 'flex';
+            document.body.classList.add('viewer-mode'); // Reset admin mode
+            
+            // Desconectar do torneio atual
+            if(currentTournamentRef) off(currentTournamentRef);
+            currentTournamentId = null;
+        }
+    }
+
+    // --- APP LOGIC (Identical to V56) ---
 
     const pInput = document.getElementById('pName');
     if(pInput) { pInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') window.addPlayer(); }); }
 
-    onValue(dbRef, (snapshot) => {
-        const data = snapshot.val();
-        document.getElementById('loading-overlay').style.display = 'none';
-        const dot = document.getElementById('conn-dot');
-        const txt = document.getElementById('conn-text');
-        dot.className = 'connection-dot online'; txt.innerText = 'ONLINE';
-
-        if (data) {
-            appState = data;
-            ['players','groups','matches'].forEach(k => { if(!appState[k]) appState[k] = []; });
-        } else {
-            appState = { mode:'individual', players: [], groups: [], matches: [], groupCounter: 0 };
-        }
-        renderAll();
-    }, (err) => { alert("Erro Rede: " + err.message); });
-
-    function saveToCloud() { set(dbRef, appState); }
+    function saveToCloud() { 
+        if(currentTournamentRef) set(currentTournamentRef, appState); 
+    }
 
     window.toggleAdmin = function() {
         if(document.body.classList.contains('viewer-mode')) {
@@ -231,7 +345,7 @@
     }
 
     window.resetSystem = function() {
-        if(confirm("Zerar tudo?")) { appState={mode:'individual',players:[],groups:[],matches:[],groupCounter:0}; saveToCloud(); }
+        if(confirm("Zerar tudo deste torneio?")) { appState={mode:'individual',players:[],groups:[],matches:[],groupCounter:0}; saveToCloud(); }
     }
 
     window.toggleSelection = function(pid, e) {
@@ -270,13 +384,11 @@
         if(confirm("Excluir jogador?")) { appState.players = appState.players.filter(p=>p.id!==pid); saveToCloud(); }
     }
 
-    // --- SMART AUTO MATCH GENERATOR (V54 Logic) ---
     window.genAllMatches = function(gid) {
         const ps = appState.players.filter(p => p.groupId === gid);
         const min = appState.mode === 'individual' ? 4 : 2;
         if(ps.length < min) return alert(`Mínimo ${min} jogadores!`);
 
-        // Histórico
         let history = new Set();
         appState.matches.forEach(m => {
             if(m.gid === gid && m.saved) {
@@ -285,7 +397,6 @@
             }
         });
 
-        // 1. FIXO (Todos contra Todos)
         if(appState.mode === 'fixed') {
             for(let i=0; i<ps.length; i++) {
                 for(let j=i+1; j<ps.length; j++) {
@@ -296,19 +407,17 @@
             saveToCloud(); return;
         }
 
-        // 2. INDIVIDUAL (5 JOGADORES = Perfeito)
         if(ps.length === 5) {
             const rounds = [
                 [ps[0], ps[1], ps[2], ps[3]], [ps[0], ps[2], ps[3], ps[4]],
                 [ps[0], ps[3], ps[1], ps[4]], [ps[0], ps[4], ps[1], ps[2]],
                 [ps[1], ps[3], ps[2], ps[4]]
             ];
-            if(appState.matches.filter(m=>m.gid===gid).length > 0 && !confirm("Já existem jogos. Gerar rodada de 5 mesmo assim?")) return;
+            if(appState.matches.filter(m=>m.gid===gid).length > 0 && !confirm("Já existem jogos. Gerar rodada de 5?")) return;
             rounds.forEach(r => createMatchObj(gid, r[0].id, r[1].id, r[2].id, r[3].id));
             saveToCloud(); return;
         }
 
-        // 3. INDIVIDUAL (Geral - Tenta casar rodada)
         let possiblePairs = [];
         for(let i=0; i<ps.length; i++) {
             for(let j=i+1; j<ps.length; j++) {
@@ -335,7 +444,7 @@
             }
             if(!found) possiblePairs.splice(0, 1);
         }
-        if(matchesMade === 0) alert("Não consegui casar jogos novos (falta de combinações). Tente manual.");
+        if(matchesMade === 0) alert("Não consegui casar jogos novos. Tente manual.");
         saveToCloud();
     }
 
@@ -347,11 +456,10 @@
         });
     }
 
-    // --- MANUAL MATCH (Cria jogo vazio para edição) ---
     window.addManualMatch = function(gid) {
         const ps = appState.players.filter(p => p.groupId === gid);
         if(ps.length < 2) return alert("Precisa de jogadores.");
-        const d = ps[0].id; // Dummy player
+        const d = ps[0].id;
         createMatchObj(gid, d, d, d, d);
         saveToCloud();
     }
@@ -387,7 +495,6 @@
         });
     }
 
-    // --- RENDER TABLE STYLE ---
     function renderAll() {
         document.getElementById('btn-ind').style.background = appState.mode==='individual' ? 'var(--secondary)' : '#ccc';
         document.getElementById('btn-ind').style.color = appState.mode==='individual' ? 'white' : 'black';
@@ -417,7 +524,6 @@
             const col = document.createElement('div');
             col.className = 'column';
             
-            // Header with AUTO button (Calls genAllMatches V56 Logic)
             let html = `
                 <div onclick="moveSelectedTo('${g.id}')" style="cursor:pointer; margin-bottom:5px;">
                     <div style="display:flex; gap:5px;" class="admin-only">
@@ -482,7 +588,7 @@
     window.downloadBackup = function() {
         const a = document.createElement('a');
         a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
-        a.download = "BT_Backup_V56.json"; a.click();
+        a.download = `Backup_${document.getElementById('tournament-title-display').innerText}.json`; a.click();
     }
     window.uploadBackup = function(input) {
         const f = input.files[0]; if(!f) return;
