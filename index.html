@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V53</title>
+    <title>BT Manager - V54 (Enter Fix)</title>
     <style>
         /* --- ESTILO V45 ORIGINAL --- */
         :root {
@@ -198,7 +198,7 @@
 
 <div id="loading-overlay">
     <div style="font-size:3em; margin-bottom:10px;">🎾</div>
-    <div style="font-weight:bold; color:#555;">Carregando V53...</div>
+    <div style="font-weight:bold; color:#555;">Carregando V54...</div>
 </div>
 
 <div class="status-bar">
@@ -233,7 +233,7 @@
     </div>
     
     <div class="row">
-        <input type="text" id="pName" placeholder="Nome do Jogador / Dupla...">
+        <input type="text" id="pName" placeholder="Nome do Jogador / Dupla..." autofocus>
         <button class="btn-add-player" onclick="addPlayer()">+ Add</button>
         <button class="btn-add-group" onclick="createGroup()">+ Grupo</button>
     </div>
@@ -287,10 +287,18 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'tournament_v53'); // NOVA CHAVE V53
+    const dbRef = ref(db, 'tournament_v53'); // Mantive V53 para não perder dados da versão anterior
 
     let appState = { mode: 'individual', players: [], groups: [], matches: [], groupCounter: 0, tieMatches: [], fixedPairs: [], bracket: [] };
     let selectedPlayerId = null;
+
+    // --- SETUP DO ENTER NO INPUT ---
+    const pInput = document.getElementById('pName');
+    if(pInput) {
+        pInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') window.addPlayer();
+        });
+    }
 
     // --- SYNC ---
     onValue(dbRef, (snapshot) => {
@@ -305,7 +313,6 @@
 
         if (data) {
             appState = data;
-            // Garantir Arrays
             ['players','groups','matches','tieMatches','fixedPairs','bracket'].forEach(k => {
                 if(!appState[k]) appState[k] = [];
             });
@@ -333,7 +340,7 @@
             if(pass === "1234") {
                 document.body.classList.remove('viewer-mode');
                 document.getElementById('mode-text').innerText = "MODO ADMIN 🔓";
-                renderAll(); // Re-render to show admin controls
+                renderAll(); 
             }
         } else {
             document.body.classList.add('viewer-mode');
@@ -351,7 +358,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
         const anchor = document.createElement('a');
         anchor.setAttribute("href", dataStr);
-        anchor.setAttribute("download", "BT_Backup_V53_" + new Date().toISOString().slice(0,10) + ".json");
+        anchor.setAttribute("download", "BT_Backup_V54_" + new Date().toISOString().slice(0,10) + ".json");
         document.body.appendChild(anchor);
         anchor.click(); anchor.remove();
     }
@@ -376,7 +383,9 @@
         const name = inp.value.trim();
         if(!name) return;
         appState.players.push({ id: 'p-'+Date.now(), name: name, groupId: 'pool', games: 0, wins: 0, balance: 0, points: 0, tieBonus: 0 });
-        inp.value = ''; saveToCloud();
+        inp.value = ''; 
+        inp.focus(); // Foco volta pro input
+        saveToCloud();
     }
 
     window.createGroup = function() {
@@ -439,7 +448,6 @@
         const min = appState.mode === 'individual' ? 4 : 2;
         if(ps.length < min) return alert(`Mínimo ${min} jogadores!`);
 
-        // Histórico para evitar repetições
         let history = new Set();
         appState.matches.forEach(m => {
             if(m.gid === gid && m.saved) {
@@ -458,7 +466,6 @@
             saveToCloud(); return;
         }
 
-        // INDIVIDUAL (V45 Logic)
         if(ps.length === 5) {
             const rounds = [
                 [ps[0], ps[1], ps[2], ps[3]], [ps[0], ps[2], ps[3], ps[4]],
@@ -516,7 +523,6 @@
         saveToCloud();
     }
 
-    // --- EDIT & SAVE LOGIC (V45 STYLE) ---
     window.saveMatch = function(mid) {
         const m = appState.matches.find(x => x.mid === mid);
         const s1In = document.getElementById('s1-'+mid);
@@ -526,15 +532,12 @@
         const textDiv = document.getElementById('t-'+mid);
         
         if(m.saved) {
-            // UNLOCK (ALTERAR)
             m.saved = false;
         } else {
-            // LOCK (SALVAR)
             const s1 = parseInt(s1In.value);
             const s2 = parseInt(s2In.value);
             if(isNaN(s1) || isNaN(s2)) return alert("Placar inválido.");
             m.s1 = s1; m.s2 = s2; m.saved = true;
-            // Se estava editando jogadores, fecha edição
             if(editDiv.style.display === 'block') {
                 editDiv.style.display = 'none';
                 textDiv.style.display = 'block';
@@ -550,12 +553,10 @@
         const inputDiv = document.getElementById('in-'+mid);
         
         if(editDiv.style.display === 'none') {
-            // OPEN EDITOR
             editDiv.style.display = 'block';
             textDiv.style.display = 'none';
             inputDiv.style.display = 'none';
         } else {
-            // CLOSE EDITOR
             editDiv.style.display = 'none';
             textDiv.style.display = 'block';
             inputDiv.style.display = 'flex';
@@ -574,7 +575,6 @@
         }
     }
 
-    // --- RECALC ---
     function recalcStats() {
         appState.players.forEach(p => { p.games=0; p.wins=0; p.balance=0; p.points=0; });
         appState.tieMatches.forEach(tm => {
@@ -596,20 +596,16 @@
         });
     }
 
-    // --- RENDER (V45 HTML STRUCTURE) ---
     function renderAll() {
-        // Buttons Update
         document.getElementById('btn-ind').className = appState.mode==='individual'?'mode-btn active':'mode-btn';
         document.getElementById('btn-fix').className = appState.mode==='fixed'?'mode-btn active':'mode-btn';
 
-        // Pool
         const poolDiv = document.getElementById('pool-list');
         poolDiv.innerHTML = '';
         const poolPs = appState.players.filter(p => p.groupId === 'pool');
         document.getElementById('pool-count').innerText = `(${poolPs.length})`;
         poolPs.forEach(p => poolDiv.appendChild(createCard(p)));
 
-        // Groups
         const groupsDiv = document.getElementById('groups-container');
         groupsDiv.innerHTML = '';
         
@@ -642,11 +638,8 @@
             const lDiv = col.querySelector(`#list-${g.id}`);
             appState.players.filter(p => p.groupId === g.id).forEach(p => lDiv.appendChild(createCard(p)));
 
-            // MATCH RENDER (V45 Logic)
             const mDiv = col.querySelector(`#matches-${g.id}`);
             const gMatches = appState.matches.filter(m => m.gid === g.id);
-            // Group matches by "Round" concept? In V50 we store simple array.
-            // Let's render as list of blocks.
             if(gMatches.length > 0) {
                 const roundBlock = document.createElement('div');
                 roundBlock.className = 'round-block';
@@ -666,7 +659,6 @@
             });
         });
         
-        // MATA MATA RENDER (if visible)
         if(document.getElementById('tiebreaker-area').style.display === 'block') renderTieUI();
         if(document.getElementById('finals-area').style.display === 'block') renderFinalsUI();
     }
@@ -688,7 +680,6 @@
             ? `${n(m.p1)} <br><small style="color:#666">VS</small><br> ${n(m.p3)}`
             : `${n(m.p1)} & ${n(m.p2)} <br><small style="color:#666">VS</small><br> ${n(m.p3)} & ${n(m.p4)}`;
             
-        // DROPDOWNS FOR EDIT
         const sel = (slot, cur) => {
             let h = `<select onchange="updateMatchPlayers('${m.mid}','${slot}',this.value)" style="max-width:90px">`;
             ps.forEach(p => h+=`<option value="${p.id}" ${p.id===cur?'selected':''}>${p.name}</option>`);
@@ -715,7 +706,6 @@
         return d;
     }
 
-    // --- MATA MATA & TIES ---
     window.startFinalsFlow = function() {
         let ties = [];
         appState.groups.forEach(g => {
@@ -756,7 +746,6 @@
     window.exitTieBreaker = function() { document.getElementById('tiebreaker-area').style.display='none'; document.getElementById('board').style.display='flex'; }
     window.exitFinals = function() { document.getElementById('finals-area').style.display='none'; document.getElementById('board').style.display='flex'; }
 
-    // (Simplified for Cloud - Expansion available via Desktop Backup)
     window.generateFixedPairs = function() { alert("Use o botão 'Baixar Backup' e gerencie as chaves na versão Desktop para controle total."); }
 </script>
 </body>
