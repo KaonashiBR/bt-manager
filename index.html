@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V51 DEFINITIVA</title>
+    <title>BT Manager - V52 (PC Compacto)</title>
     <style>
         /* --- ESTILO V45 ORIGINAL --- */
         :root {
@@ -94,8 +94,7 @@
             background: var(--bg-card); flex: 1 1 100%; border-radius: 8px; 
             display: flex; flex-direction: column; box-shadow: var(--shadow); border: 1px solid #999;
         }
-        @media(min-width: 768px) { .column { flex: 1 1 48%; } }
-
+        
         .column-header { 
             background: #e2e6ea; color: #000; padding: 15px; font-weight: 900; 
             display: flex; justify-content: space-between; align-items: center; 
@@ -159,13 +158,34 @@
         .bracket-match.finished { background: #e8f5e9; border-color: green; }
         .b-team { background: #f8f9fa; padding: 5px; margin-bottom: 2px; display: flex; justify-content: space-between; font-weight: bold;}
         .b-team.winner { background: #28a745; color: white; }
+
+        /* ========== AJUSTE RESPONSIVO PARA PC (Diminui ~20%) ========== */
+        @media (min-width: 1024px) {
+            body { 
+                font-size: 14px; /* Base menor */
+                max-width: 95%; 
+                margin: 0 auto; 
+            }
+            .column { flex: 1 1 350px; } /* Colunas mais estreitas */
+            
+            button { padding: 8px 12px; font-size: 0.8em; }
+            h2 { font-size: 1.4em; }
+            .header-controls { padding: 10px; }
+            .player-card { padding: 6px 8px; font-size: 0.9em; min-width: 100px; }
+            input { padding: 8px; font-size: 0.9em; }
+            
+            /* Ajuste Fino nos Jogos */
+            .match-item { padding: 8px; }
+            .score-input { width: 35px; height: 32px; font-size: 1.1em; }
+            .match-teams { font-size: 0.95em; margin-bottom: 5px; }
+        }
     </style>
 </head>
 <body class="viewer-mode">
 
 <div id="loading-overlay">
     <div style="font-size:3em; margin-bottom:10px;">🎾</div>
-    <div style="font-weight:bold; color:#555;">Carregando V51...</div>
+    <div style="font-weight:bold; color:#555;">Carregando V52...</div>
 </div>
 
 <div class="status-bar">
@@ -254,7 +274,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'tournament_v51'); // NOVA CHAVE V51
+    const dbRef = ref(db, 'tournament_v52'); // NOVA CHAVE V52
 
     let appState = { mode: 'individual', players: [], groups: [], matches: [], groupCounter: 0, tieMatches: [], fixedPairs: [], bracket: [] };
     let selectedPlayerId = null;
@@ -318,7 +338,7 @@
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
         const anchor = document.createElement('a');
         anchor.setAttribute("href", dataStr);
-        anchor.setAttribute("download", "BT_Backup_V51_" + new Date().toISOString().slice(0,10) + ".json");
+        anchor.setAttribute("download", "BT_Backup_V52_" + new Date().toISOString().slice(0,10) + ".json");
         document.body.appendChild(anchor);
         anchor.click(); anchor.remove();
     }
