@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Arena - V82 (Mata-Mata Pro)</title>
+    <title>BT Manager - V83 (Pro)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -18,18 +18,15 @@
             --text-dark: #333;
             --blue-masc: #2196F3;
             --pink-fem: #E91E63;
-            --fav-color: #ff3b30;
         }
 
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; -webkit-tap-highlight-color: transparent; height: 100vh; display: flex; flex-direction: column; }
 
         /* NAVBAR */
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
-        .nav-logo { font-weight: 800; font-size: 0.95em; color: var(--secondary); display: flex; align-items: center; gap: 6px; letter-spacing: -0.3px; line-height: 1.2; cursor: pointer; user-select: none; }
-        .nav-logo:active { opacity: 0.7; transform: scale(0.98); }
+        .nav-logo { font-weight: 800; font-size: 0.95em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
-        .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; transition: background 0.2s; }
-        .nav-user:active { background: #eee; }
+        .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
         .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd; object-fit: cover; }
         .user-name { font-size: 0.8em; font-weight: 600; color: #555; display: none; }
         @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.2em; } }
@@ -39,9 +36,6 @@
         .screen.active { display: flex; flex-direction: column; }
 
         /* CARDS */
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
-        .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-bottom: 15px;}
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; width: 100%; }
         .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
         .std-card:active { transform: scale(0.97); }
@@ -57,35 +51,7 @@
 
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
         .btn-icon-circle { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.9); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
-        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
-        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
-        .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
-
-        /* FOOTER */
-        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 10px 5px; font-size: 0.7em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
-        .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
-
-        /* MODAL */
-        #modal-overlay, #modal-login { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
-        .modal-title { margin: 0 0 20px; font-size: 1.3em; color: var(--secondary); text-align: center; }
-        .modal-label { font-size: 0.9em; color: #666; margin-bottom: 5px; display: block; font-weight: 600; margin-top: 10px; text-align: left; }
-        .preview-img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background: #eee; border: 1px solid #ddd;}
         
-        .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-google { background: #db4437; } .btn-logout { background: #555; }
-
-        /* TABS & RANKING */
-        .tabs { display: flex; margin-bottom: 15px; border-bottom: 1px solid #ddd; }
-        .tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; color: #666; font-weight: 600; }
-        .tab.active { color: var(--secondary); border-bottom: 3px solid var(--secondary); }
-        .tab-content { display: none; } .tab-content.active { display: block; }
-        .rank-table { width: 100%; border-collapse: collapse; background: white; }
-        .rank-table th { background: #333; color: white; padding: 8px; font-size: 0.8em; }
-        .rank-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
-        .rank-pos { width: 30px; height: 30px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 0.9em; }
-        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
-
         /* APP ELEMENTS */
         .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
         .header-controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
@@ -94,7 +60,7 @@
         .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; }
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; }
 
-        /* TABLE & COURT */
+        /* TABELA */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
         .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; }
         .gh-0 { background: #00b050 !important; color: white !important; } .gh-1 { background: #00b0f0 !important; color: black !important; } .gh-2 { background: #ffff00 !important; color: black !important; } .gh-3 { background: #ff0000 !important; color: white !important; }
@@ -104,6 +70,16 @@
         .tbl-input:disabled { border: none; background: transparent; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
 
+        /* BRACKET (CHAVES) VISUAL */
+        .bracket-container { overflow-x: auto; padding: 20px; white-space: nowrap; background: #eee; border-radius: 8px; margin-bottom: 20px; }
+        .bracket-round { display: inline-block; vertical-align: top; margin-right: 20px; width: 160px; }
+        .bracket-header { text-align: center; font-weight: bold; margin-bottom: 10px; color: var(--secondary); text-transform: uppercase; font-size: 0.8em; }
+        .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; }
+        .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .match-team:last-child { border-bottom: none; }
+        .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
+        .match-score { font-weight: 900; color: #333; }
+        
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
         .viewer-mode .court-select { pointer-events: none; border: none; background: transparent; appearance: none; }
@@ -112,8 +88,10 @@
         @media(min-width: 900px) { .board { flex-direction: row; flex-wrap: wrap; } .column { flex: 1 1 40%; } }
         
         #loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index: 3000; display: flex; justify-content: center; align-items: center; flex-direction: column;}
-        .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); }
-        .queue-court { font-weight:900; color:var(--primary); margin-right:10px; }
+        
+        /* FOOTER */
+        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 10px 5px; font-size: 0.7em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
+        .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -161,8 +139,7 @@
         <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.1em;">arrow_back</span> Sair</div>
         <div style="display:flex; align-items:center; gap:5px;">
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
-            <button onclick="shareLink()" id="btn-share" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
-            <button onclick="openQueue()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">list_alt</span></button>
+            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
         </div>
     </div>
@@ -178,7 +155,7 @@
         <div style="display:flex; gap:5px; flex-wrap:wrap;">
             <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
             <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std" style="width:auto;">Fixas</button>
-            <button onclick="askKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Gerar Mata-Mata</button>
+            <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Gerar Mata-Mata</button>
             <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
             <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
         </div>
@@ -198,21 +175,11 @@
 
 <div class="app-footer">Todos os direitos reservados © 2026<br>Desenvolvido por <a href="https://instagram.com/lsibie" target="_blank">@LSIBIE</a></div>
 
-<div id="modal-queue" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2200; justify-content:center; align-items:center;">
-    <div class="modal-box">
-        <h3 class="modal-title">Fila de Jogos</h3>
-        <div id="queue-list" style="max-height:60vh; overflow-y:auto;"></div>
-        <button class="btn-std btn-red" onclick="document.getElementById('modal-queue').style.display='none'" style="margin-top:15px;">Fechar</button>
-    </div>
-</div>
-
-<div id="modal-login">
+<div id="modal-login" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2500; justify-content:center; align-items:center;">
     <div class="modal-box">
         <h3 class="modal-title">Entrar no BT Arena</h3>
-        <button class="btn-login-opt btn-google" onclick="doGoogleLogin()">
-            <span style="background:white; color:#db4437; border-radius:50%; width:20px; height:20px; display:flex; justify-content:center; align-items:center; font-weight:900;">G</span> Google (Gmail)
-        </button>
-        <button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button>
+        <button class="btn-std btn-org" onclick="doGoogleLogin()">Google (Gmail)</button>
+        <button class="btn-std btn-red" onclick="closeLoginModal()" style="margin-top:10px;">Cancelar</button>
     </div>
 </div>
 
@@ -241,6 +208,14 @@
     </div>
 </div>
 
+<div id="modal-knockout" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2300; justify-content:center; align-items:center;">
+    <div class="modal-box">
+        <h3 class="modal-title">Configurar Mata-Mata</h3>
+        <div id="knockout-config-list" style="max-height:50vh; overflow-y:auto; margin-bottom:15px;"></div>
+        <div style="display:flex; gap:10px;"><button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button></div>
+    </div>
+</div>
+
 <div id="modal-finals" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2100; justify-content:center; align-items:center;">
     <div class="modal-box">
         <h3 class="modal-title">Encerrar & Pontuar</h3>
@@ -257,6 +232,7 @@
     import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
+    const MASTER_PASS = "lucas10";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
@@ -273,6 +249,7 @@
     const googleProvider = new GoogleAuthProvider();
 
     let user = null;
+    let localAdmin = false;
     let curArenaId = null; let curCatId = null; let curCatData = null; let curTourneyId = null; let appRef = null;
     let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'', courtCount:1 };
     let selectedPid = null;
@@ -294,6 +271,11 @@
     onAuthStateChanged(auth, (u) => {
         document.getElementById('loading').style.display = 'none';
         user = u;
+        updateUserUI();
+        loadArenas(); 
+    });
+
+    function updateUserUI() {
         if(user) {
             document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : "Usuário";
@@ -306,13 +288,12 @@
             });
         } else {
             document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-            document.getElementById('nav-username').innerText = "Visitante";
-            document.getElementById('btn-add-arena').style.display = 'none';
-            document.getElementById('msg-login').style.display = 'block';
+            document.getElementById('nav-username').innerText = localAdmin ? "Admin Local" : "Visitante";
+            document.getElementById('btn-add-arena').style.display = localAdmin ? 'flex' : 'none';
+            document.getElementById('msg-login').style.display = localAdmin ? 'none' : 'block';
             favorites = {};
-            loadArenas(); 
         }
-    });
+    }
 
     window.openLoginModal = () => { if(user) { if(confirm("Sair da conta?")) signOut(auth); } else { document.getElementById('modal-login').style.display = 'flex'; } }
     window.closeLoginModal = () => { document.getElementById('modal-login').style.display = 'none'; }
@@ -323,8 +304,6 @@
         if(!user) return alert("Faça login para favoritar.");
         const isFav = favorites[id] ? null : true; 
         update(ref(db, `users/${user.uid}/favorites`), { [id]: isFav });
-        e.target.classList.toggle('active');
-        e.target.innerText = isFav ? 'favorite' : 'favorite_border';
     }
 
     function loadArenaPlayers(arenaId) {
@@ -351,7 +330,7 @@
         else if(type === 'tournament') { 
             document.getElementById('field-pwd').style.display = 'block'; 
             document.getElementById('inp-pwd').value = extra1 || "1234";
-            document.getElementById('inp-courts').value = appState.courtCount || 1; // Default
+            document.getElementById('inp-courts').value = appState.courtCount || 1;
         }
     }
     window.closeModal = () => { document.getElementById('modal-overlay').style.display = 'none'; }
@@ -359,27 +338,26 @@
     window.handleFileSelect = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d'); const scale = 500 / img.width; cvs.width = 500; cvs.height = img.height * scale; ctx.drawImage(img, 0, 0, cvs.width, cvs.height); const data = cvs.toDataURL('image/jpeg', 0.7); document.getElementById('inp-url').value = data; updatePreview(data); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
 
     window.saveModal = () => {
-        if(!user) return;
+        if(!user && !localAdmin) return;
         const type = document.getElementById('modal-type').value;
         const id = document.getElementById('modal-id').value;
         const name = document.getElementById('inp-name').value.trim();
         if(!name) return alert("Nome obrigatório");
-        let path = ''; let data = { name, owner: user.uid };
+        let path = ''; let data = { name, owner: user ? user.uid : 'local' };
         if (type === 'arena') { path = 'arenas'; data.img = document.getElementById('inp-url').value; } 
         else if (type === 'category') { path = `categories/${curArenaId}`; data.type = document.getElementById('inp-cat-type').value; data.short = document.getElementById('inp-cat-short').value.toUpperCase(); data.points = { p1: parseInt(document.getElementById('pts-1').value)||0, p2: parseInt(document.getElementById('pts-2').value)||0, p3: parseInt(document.getElementById('pts-3').value)||0, part: parseInt(document.getElementById('pts-part').value)||0 }; } 
         else if (type === 'tournament') { path = `tournaments_meta/${curCatId}`; data.pwd = document.getElementById('inp-pwd').value || "1234"; data.date = Date.now(); }
 
-        // Logic update: If editing tournament, we must update court count in 'tournaments_data' too, not just meta
         const courts = parseInt(document.getElementById('inp-courts').value) || 1;
 
         if (id) { 
             update(ref(db, `${path}/${id}`), data); 
-            if(type === 'tournament') update(ref(db, `tournaments_data/${id}`), { courtCount: courts }); // FIX COURT COUNT EDIT
+            if(type === 'tournament') update(ref(db, `tournaments_data/${id}`), { courtCount: courts }); 
         } else {
             data.createdAt = Date.now();
             const newRef = push(ref(db, path), data);
             if(type === 'tournament') {
-                set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user.uid, courtCount: courts });
+                set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user?user.uid:'local', courtCount: courts });
             }
         }
         closeModal();
@@ -393,7 +371,7 @@
             const list = document.getElementById('grid-arenas'); list.innerHTML = '';
             const data = snap.val(); if(!data) return; 
             const keys = Object.keys(data).sort((a,b) => { const favA = favorites[a] ? 1 : 0; const favB = favorites[b] ? 1 : 0; return favB - favA; });
-            keys.forEach(key => { const d = data[key]; const isOwner = user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email)); list.appendChild(createCard(key, d.name, d.img, isOwner, 'arena', () => enterArena(key, d))); });
+            keys.forEach(key => { const d = data[key]; const isOwner = localAdmin || (user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email))); list.appendChild(createCard(key, d.name, d.img, isOwner, 'arena', () => enterArena(key, d))); });
         });
     }
 
@@ -407,16 +385,16 @@
         div.onclick = onClick; return div;
     }
 
-    window.enterArena = (id, data) => { curArenaId = id; document.getElementById('title-arena').innerText = data.name; document.getElementById('btn-add-cat').style.display = user ? 'flex' : 'none'; showScreen('screen-categories'); loadCategories(id); if(user) loadArenaPlayers(id); }
-    function loadCategories(arenaId) { onValue(ref(db, `categories/${arenaId}`), (snap) => { const list = document.getElementById('grid-categories'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; } Object.keys(data).forEach(key => { const d = data[key]; const isOwner = user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email)); list.appendChild(createCard(key, d.name, {type: d.type, short: d.short}, isOwner, 'category', () => enterCategory(key, d))); }); }); }
-    window.enterCategory = (id, data) => { curCatId = id; curCatData = data; document.getElementById('title-cat').innerText = data.name; document.getElementById('btn-add-tourney').style.display = user ? 'flex' : 'none'; switchTab('tournaments'); showScreen('screen-tournaments'); loadTournaments(id); }
-    function loadTournaments(catId) { onValue(ref(db, `tournaments_meta/${catId}`), (snap) => { const list = document.getElementById('grid-tournaments'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; } Object.keys(data).forEach(key => { const d = data[key]; const isOwner = user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email)); const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : ''); list.appendChild(createCard(key, d.name, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub)); }); }); }
+    window.enterArena = (id, data) => { curArenaId = id; document.getElementById('title-arena').innerText = data.name; document.getElementById('btn-add-cat').style.display = (user || localAdmin) ? 'flex' : 'none'; showScreen('screen-categories'); loadCategories(id); if(user || localAdmin) loadArenaPlayers(id); }
+    function loadCategories(arenaId) { onValue(ref(db, `categories/${arenaId}`), (snap) => { const list = document.getElementById('grid-categories'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; } Object.keys(data).forEach(key => { const d = data[key]; const isOwner = localAdmin || (user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email))); list.appendChild(createCard(key, d.name, {type: d.type, short: d.short}, isOwner, 'category', () => enterCategory(key, d))); }); }); }
+    window.enterCategory = (id, data) => { curCatId = id; curCatData = data; document.getElementById('title-cat').innerText = data.name; document.getElementById('btn-add-tourney').style.display = (user || localAdmin) ? 'flex' : 'none'; switchTab('tournaments'); showScreen('screen-tournaments'); loadTournaments(id); }
+    function loadTournaments(catId) { onValue(ref(db, `tournaments_meta/${catId}`), (snap) => { const list = document.getElementById('grid-tournaments'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; } Object.keys(data).forEach(key => { const d = data[key]; const isOwner = localAdmin || (user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email))); const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : ''); list.appendChild(createCard(key, d.name, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub)); }); }); }
     function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th>#</th><th>Nome</th><th>Pts</th><th>J</th><th>V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-size:1.1em;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
 
     window.enterApp = (tId, name, pwd, ownerId) => {
         curTourneyId = tId; document.getElementById('t-title-header').innerText = name; showScreen('screen-app');
         if(curArenaId) loadArenaPlayers(curArenaId);
-        const isOwner = user && (user.uid === ownerId || ADMIN_EMAILS.includes(user.email));
+        const isOwner = localAdmin || (user && (user.uid === ownerId || ADMIN_EMAILS.includes(user.email)));
         if(isOwner) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; } else { document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; }
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
         onValue(appRef, (snap) => {
@@ -432,103 +410,119 @@
     window.openFinalsModal = () => { document.getElementById('modal-finals').style.display = 'flex'; const fills = [document.getElementById('sel-win-1'), document.getElementById('sel-win-2'), document.getElementById('sel-win-3')]; fills.forEach(s => { s.innerHTML = '<option value="">Selecione...</option>'; appState.players.forEach(p => s.innerHTML += `<option value="${p.name}">${p.name}</option>`); }); }
     window.submitPoints = async () => { if(!curCatData || !curCatData.points) return alert("Erro na config da categoria."); const p1 = document.getElementById('sel-win-1').value; const p2 = document.getElementById('sel-win-2').value; const p3 = document.getElementById('sel-win-3').value; if(!p1) return alert("Selecione o campeão."); update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); const rankRef = ref(db, `rankings/${curCatId}`); const snap = await get(rankRef); let ranking = snap.val() || {}; const updatePlayer = (name, pts, isWin=false) => { const key = name.replace(/[.#$/[\]]/g, ""); if(!ranking[key]) ranking[key] = { name: name, points: 0, tournaments: 0, wins: 0 }; ranking[key].points += pts; ranking[key].tournaments += 1; if(isWin) ranking[key].wins += 1; }; if(p1) updatePlayer(p1, curCatData.points.p1, true); if(p2) updatePlayer(p2, curCatData.points.p2); if(p3) updatePlayer(p3, curCatData.points.p3); appState.players.forEach(p => { if(p.name !== p1 && p.name !== p2 && p.name !== p3) updatePlayer(p.name, curCatData.points.part); }); await set(rankRef, ranking); alert("Ranking Atualizado!"); document.getElementById('modal-finals').style.display = 'none'; }
 
-    // --- KNOCKOUT GEN ---
-    window.askKnockout = () => {
-        const perGroup = prompt("Quantos classificam por GRUPO?", "2");
-        if(!perGroup) return;
-        genKnockout(parseInt(perGroup));
+    // --- PRO KNOCKOUT CONFIG ---
+    window.openConfigKnockout = () => {
+        const div = document.getElementById('knockout-config-list');
+        div.innerHTML = '';
+        appState.groups.forEach(g => {
+            if(g.id.includes('ko')) return;
+            div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="2" min="0"></div>`;
+        });
+        document.getElementById('modal-knockout').style.display = 'flex';
     }
 
-    window.genKnockout = (perGroup) => {
-        // 1. Get qualified per group
+    window.execKnockout = () => {
         let qualified = [];
         appState.groups.forEach(g => {
-            if(g.name.includes("MATA")) return; // Skip existing knockouts
-            const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
-            qualified.push(...ps.slice(0, perGroup));
+            if(g.id.includes('ko')) return;
+            const n = parseInt(document.getElementById(`ko-n-${g.id}`).value) || 0;
+            if(n > 0) {
+                const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
+                qualified.push(...ps.slice(0, n));
+            }
         });
 
-        // 2. Global Seed sort
+        if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
+        
+        // Sort Global Seeds (Best to Worst)
         qualified.sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
-        
-        const T = qualified.length;
-        if(T < 2) return alert("Poucos jogadores classificados.");
 
-        // 3. Calc next Power of 2 (4, 8, 16, 32)
-        let P = 2;
-        while(P < T) P *= 2;
-        const byes = P - T;
-        const activeCount = T - byes;
-
-        // 4. Create Group
-        const gName = `MATA-MATA (Rodada de ${P})`;
-        let gid = 'g-ko-'+Date.now();
-        appState.groups.push({ id: gid, name: gName });
-
-        // 5. Matches: High vs Low from the *Active* bottom of list
-        // Top 'byes' players wait. The next 'activeCount' players play.
-        // Actually, standard bracket: 
-        // If 6 players (P=8). 2 Byes. Seeds 1 & 2 bye. 
-        // Matches: 3vs6, 4vs5.
+        // Power of 2 (2, 4, 8, 16, 32)
+        let size = 2;
+        while(size < qualified.length) size *= 2;
         
-        // Wait list text
-        const byePlayers = qualified.slice(0, byes);
-        const playPlayers = qualified.slice(byes);
+        // Calculate Byes (Players who skip first round)
+        // Standard single elimination bracket logic:
+        // Top seeds get byes. 
+        // Number of matches in round 1 = qualified.length - size/2 ?? No.
+        // Formula: Byes = Size - Qualified.
+        const byesCount = size - qualified.length;
         
-        // Add fake players or just handle IDs?
-        // Let's create matches for the bottom set
-        // Pair highest of remaining vs lowest of remaining
-        // Ex: 3 vs 6, 4 vs 5
-        
-        // Add info about byes
-        if(byes > 0) {
-            const byeNames = byePlayers.map(p=>p.name).join(", ");
-            alert(`Classificados com BYE (Passam direto): ${byeNames}`);
-        }
+        // Create Knockout Group
+        const gid = `g-ko-${Date.now()}`;
+        appState.groups.push({ id: gid, name: `MATA-MATA (Chave de ${size})` });
 
-        // Generate Matches for 'playPlayers'
-        // We need to pair Top of Play vs Bottom of Play
-        for(let i=0; i < playPlayers.length / 2; i++) {
-            const pHigh = playPlayers[i];
-            const pLow = playPlayers[playPlayers.length - 1 - i];
-            // Individual vs Fixed?
-            if(appState.mode === 'fixed') {
-                addMatch(gid, pHigh.id, 'd', pLow.id, 'd');
+        // Logic:
+        // We create matches for the first "Real" round. 
+        // Players with Bye automatically advance conceptually (we don't create match for them yet, or create visual bye).
+        // Let's create visual matchups using a new Data Structure in appState if possible, OR just normal matches.
+        // To keep it simple in V83:
+        // The players who play R1 are the bottom ones.
+        // Total players playing R1 = (Qualified - Byes) ?? No.
+        // Number of matches in R1 = Qualified - (Size/2). Ex: 12 players (Size 16). 4 Byes. 8 play R1 (4 matches).
+        
+        // Let's just create pairings for everyone for simplicity of this version:
+        // Seed 1 vs Seed Last
+        // Seed 2 vs Seed Last-1 ...
+        // If Seed Last is empty (Bye), Seed 1 auto wins.
+        
+        // Better: Just Pair them up 1vLast, 2vLast-1...
+        // If opponent is "null" (Bye), visual indication.
+        
+        // Let's do simple pairing for now:
+        for(let i=0; i<size/2; i++) {
+            const high = qualified[i];
+            const lowIndex = size - 1 - i;
+            const low = qualified[lowIndex]; // Might be undefined (Bye)
+            
+            if(!low) {
+                // BYE Match - Add specialized match type or just skip? 
+                // Let's Add a match with "BYE" as opponent name visually
+                // We create a "Ghost Player" for BYE
+                const byeId = 'bye-'+i;
+                // Add match: High vs Bye
+                // We can use a special flag on match to render differently
+                addMatch(gid, high.id, high.id, 'BYE', 'BYE', true); 
             } else {
-                // Individual requires 4 players per match. Knockout is usually fixed pairs.
-                // Assuming Fixed for Knockout logic simplification or simple 1v1 placeholder
-                addMatch(gid, pHigh.id, pHigh.id, pLow.id, pLow.id);
+                addMatch(gid, high.id, high.id, low.id, low.id);
             }
         }
         
+        document.getElementById('modal-knockout').style.display = 'none';
         save();
+        alert("Chave Gerada!");
     }
 
-    function addMatch(gid, p1, p2, p3, p4) { appState.matches.push({mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1,p2,p3,p4, s1:'', s2:'', saved:false, court: 1}); }
-
-    // --- NEW: RENAME & QUEUE ---
-    window.editName = (pid, oldName, e) => {
-        e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return;
-        const newName = prompt("Novo nome:", oldName);
-        if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } }
+    function addMatch(gid, p1, p2, p3, p4, isBye=false) { 
+        appState.matches.push({
+            mid:'m'+Date.now()+Math.random().toString().substr(2,3), 
+            gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, court:1, isBye
+        }); 
     }
 
-    window.openQueue = () => {
-        const list = document.getElementById('queue-list'); list.innerHTML = '';
-        const pending = appState.matches.filter(m => !m.saved).sort((a,b) => a.court - b.court);
-        if(pending.length === 0) list.innerHTML = '<div style="padding:10px; color:#777;">Fila vazia.</div>'; 
-        else pending.forEach(m => {
-            const p1 = appState.players.find(x=>x.id===m.p1)?.name || '?'; const p3 = appState.players.find(x=>x.id===m.p3)?.name || '?';
-            const div = document.createElement('div'); div.className = 'queue-item'; div.innerHTML = `<span class="queue-court">Q${m.court}</span> ${p1} x ${p3}`; list.appendChild(div);
-        });
-        document.getElementById('modal-queue').style.display = 'flex';
+    window.tryAdmin = () => { 
+        if(!document.body.classList.contains('viewer-mode')) return; 
+        const p = prompt("Senha:"); 
+        if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { 
+            document.body.classList.remove('viewer-mode'); 
+            document.getElementById('btn-lock').innerText = '🔓'; 
+            localAdmin = true;
+            updateUserUI();
+        } else alert("Senha incorreta"); 
     }
 
-    window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; } else alert("Senha incorreta"); }
     window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
     function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
-    window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); }
+    window.addPlayer = () => { 
+        const n=document.getElementById('pName').value.trim(); if(!n)return; 
+        // Duplicate Check
+        if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!");
+        
+        appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); 
+        if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } 
+        document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); 
+    }
     window.addGroup = () => { appState.groupCount++; appState.groups.push({id:'g'+Date.now(), name: "GRUPO "+String.fromCharCode(64+appState.groupCount)}); save(); }
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
     window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); } }
@@ -537,7 +531,17 @@
     window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); save(); }
     window.delGroup = (gid) => { if(confirm("Excluir?")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); }}
     window.delPlayer = (pid) => { if(confirm("Excluir?")) { appState.players=appState.players.filter(p=>p.id!==pid); save(); }}
-    window.genMatches = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); let hist=new Set(); appState.matches.filter(m=>m.gid===gid && m.saved).forEach(m=>{ if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-')); else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); } }); if(appState.mode==='fixed') { for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) addM(gid, ps[i].id, 'd', ps[j].id, 'd'); } } else if(ps.length===5) { if(appState.matches.filter(m=>m.gid===gid).length && !confirm("Rodada 5?")) return; [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>addM(gid, ps[r[0]].id, ps[r[1]].id, ps[r[2]].id, ps[r[3]].id)); } else { let pairs=[]; for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id}); } if(!pairs.length) return alert("Sem combinações."); pairs.sort(()=>Math.random()-0.5); let count=0; while(pairs.length) { let pA=pairs[0], found=false; for(let k=1; k<pairs.length; k++) { let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); if(all.size===4) { addM(gid,pA.p1,pA.p2,pB.p1,pB.p2); pairs.splice(k,1); pairs.splice(0,1); found=true; count++; break; } } if(!found) pairs.splice(0,1); } if(!count) alert("Não consegui casar."); } save(); }
+    window.genMatches = (gid) => { 
+        // Fixed Auto Gen Button
+        const ps=appState.players.filter(p=>p.groupId===gid); 
+        if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); 
+        let hist=new Set(); 
+        appState.matches.filter(m=>m.gid===gid && m.saved).forEach(m=>{ if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-')); else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); } }); 
+        if(appState.mode==='fixed') { for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) addM(gid, ps[i].id, 'd', ps[j].id, 'd'); } } 
+        else if(ps.length===5) { if(appState.matches.filter(m=>m.gid===gid).length && !confirm("Rodada 5?")) return; [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>addM(gid, ps[r[0]].id, ps[r[1]].id, ps[r[2]].id, ps[r[3]].id)); } 
+        else { let pairs=[]; for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id}); } if(!pairs.length) return alert("Sem combinações."); pairs.sort(()=>Math.random()-0.5); let count=0; while(pairs.length) { let pA=pairs[0], found=false; for(let k=1; k<pairs.length; k++) { let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); if(all.size===4) { addM(gid,pA.p1,pA.p2,pB.p1,pB.p2); pairs.splice(k,1); pairs.splice(0,1); found=true; count++; break; } } if(!found) pairs.splice(0,1); } if(!count) alert("Não consegui casar."); } save(); 
+    }
+    function addM(gid,p1,p2,p3,p4) { appState.matches.push({mid:'m'+Date.now()+Math.random(), gid, p1,p2,p3,p4, s1:'', s2:'', saved:false, court: 1}); }
     window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addM(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id); save(); }
     window.saveS = (mid) => { const m = appState.matches.find(x=>x.mid===mid), s1=document.getElementById(`s1-${mid}`).value, s2=document.getElementById(`s2-${mid}`).value; if(m.saved) { m.saved=false; } else { if(s1===''||s2==='') return; m.s1=parseInt(s1); m.s2=parseInt(s2); m.saved=true; } recalc(); save(); }
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
@@ -557,31 +561,52 @@
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='column';
             let h = ``;
-            // HEADERS: With Delete Group Button restored
-            if(g.id.includes('ko-')) { // Special style for Knockout
+            // HEADERS
+            if(g.id.includes('ko-')) { 
                 h += `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px; background:black; color:white; padding:5px; font-weight:bold; border-radius:4px;">${g.name} <span class="admin-only" style="float:right; color:red;" onclick="delGroup('${g.id}');event.stopPropagation()">✕</span></div>`;
+                h += `<div class="bracket-container" style="display:flex; overflow-x:auto;">`;
+                // Simple Card View for Matches instead of Table
+                ms.forEach((m, idx) => {
+                    const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'?');
+                    const p1n = appState.mode==='fixed' ? n(m.p1) : n(m.p1)+'/'+n(m.p2);
+                    const p2n = appState.mode==='fixed' ? n(m.p3) : n(m.p3)+'/'+n(m.p4);
+                    // Winner style
+                    const w1 = m.saved && m.s1 > m.s2;
+                    const w2 = m.saved && m.s2 > m.s1;
+                    
+                    h += `<div class="match-card" style="min-width:180px; margin-right:10px;">
+                        <div style="font-size:0.7em; color:#777; margin-bottom:5px;">Jogo ${idx+1} ${m.isBye ? '(BYE)' : ''}</div>
+                        <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;"><span>${p1n}</span><span class="match-score">${m.s1||'-'}</span></div>
+                        <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;"><span>${p2n}</span><span class="match-score">${m.s2||'-'}</span></div>
+                        ${!m.isBye ? `
+                        <div class="admin-only" style="margin-top:5px; display:flex; gap:5px;">
+                            <input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;">
+                            <input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;">
+                            <button class="btn-ok-mini" style="background:green; color:white; border:none; border-radius:3px;" onclick="saveS('${m.mid}')">OK</button>
+                        </div>` : ''}
+                    </div>`;
+                });
+                h += `</div>`;
             } else {
                 h += `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px;"><div class="admin-only" style="display:flex; gap:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div></div>`;
-            }
-
-            if(ms.length) {
-                h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}" onclick="moveSel('${g.id}')">${g.name} <span class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation()" style="float:right; cursor:pointer;">✕</span></th></tr></thead><tbody>`;
-                ms.forEach(m => {
-                    const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
-                    const t1 = appState.mode==='fixed' ? n(m.p1) : `${n(m.p1)}<br><small>/${n(m.p2)}</small>`;
-                    const t2 = appState.mode==='fixed' ? n(m.p3) : `${n(m.p3)}<br><small>/${n(m.p4)}</small>`;
-                    let courtOpts = ''; const totalCourts = appState.courtCount || 1;
-                    for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
-                    h += `<tr><td style="text-align:right">${t1}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left">${t2}</td><td class="admin-only" style="width:40px"><button class="btn-ok-mini ${m.saved?'saved':''}" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
-                });
-                h += `</tbody></table>`;
-            } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">${g.name} (Vazio) <span class="admin-only" style="float:right; color:red; cursor:pointer;" onclick="delGroup('${g.id}');event.stopPropagation()">✕</span></div>`; }
-            
-            // Only show rankings for non-knockout groups
-            if(ps.length && !g.id.includes('ko-')) { 
-                h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`; 
-                ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; cursor:pointer;" onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)">${p.name} ✎</td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
-                h += `</table>`; 
+                if(ms.length) {
+                    h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}" onclick="moveSel('${g.id}')">${g.name} <span class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation()" style="float:right; cursor:pointer; font-weight:400;">✕</span></th></tr></thead><tbody>`;
+                    ms.forEach(m => {
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
+                        const t1 = appState.mode==='fixed' ? n(m.p1) : `${n(m.p1)}<br><small>/${n(m.p2)}</small>`;
+                        const t2 = appState.mode==='fixed' ? n(m.p3) : `${n(m.p3)}<br><small>/${n(m.p4)}</small>`;
+                        let courtOpts = ''; const totalCourts = appState.courtCount || 1;
+                        for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
+                        h += `<tr><td style="text-align:right">${t1}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left">${t2}</td><td class="admin-only" style="width:40px"><button class="btn-ok-mini ${m.saved?'saved':''}" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                    });
+                    h += `</tbody></table>`;
+                } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">${g.name} (Vazio) <span class="admin-only" style="float:right; cursor:pointer;" onclick="delGroup('${g.id}'); event.stopPropagation()">✕</span></div>`; }
+                
+                if(ps.length) { 
+                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`; 
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; cursor:pointer;" onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)">${p.name} ✎</td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
+                    h += `</table>`; 
+                }
             }
             col.innerHTML = h; gc.appendChild(col);
         });
