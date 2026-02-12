@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V57 (Multi-Torneios)</title>
+    <title>BT Manager - V58 (Multi-Admin)</title>
     <style>
         :root {
             --primary: #ff6b00;
@@ -35,11 +35,10 @@
         body.viewer-mode .del-btn { display: none; }
         body.viewer-mode .tbl-actions { display: none; }
 
-        /* --- TELAS (LOBBY vs APP) --- */
-        #app-area { display: none; padding: 10px; padding-bottom: 80px; overflow-y: auto; flex:1;}
+        /* --- LOBBY AREA --- */
         #landing-area { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; height: 100%; overflow-y: auto; }
+        #app-area { display: none; padding: 10px; padding-bottom: 80px; overflow-y: auto; flex:1;}
 
-        /* --- LOBBY STYLES --- */
         .lobby-card { 
             background: white; width: 100%; max-width: 400px; padding: 20px; 
             border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -47,7 +46,7 @@
             border-left: 6px solid var(--secondary); transition: transform 0.1s;
         }
         .lobby-card:active { transform: scale(0.98); background: #f0f0f0; }
-        .lobby-title { font-weight: 800; font-size: 1.2em; color: #333; }
+        .lobby-title { font-weight: 800; font-size: 1.2em; color: #333; text-transform: uppercase; }
         .lobby-date { font-size: 0.8em; color: #777; }
         .btn-create { 
             background: var(--primary); color: white; border: none; padding: 15px; 
@@ -82,7 +81,7 @@
         .btn-ok-mini { background: #28a745; color: white; border: none; border-radius: 3px; padding: 4px 6px; font-size: 0.7em; font-weight: bold; cursor: pointer; }
         .btn-ok-mini.saved { background: #ffc107; color: black; }
 
-        /* --- RESTO DO LAYOUT --- */
+        /* --- LAYOUT DO APP --- */
         .status-bar {
             display: flex; justify-content: space-between; align-items: center;
             background: #343a40; color: white; padding: 10px; border-radius: 8px; 
@@ -132,14 +131,14 @@
 </div>
 
 <div id="landing-area">
-    <div style="text-align:center; margin-bottom:30px;">
+    <div style="text-align:center; margin-bottom:30px; margin-top:20px;">
         <h1 style="color:var(--secondary); font-size:2.5em; margin:0;">BT MANAGER</h1>
-        <p style="color:#666;">Selecione um torneio ou crie um novo</p>
+        <p style="color:#666;">Plataforma de Torneios</p>
     </div>
 
     <button class="btn-create" onclick="createNewTournament()">+ CRIAR NOVO TORNEIO</button>
 
-    <div style="width:100%; max-width:400px; text-align:left; font-weight:bold; color:#555; margin-bottom:10px;">TORNEIOS DISPONÍVEIS:</div>
+    <div style="width:100%; max-width:400px; text-align:left; font-weight:bold; color:#555; margin-bottom:10px; padding-left:5px;">TORNEIOS DISPONÍVEIS:</div>
     <div id="lobby-list" style="width:100%; display:flex; flex-direction:column; align-items:center;">
         <div style="color:#999;">Carregando lista...</div>
     </div>
@@ -148,12 +147,12 @@
 <div id="app-area">
     <div class="status-bar">
         <div>
-            <button onclick="exitTournament()" style="background:#555; margin-right:5px;">⬅ Sair</button>
+            <button onclick="exitTournament()" style="background:#555; margin-right:5px; padding:5px 10px;">⬅ Sair</button>
             <span id="conn-dot" class="connection-dot"></span> <span id="conn-text">ONLINE</span>
         </div>
         <div style="display:flex; align-items:center; gap:5px;">
             <span id="tournament-title-display" style="color:#ccc; font-size:0.8em; margin-right:5px; text-transform:uppercase;"></span>
-            <button onclick="toggleAdmin()" style="background:transparent; border:1px solid #aaa; padding:2px 6px; font-size:0.7em;">🔒</button>
+            <button onclick="toggleAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 6px; font-size:0.7em;">🔒</button>
         </div>
     </div>
 
@@ -204,18 +203,14 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    
-    // Referência para a lista de torneios
-    const lobbyRef = ref(db, 'tournaments_lobby');
+    const lobbyRef = ref(db, 'tournaments_lobby_v2'); // Nova referência de Lobby V2
     
     let currentTournamentRef = null;
-    let appState = { mode: 'individual', players: [], groups: [], matches: [], groupCounter: 0 };
+    let appState = { mode: 'individual', players: [], groups: [], matches: [], groupCounter: 0, adminPassword: '' };
     let selectedPlayerId = null;
     let currentTournamentId = null;
 
     // --- LOBBY LOGIC ---
-    
-    // Carregar lista de torneios ao abrir
     onValue(lobbyRef, (snapshot) => {
         const data = snapshot.val();
         const listDiv = document.getElementById('lobby-list');
@@ -226,7 +221,6 @@
             const keys = Object.keys(data);
             if(keys.length === 0) listDiv.innerHTML = '<div style="color:#999; margin-top:20px;">Nenhum torneio criado.</div>';
             
-            // Ordenar mais recente primeiro (opcional)
             keys.reverse().forEach(key => {
                 const t = data[key];
                 const card = document.createElement('div');
@@ -247,35 +241,52 @@
     });
 
     window.createNewTournament = function() {
-        const pass = prompt("Senha de Admin para criar:");
-        if(pass !== "1234") return alert("Senha incorreta!");
-        
+        // Passo 1: Nome
         const name = prompt("Nome do Novo Torneio (ex: Copa Verão):");
         if(!name) return;
+
+        // Passo 2: Senha exclusiva
+        const password = prompt("Crie uma SENHA DE ADMIN para este torneio (não esqueça!):");
+        if(!password) return alert("É obrigatório criar uma senha para proteger seu torneio.");
 
         const newRef = push(lobbyRef);
         const newId = newRef.key;
         
-        // Salva no Lobby
-        set(newRef, {
-            name: name,
-            createdAt: Date.now()
-        }).then(() => {
-            // Entra no torneio recém criado
-            enterTournament(newId, name);
+        // Salva metadados no Lobby
+        set(newRef, { name: name, createdAt: Date.now() }).then(() => {
+            // Inicializa dados do torneio COM A SENHA definida
+            const initData = { 
+                mode: 'individual', 
+                players: [], groups: [], matches: [], 
+                groupCounter: 0,
+                adminPassword: password // Salva a senha dentro do torneio
+            };
+            
+            set(ref(db, 'tournaments_data_v2/' + newId), initData).then(() => {
+                // Entra automaticamente como Admin
+                enterTournament(newId, name, true);
+            });
         });
     }
 
-    window.enterTournament = function(id, name) {
+    window.enterTournament = function(id, name, autoAdmin = false) {
         currentTournamentId = id;
         document.getElementById('landing-area').style.display = 'none';
         document.getElementById('app-area').style.display = 'block';
         document.getElementById('tournament-title-header').innerText = name;
         document.getElementById('tournament-title-display').innerText = name;
         
-        // Conectar ao nó específico deste torneio
-        if(currentTournamentRef) off(currentTournamentRef); // Desliga listener anterior se houver
-        currentTournamentRef = ref(db, 'tournaments_data/' + id);
+        // Auto Admin se acabou de criar
+        if(autoAdmin) {
+            document.body.classList.remove('viewer-mode');
+            document.getElementById('btn-lock').innerText = '🔓';
+        } else {
+            document.body.classList.add('viewer-mode');
+            document.getElementById('btn-lock').innerText = '🔒';
+        }
+
+        if(currentTournamentRef) off(currentTournamentRef);
+        currentTournamentRef = ref(db, 'tournaments_data_v2/' + id);
         
         document.getElementById('loading-overlay').style.display = 'flex';
         
@@ -287,28 +298,29 @@
 
             if (data) {
                 appState = data;
+                // Garante arrays
                 ['players','groups','matches'].forEach(k => { if(!appState[k]) appState[k] = []; });
+                // Garante senha antiga se não tiver
+                if(!appState.adminPassword) appState.adminPassword = '1234'; 
             } else {
-                appState = { mode:'individual', players: [], groups: [], matches: [], groupCounter: 0 };
+                // Fallback
+                appState = { mode:'individual', players: [], groups: [], matches: [], groupCounter: 0, adminPassword: '1234' };
             }
             renderAll();
         });
     }
 
     window.exitTournament = function() {
-        if(confirm("Sair deste torneio e voltar para a lista?")) {
-            // Reset UI
+        if(confirm("Sair do torneio e voltar para a lista?")) {
             document.getElementById('app-area').style.display = 'none';
             document.getElementById('landing-area').style.display = 'flex';
-            document.body.classList.add('viewer-mode'); // Reset admin mode
-            
-            // Desconectar do torneio atual
+            document.body.classList.add('viewer-mode');
             if(currentTournamentRef) off(currentTournamentRef);
             currentTournamentId = null;
         }
     }
 
-    // --- APP LOGIC (Identical to V56) ---
+    // --- APP LOGIC (V56 Smart + Auth) ---
 
     const pInput = document.getElementById('pName');
     if(pInput) { pInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') window.addPlayer(); }); }
@@ -319,9 +331,18 @@
 
     window.toggleAdmin = function() {
         if(document.body.classList.contains('viewer-mode')) {
-            if(prompt("Senha:")==="1234") document.body.classList.remove('viewer-mode');
+            const pass = prompt("Digite a Senha de Admin deste Torneio:");
+            // Verifica a senha DO TORNEIO ou a MESTRA (master123)
+            if(pass === appState.adminPassword || pass === "master123") {
+                document.body.classList.remove('viewer-mode');
+                document.getElementById('btn-lock').innerText = '🔓';
+                alert("Acesso Admin Liberado!");
+            } else {
+                alert("Senha incorreta!");
+            }
         } else {
             document.body.classList.add('viewer-mode');
+            document.getElementById('btn-lock').innerText = '🔒';
         }
     }
 
@@ -345,7 +366,12 @@
     }
 
     window.resetSystem = function() {
-        if(confirm("Zerar tudo deste torneio?")) { appState={mode:'individual',players:[],groups:[],matches:[],groupCounter:0}; saveToCloud(); }
+        // Mantém a senha ao resetar!
+        if(confirm("Zerar tudo deste torneio?")) { 
+            const pwd = appState.adminPassword;
+            appState = { mode:'individual', players: [], groups: [], matches: [], groupCounter: 0, adminPassword: pwd }; 
+            saveToCloud(); 
+        }
     }
 
     window.toggleSelection = function(pid, e) {
@@ -384,6 +410,7 @@
         if(confirm("Excluir jogador?")) { appState.players = appState.players.filter(p=>p.id!==pid); saveToCloud(); }
     }
 
+    // --- SMART LOGIC ---
     window.genAllMatches = function(gid) {
         const ps = appState.players.filter(p => p.groupId === gid);
         const min = appState.mode === 'individual' ? 4 : 2;
@@ -444,7 +471,7 @@
             }
             if(!found) possiblePairs.splice(0, 1);
         }
-        if(matchesMade === 0) alert("Não consegui casar jogos novos. Tente manual.");
+        if(matchesMade === 0) alert("Não consegui casar jogos. Tente manual.");
         saveToCloud();
     }
 
@@ -495,6 +522,7 @@
         });
     }
 
+    // --- RENDER ---
     function renderAll() {
         document.getElementById('btn-ind').style.background = appState.mode==='individual' ? 'var(--secondary)' : '#ccc';
         document.getElementById('btn-ind').style.color = appState.mode==='individual' ? 'white' : 'black';
