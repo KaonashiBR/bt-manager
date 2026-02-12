@@ -8,33 +8,40 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V50 COMPLETA</title>
+    <title>BT Manager - V51 DEFINITIVA</title>
     <style>
+        /* --- ESTILO V45 ORIGINAL --- */
         :root {
             --primary: #ff6b00;       
             --secondary: #004e98;     
             --secondary-dark: #003366;
-            --success: #28a745;
-            --danger: #dc3545;
+            --success-dark: #1b5e20;
+            --danger-dark: #b71c1c;
+            --dark-grey: #2c3e50;
             --bg-body: #dee2e6;
             --bg-card: #ffffff;
+            --border-radius: 8px;
+            --shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-body); color: #000; 
+            background: var(--bg-body); 
+            color: #000; 
             padding: 10px; margin: 0; padding-bottom: 80px;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- VISIBILIDADE --- */
+        /* --- VISIBILIDADE (Admin vs Espectador) --- */
         body.viewer-mode .admin-only { display: none !important; }
         body.viewer-mode input:not(.score-display) { pointer-events: none; border:none; background: transparent; }
         body.viewer-mode .score-input { border: none; background: transparent; font-size: 1.4em; color: black; }
         body.viewer-mode #col-pool { display: none !important; } 
-        body.viewer-mode .del-btn { display: none; }
+        body.viewer-mode .del-player-btn { display: none; }
+        body.viewer-mode .btn-match-action { display: none; }
+        body.viewer-mode .btn-edit-match { display: none; }
 
-        /* --- STATUS BAR --- */
+        /* --- BARRA DE STATUS --- */
         .status-bar {
             display: flex; justify-content: space-between; align-items: center;
             background: #343a40; color: white; padding: 12px; border-radius: 8px; 
@@ -45,96 +52,120 @@
         .connection-dot.online { background: #0f0; box-shadow: 0 0 8px #0f0; }
         .connection-dot.offline { background: #f00; }
 
-        /* --- BOTÕES --- */
+        /* --- BOTÕES V45 --- */
         button {
-            border: none; border-radius: 6px; cursor: pointer; font-weight: 700;
-            text-transform: uppercase; color: white; padding: 10px; font-size: 0.85em;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2); transition: transform 0.1s;
+            border: none; border-radius: 6px; cursor: pointer; font-family: inherit;
+            font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            transition: all 0.2s; box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+            display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+            color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.5); padding: 10px 15px;
         }
         button:active { transform: scale(0.96); }
 
-        .btn-add { background: var(--primary); flex: 1; }
-        .btn-group { background: var(--secondary); flex: 1; }
-        .btn-auto { background: #2e7d32; flex: 1; } /* VERDE AUTO */
-        .btn-manual { background: #0277bd; flex: 1; } /* AZUL MANUAL */
-        
-        .btn-save-file { background: #555; font-size: 0.75em; padding: 8px; }
-        .btn-load-file { background: #d35400; font-size: 0.75em; padding: 8px; }
-        .btn-reset { background: var(--danger); }
-        .btn-finals { background: #4a148c; width: 100%; margin-top: 5px; }
-        .btn-match { background: #333; min-width: 60px; }
-        .btn-match.saved { background: #ffc107; color: black; border: 1px solid #d39e00; }
+        .btn-save { background-color: var(--secondary-dark) !important; font-size: 0.8em; padding: 8px; } 
+        .btn-load { background-color: #d35400 !important; font-size: 0.8em; padding: 8px; } 
+        .btn-finals { background-color: #4a148c !important; width: 100%; margin-top: 5px; } 
+        .btn-add-player { background-color: var(--primary) !important; flex:1; }
+        .btn-add-group { background-color: var(--secondary) !important; flex:1; }
+        .btn-gen { background-color: #2e7d32 !important; width: 100%; } 
+        .btn-manual { background-color: #0277bd !important; width: 100%; } 
+        .btn-check-tie { background-color: var(--success-dark) !important; width: 100%; padding: 15px; }
+        .btn-distribute { background-color: #fff !important; color: var(--secondary-dark) !important; text-shadow: none !important; border: 2px solid var(--secondary-dark) !important; font-size: 0.8em; padding: 5px 10px; }
         
         /* --- LAYOUT --- */
-        .control-panel { 
-            background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .header-controls { 
+            background: var(--bg-card); padding: 15px; border-radius: var(--border-radius); 
+            box-shadow: var(--shadow); margin-bottom: 20px; border: 1px solid #ccc;
         }
-        .row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
-        .title { margin: 0; font-size: 1.4em; text-transform: uppercase; color: var(--secondary); width: 100%; text-align: center; }
-
-        input[type="text"] { 
-            padding: 10px; border: 2px solid #ced4da; border-radius: 6px; 
-            flex: 1; font-size: 1rem; width: 100%; box-sizing: border-box;
-        }
+        .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; width: 100%; margin-bottom: 10px; justify-content: center;}
         
-        /* Seletor de Modo */
-        .mode-selector { display: flex; gap: 5px; width: 100%; margin-bottom: 10px; }
-        .mode-btn { flex: 1; background: #ddd; color: #333; padding: 8px; }
-        .mode-btn.active { background: var(--secondary); color: white; }
+        h2 { margin: 0; color: #000; font-weight: 900; font-size: 1.6em; text-transform: uppercase; text-align: center; width:100%; }
+
+        input { padding: 12px; border: 2px solid #6c757d; border-radius: 6px; flex: 1; outline: none; font-size: 1rem; font-weight: 600; color: #000; }
+        input:focus { border-color: var(--primary); background: #fffbe6; }
+
+        .mode-selector { background: #ced4da; padding: 5px; border-radius: 8px; display: flex; gap: 5px; width: 100%; }
+        .mode-btn { background: transparent; color: #000; border-radius: 6px; padding: 10px; font-size: 0.8em; box-shadow: none; text-shadow: none; flex: 1; }
+        .mode-btn.active { background: var(--secondary); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
         /* --- BOARD --- */
-        .board { display: flex; flex-wrap: wrap; gap: 15px; }
+        .board { display: flex; flex-wrap: wrap; gap: 20px; }
         .column { 
-            background: white; flex: 1 1 100%; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); border: 1px solid #dee2e6;
+            background: var(--bg-card); flex: 1 1 100%; border-radius: 8px; 
+            display: flex; flex-direction: column; box-shadow: var(--shadow); border: 1px solid #999;
         }
         @media(min-width: 768px) { .column { flex: 1 1 48%; } }
 
-        .col-header { 
-            background: #e9ecef; padding: 12px; font-weight: 800; 
-            display: flex; justify-content: space-between; align-items: center;
+        .column-header { 
+            background: #e2e6ea; color: #000; padding: 15px; font-weight: 900; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 2px solid #ccc; font-size: 1.1em;
         }
-        #col-pool .col-header { background: var(--secondary); color: white; }
+        #col-pool .column-header { background: var(--secondary); color: white; border: none; }
 
-        .player-list { padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; min-height: 50px; }
+        .player-pool { background: #f8f9fa; padding: 10px; min-height: 80px; display: flex; flex-wrap: wrap; gap: 8px; }
         
-        .card { 
-            background: white; border: 1px solid #ccc; padding: 8px 12px; border-radius: 6px; 
-            display: flex; justify-content: space-between; align-items: center;
-            font-weight: 600; font-size: 0.9em; flex: 1 1 auto; cursor: pointer;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        .player-card { 
+            background: white; padding: 10px; border-radius: 6px; font-size: 0.95em; font-weight: 700;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); cursor: pointer; display: flex; align-items: center; 
+            justify-content: space-between; flex: 1 1 auto; min-width: 120px; border: 1px solid #ccc; color: #000;
         }
-        .card.selected { background: #fff3cd; border: 2px solid #ffc107; transform: scale(1.02); }
+        .player-card.selected { background: #fff3cd; border: 2px solid #ffc107; transform: scale(1.02); }
+        
+        .del-player-btn { color: #aaa; font-size: 1.3em; cursor: pointer; padding: 0 8px; font-weight: 900; }
+        .del-player-btn:hover { color: red; background: #fee; border-radius: 50%; }
 
-        /* --- PLACAR --- */
-        .match-row { padding: 10px; border-bottom: 1px solid #eee; text-align: center; background: white; }
-        .match-row.saved { background: #f1f3f5; }
-        .teams-vs { font-weight: 700; margin-bottom: 6px; font-size: 0.95em; line-height: 1.3; }
-        .inputs-area { display: flex; justify-content: center; gap: 5px; align-items: center; }
-        .score-box { width: 45px; height: 38px; text-align: center; font-size: 1.3em; border-radius: 4px; border: 2px solid #ccc; font-weight: bold; }
+        /* --- MATCHES V45 --- */
+        .round-block { background: white; border: 1px solid #999; border-radius: 6px; margin-bottom: 15px; overflow: hidden; }
+        .round-header { background: #ced4da; padding: 8px 12px; font-size: 0.9em; font-weight: 800; color: #000; display:flex; justify-content:space-between; border-bottom: 1px solid #999; }
+        
+        .match-item { padding: 12px; border-bottom: 1px solid #ddd; position: relative; }
+        .match-item.locked-bg { background: #e9ecef; }
+        
+        .match-teams { text-align: center; font-weight: 700; font-size: 1em; margin-bottom: 8px; color: #000; line-height: 1.3;}
+        .match-inputs { display: flex; justify-content: center; gap: 8px; align-items: center; }
+        .score-input { width: 45px; height: 38px; text-align: center; font-weight: 800; font-size: 1.2em; border: 2px solid #6c757d; color: #000; border-radius: 4px;}
+        
+        .btn-match-action { 
+            padding: 5px 15px; font-size: 0.8em; min-width: 70px; 
+            background-color: #343a40 !important; box-shadow: none;
+        }
+        .btn-match-action.saved { 
+            background-color: #ffc107 !important; color: #000 !important; 
+            text-shadow: none !important; border: 1px solid #d39e00;
+        }
+        .btn-edit-match { 
+            position: absolute; top: 5px; right: 5px; color: #6c757d; 
+            font-size: 1.3em; padding: 5px; background: none; box-shadow: none; 
+            border:none; text-shadow: none;
+        }
 
-        /* --- TABELA --- */
-        table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 5px; }
-        th { background: #343a40; color: white; padding: 6px; }
-        td { border: 1px solid #dee2e6; padding: 6px; text-align: center; font-weight: 600; }
-        .tie-icon { color: red; animation: blink 1s infinite; font-size: 1.2em; }
+        /* --- RANKING --- */
+        table { width: 100%; border-collapse: collapse; font-size: 0.95em; }
+        th { background: #343a40; color: #fff; padding: 8px; font-size: 0.8em; text-transform: uppercase; border: 1px solid #454d55; }
+        td { padding: 6px; border: 1px solid #dee2e6; text-align: center; font-weight: 600; color: #000; }
+        .tie-indicator { color: red; font-size: 1.2em; animation: pulse 1s infinite; margin-left: 5px; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* --- MATA MATA --- */
-        #finals-area { display: none; background: white; padding: 15px; border-radius: 8px; border-top: 5px solid var(--secondary); margin-top: 20px;}
+        /* --- LOADING --- */
         #loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: white; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        .alert-box { 
-            display:none; padding: 10px; margin: 10px; border-radius: 4px; 
-            text-align: center; font-weight: bold; font-size: 0.9em;
-        }
+        /* --- MATA MATA --- */
+        #finals-area, #tiebreaker-area { display: none; background: white; padding: 15px; border-radius: 8px; margin-top: 20px; border-top: 5px solid var(--secondary); }
+        .pairs-preview-container { border: 1px solid #ccc; padding: 10px; max-height: 200px; overflow-y: auto; margin-bottom: 10px;}
+        .fixed-pair-row { background: #eee; padding: 5px; margin-bottom: 5px; font-weight: bold; }
+        .bracket-container { display: flex; gap: 20px; overflow-x: auto; padding: 20px 0; }
+        .bracket-match { border: 1px solid #999; padding: 10px; margin-bottom: 10px; background: white; border-radius: 5px; min-width: 160px; }
+        .bracket-match.finished { background: #e8f5e9; border-color: green; }
+        .b-team { background: #f8f9fa; padding: 5px; margin-bottom: 2px; display: flex; justify-content: space-between; font-weight: bold;}
+        .b-team.winner { background: #28a745; color: white; }
     </style>
 </head>
 <body class="viewer-mode">
 
 <div id="loading-overlay">
     <div style="font-size:3em; margin-bottom:10px;">🎾</div>
-    <div style="font-weight:bold; color:#555;">Carregando V50...</div>
+    <div style="font-weight:bold; color:#555;">Carregando V51...</div>
 </div>
 
 <div class="status-bar">
@@ -148,40 +179,64 @@
     </div>
 </div>
 
-<div class="control-panel admin-only">
-    <h2 class="title">Painel de Controle</h2>
-    
-    <div class="mode-selector">
-        <button id="btn-ind" class="mode-btn active" onclick="setGameMode('individual')">Individual</button>
-        <button id="btn-fix" class="mode-btn" onclick="setGameMode('fixed')">Duplas Fixas</button>
+<div class="header-controls admin-only">
+    <div class="row">
+        <h2>Beach Tennis Manager</h2>
     </div>
 
-    <div class="row" style="justify-content: center; margin-top:10px; border-bottom: 1px solid #eee; padding-bottom:10px;">
-        <button class="btn-save-file" onclick="downloadBackup()">💾 Baixar Backup</button>
-        <button class="btn-load-file" onclick="document.getElementById('fileInput').click()">📂 Carregar Backup</button>
+    <div class="row" style="border-bottom:1px solid #ccc; padding-bottom:10px;">
+        <button class="btn-save" onclick="downloadBackup()">💾 Baixar Backup</button>
+        <button class="btn-load" onclick="document.getElementById('fileInput').click()">📂 Carregar Backup</button>
         <input type="file" id="fileInput" style="display:none" onchange="uploadBackup(this)">
     </div>
 
     <div class="row">
-        <input type="text" id="pName" placeholder="Nome do Jogador / Dupla...">
-        <button class="btn-add" onclick="addPlayer()">+ Add</button>
+        <div class="mode-selector">
+            <button id="btn-ind" class="mode-btn active" onclick="setGameMode('individual')">Individual</button>
+            <button id="btn-fix" class="mode-btn" onclick="setGameMode('fixed')">Duplas Fixas</button>
+        </div>
+        <button class="btn-finals" onclick="startFinalsFlow()">🏆 Fase Final</button>
+        <button style="background:#d32f2f; width:100%; margin-top:5px;" onclick="resetSystem()">⚠ Reset Total</button>
     </div>
+    
     <div class="row">
-        <button class="btn-group" onclick="createGroup()">+ Grupo</button>
-        <button class="btn-reset" onclick="resetSystem()">⚠ Reset</button>
+        <input type="text" id="pName" placeholder="Nome do Jogador / Dupla...">
+        <button class="btn-add-player" onclick="addPlayer()">+ Add</button>
+        <button class="btn-add-group" onclick="createGroup()">+ Grupo</button>
     </div>
-    <div style="text-align:center; font-size:0.8em; color:#666; margin-top:5px;">Toque no Jogador > Toque no Grupo para mover.</div>
+    <div style="text-align:center; font-size:0.8em; color:#666; margin-top:5px;">Toque no Jogador para selecionar > Toque no Grupo para mover.</div>
 </div>
 
 <div class="board" id="board">
     <div class="column" id="col-pool">
-        <div class="col-header" onclick="moveSelectedTo('pool')">
-            <span>Reservas <span id="pool-count">(0)</span></span>
-            <button class="admin-only" onclick="distributePlayers(); event.stopPropagation();" style="background:white; color:#004e98; padding:5px; font-size:0.7em;">🚀 Distribuir</button>
+        <div class="column-header" onclick="moveSelectedTo('pool')">
+            <span>Banco de Reservas <span id="pool-count">(0)</span></span>
+            <button class="admin-only btn-distribute" onclick="distributePlayers(); event.stopPropagation();">🚀 Distribuir</button>
         </div>
-        <div class="player-list" id="pool-list"></div>
+        <div class="player-pool" id="pool-list"></div>
     </div>
+    
     <div id="groups-container" style="display:contents;"></div>
+</div>
+
+<div id="tiebreaker-area" class="admin-only">
+    <button onclick="exitTieBreaker()" style="background:#555; margin-bottom:10px;">← Voltar</button>
+    <div class="setup-box" style="text-align:center;">
+        <h2 style="color:#b71c1c;">⚠️ Desempate Necessário</h2>
+        <div id="tie-list-container"></div>
+    </div>
+</div>
+
+<div id="finals-area" class="admin-only">
+    <button onclick="exitFinals()" style="background:#555; margin-bottom:10px;">← Voltar</button>
+    <div class="setup-box" id="finals-setup">
+        <h3>Configurar Classificados</h3>
+        <div id="groups-config-container"></div>
+        <button onclick="generateFixedPairs()" class="btn-gen" style="margin-top:10px;">Gerar Classificados</button>
+        <div id="pairs-list" class="pairs-preview-container"></div>
+        <button id="btn-start-bracket" onclick="generateBracketTree()" class="btn-check-tie" style="display:none; margin-top:10px;">🚀 INICIAR CHAVES</button>
+    </div>
+    <div class="bracket-container" id="bracket-view"></div>
 </div>
 
 <script type="module">
@@ -199,10 +254,9 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'tournament_v50'); // V50 Path
+    const dbRef = ref(db, 'tournament_v51'); // NOVA CHAVE V51
 
-    // GLOBAL STATE
-    let appState = { mode: 'individual', players: [], groups: [], matches: [], groupCounter: 0 };
+    let appState = { mode: 'individual', players: [], groups: [], matches: [], groupCounter: 0, tieMatches: [], fixedPairs: [], bracket: [] };
     let selectedPlayerId = null;
 
     // --- SYNC ---
@@ -218,11 +272,12 @@
 
         if (data) {
             appState = data;
-            if(!appState.players) appState.players = [];
-            if(!appState.groups) appState.groups = [];
-            if(!appState.matches) appState.matches = [];
+            // Garantir Arrays
+            ['players','groups','matches','tieMatches','fixedPairs','bracket'].forEach(k => {
+                if(!appState[k]) appState[k] = [];
+            });
         } else {
-            appState = { mode:'individual', players: [], groups: [], matches: [], groupCounter: 0 };
+            appState = { mode:'individual', players: [], groups: [], matches: [], groupCounter: 0, tieMatches: [], fixedPairs: [], bracket: [] };
         }
         renderAll();
     }, (error) => {
@@ -238,31 +293,32 @@
         });
     }
 
-    // --- WINDOW FUNCTIONS ---
+    // --- GLOBAL FUNCTIONS ---
     window.toggleAdmin = function() {
         if(document.body.classList.contains('viewer-mode')) {
             const pass = prompt("Senha Admin:");
             if(pass === "1234") {
                 document.body.classList.remove('viewer-mode');
                 document.getElementById('mode-text').innerText = "MODO ADMIN 🔓";
+                renderAll(); // Re-render to show admin controls
             }
         } else {
             document.body.classList.add('viewer-mode');
             document.getElementById('mode-text').innerText = "ESPECTADOR";
+            renderAll();
         }
     }
 
     window.setGameMode = function(m) {
-        if(appState.players.length>0 && !confirm("Mudar modo pode confundir jogos existentes. Continuar?")) return;
-        appState.mode = m;
-        saveToCloud();
+        if(appState.players.length>0 && !confirm("Mudar modo pode confundir jogos. Continuar?")) return;
+        appState.mode = m; saveToCloud();
     }
 
     window.downloadBackup = function() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
         const anchor = document.createElement('a');
         anchor.setAttribute("href", dataStr);
-        anchor.setAttribute("download", "BT_Backup_" + new Date().toISOString().slice(0,10) + ".json");
+        anchor.setAttribute("download", "BT_Backup_V51_" + new Date().toISOString().slice(0,10) + ".json");
         document.body.appendChild(anchor);
         anchor.click(); anchor.remove();
     }
@@ -274,12 +330,10 @@
         reader.onload = function(e) {
             try {
                 const loaded = JSON.parse(e.target.result);
-                if(confirm("Carregar backup substituirá TUDO na nuvem. Continuar?")) {
-                    appState = loaded;
-                    saveToCloud();
-                    alert("Backup carregado!");
+                if(confirm("CARREGAR BACKUP SUBSTITUIRÁ A NUVEM. CONTINUAR?")) {
+                    appState = loaded; saveToCloud(); alert("Carregado!");
                 }
-            } catch(err) { alert("Erro ao ler arquivo."); }
+            } catch(err) { alert("Erro arquivo."); }
         };
         reader.readAsText(file);
     }
@@ -288,7 +342,7 @@
         const inp = document.getElementById('pName');
         const name = inp.value.trim();
         if(!name) return;
-        appState.players.push({ id: 'p-'+Date.now(), name: name, groupId: 'pool', games: 0, wins: 0, balance: 0, points: 0 });
+        appState.players.push({ id: 'p-'+Date.now(), name: name, groupId: 'pool', games: 0, wins: 0, balance: 0, points: 0, tieBonus: 0 });
         inp.value = ''; saveToCloud();
     }
 
@@ -296,6 +350,13 @@
         appState.groupCounter++;
         appState.groups.push({ id: 'g-'+Date.now(), name: "Grupo "+appState.groupCounter });
         saveToCloud();
+    }
+
+    window.resetSystem = function() {
+        if(confirm("RESET TOTAL: Apagar tudo?")) {
+            appState = { mode: appState.mode, players: [], groups: [], matches: [], groupCounter: 0, tieMatches: [], fixedPairs: [], bracket: [] };
+            saveToCloud();
+        }
     }
 
     window.toggleSelection = function(pid, e) {
@@ -336,60 +397,46 @@
     }
     
     window.deletePlayer = function(pid) {
-        if(confirm("Excluir?")) { appState.players = appState.players.filter(p=>p.id!==pid); saveToCloud(); }
+        if(confirm("Excluir jogador?")) { appState.players = appState.players.filter(p=>p.id!==pid); saveToCloud(); }
     }
 
-    // --- GAME LOGIC (The Brain) ---
-    
+    // --- ENGINE V45 (MATCH GENERATOR) ---
     window.genAllMatches = function(gid) {
         const ps = appState.players.filter(p => p.groupId === gid);
         const min = appState.mode === 'individual' ? 4 : 2;
         if(ps.length < min) return alert(`Mínimo ${min} jogadores!`);
 
-        // Remove unsaved matches logic (optional, lets keep existing matches to be safe)
-        // Check history
+        // Histórico para evitar repetições
         let history = new Set();
         appState.matches.forEach(m => {
             if(m.gid === gid && m.saved) {
-                if(appState.mode === 'fixed') {
-                    history.add([m.p1, m.p3].sort().join('-'));
-                } else {
-                    history.add([m.p1, m.p2].sort().join('-'));
-                    history.add([m.p3, m.p4].sort().join('-'));
-                }
+                if(appState.mode === 'fixed') history.add([m.p1, m.p3].sort().join('-'));
+                else { history.add([m.p1, m.p2].sort().join('-')); history.add([m.p3, m.p4].sort().join('-')); }
             }
         });
 
-        // FIXO
         if(appState.mode === 'fixed') {
             for(let i=0; i<ps.length; i++) {
                 for(let j=i+1; j<ps.length; j++) {
                     const key = [ps[i].id, ps[j].id].sort().join('-');
-                    if(!history.has(key)) {
-                        createMatchObj(gid, ps[i].id, 'dummy', ps[j].id, 'dummy');
-                    }
+                    if(!history.has(key)) createMatchObj(gid, ps[i].id, 'dummy', ps[j].id, 'dummy');
                 }
             }
-            saveToCloud();
-            return;
+            saveToCloud(); return;
         }
 
-        // INDIVIDUAL (The Smart Logic)
+        // INDIVIDUAL (V45 Logic)
         if(ps.length === 5) {
             const rounds = [
                 [ps[0], ps[1], ps[2], ps[3]], [ps[0], ps[2], ps[3], ps[4]],
                 [ps[0], ps[3], ps[1], ps[4]], [ps[0], ps[4], ps[1], ps[2]],
                 [ps[1], ps[3], ps[2], ps[4]]
             ];
-            // Check if matches already exist to avoid dups
             if(appState.matches.filter(m=>m.gid===gid).length > 0 && !confirm("Já existem jogos. Gerar rodada de 5 mesmo assim?")) return;
-            
             rounds.forEach(r => createMatchObj(gid, r[0].id, r[1].id, r[2].id, r[3].id));
-            saveToCloud();
-            return;
+            saveToCloud(); return;
         }
 
-        // General Pair Logic
         let possiblePairs = [];
         for(let i=0; i<ps.length; i++) {
             for(let j=i+1; j<ps.length; j++) {
@@ -399,38 +446,31 @@
         }
         
         if(possiblePairs.length === 0) return alert("Todas as combinações já jogaram!");
-        
         possiblePairs.sort(() => Math.random() - 0.5);
+        
         let matchesMade = 0;
-
         while(possiblePairs.length > 0) {
             let pairA = possiblePairs[0];
             let found = false;
             for(let k=1; k < possiblePairs.length; k++) {
                 let pairB = possiblePairs[k];
-                // Check distinct players
                 let all = new Set([pairA.p1, pairA.p2, pairB.p1, pairB.p2]);
                 if(all.size === 4) {
                     createMatchObj(gid, pairA.p1, pairA.p2, pairB.p1, pairB.p2);
-                    possiblePairs.splice(k, 1);
-                    possiblePairs.splice(0, 1);
-                    matchesMade++;
-                    found = true;
-                    break;
+                    possiblePairs.splice(k, 1); possiblePairs.splice(0, 1);
+                    matchesMade++; found = true; break;
                 }
             }
             if(!found) possiblePairs.splice(0, 1);
         }
-        
-        if(matchesMade === 0) alert("Não consegui casar jogos novos agora.");
+        if(matchesMade === 0) alert("Não consegui casar jogos novos.");
         saveToCloud();
     }
 
     function createMatchObj(gid, p1, p2, p3, p4) {
         appState.matches.push({
             mid: 'm-'+Date.now()+Math.random().toString().substr(2,5),
-            gid: gid,
-            p1: p1, p2: p2, p3: p3, p4: p4,
+            gid: gid, p1: p1, p2: p2, p3: p3, p4: p4,
             s1: '', s2: '', saved: false
         });
     }
@@ -443,60 +483,89 @@
         saveToCloud();
     }
 
-    window.saveScore = function(mid) {
+    // --- EDIT & SAVE LOGIC (V45 STYLE) ---
+    window.saveMatch = function(mid) {
         const m = appState.matches.find(x => x.mid === mid);
+        const s1In = document.getElementById('s1-'+mid);
+        const s2In = document.getElementById('s2-'+mid);
+        const btn = document.getElementById('btn-'+mid);
+        const editDiv = document.getElementById('e-'+mid);
+        const textDiv = document.getElementById('t-'+mid);
+        
         if(m.saved) {
+            // UNLOCK (ALTERAR)
             m.saved = false;
         } else {
-            const s1 = document.getElementById('s1-'+mid).value;
-            const s2 = document.getElementById('s2-'+mid).value;
-            if(s1 === '' || s2 === '') return alert("Digite placar.");
-            m.s1 = parseInt(s1); m.s2 = parseInt(s2); m.saved = true;
+            // LOCK (SALVAR)
+            const s1 = parseInt(s1In.value);
+            const s2 = parseInt(s2In.value);
+            if(isNaN(s1) || isNaN(s2)) return alert("Placar inválido.");
+            m.s1 = s1; m.s2 = s2; m.saved = true;
+            // Se estava editando jogadores, fecha edição
+            if(editDiv.style.display === 'block') {
+                editDiv.style.display = 'none';
+                textDiv.style.display = 'block';
+                document.getElementById('in-'+mid).style.display = 'flex';
+            }
         }
         recalcStats(); saveToCloud();
     }
 
-    window.deleteMatch = function(mid) {
-        if(confirm("Excluir jogo?")) {
+    window.toggleEditPlayers = function(mid) {
+        const editDiv = document.getElementById('e-'+mid);
+        const textDiv = document.getElementById('t-'+mid);
+        const inputDiv = document.getElementById('in-'+mid);
+        
+        if(editDiv.style.display === 'none') {
+            // OPEN EDITOR
+            editDiv.style.display = 'block';
+            textDiv.style.display = 'none';
+            inputDiv.style.display = 'none';
+        } else {
+            // CLOSE EDITOR
+            editDiv.style.display = 'none';
+            textDiv.style.display = 'block';
+            inputDiv.style.display = 'flex';
+        }
+    }
+
+    window.updateMatchPlayers = function(mid, slot, pid) {
+        const m = appState.matches.find(x => x.mid === mid);
+        if(m) { m[slot] = pid; saveToCloud(); }
+    }
+
+    window.delRound = function(mid) {
+        if(confirm("Apagar jogo?")) {
             appState.matches = appState.matches.filter(m => m.mid !== mid);
             recalcStats(); saveToCloud();
         }
     }
 
-    window.updateMatchPlayer = function(mid, slot, pid) {
-        const m = appState.matches.find(x => x.mid === mid);
-        if(m) { m[slot] = pid; saveToCloud(); }
-    }
-
-    window.resetSystem = function() {
-        if(confirm("RESET TOTAL: Apagar tudo?")) {
-            appState = { mode: appState.mode, players: [], groups: [], matches: [], groupCounter: 0 };
-            saveToCloud();
-        }
-    }
-
+    // --- RECALC ---
     function recalcStats() {
         appState.players.forEach(p => { p.games=0; p.wins=0; p.balance=0; p.points=0; });
+        appState.tieMatches.forEach(tm => {
+            const w = appState.players.find(x=>x.id===tm.winnerId);
+            if(w) w.tieBonus += 0.001;
+        });
         appState.matches.forEach(m => {
             if(m.saved) {
                 const run = (pid, myS, opS) => {
                     const pl = appState.players.find(x => x.id === pid);
                     if(pl) {
-                        pl.games++;
-                        pl.balance += (myS - opS);
+                        pl.games++; pl.balance += (myS - opS);
                         if(myS > opS) { pl.wins++; pl.points += 3; }
                     }
                 };
                 run(m.p1, m.s1, m.s2); run(m.p3, m.s2, m.s1);
-                if(appState.mode === 'individual') {
-                    run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1);
-                }
+                if(appState.mode === 'individual') { run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); }
             }
         });
     }
 
+    // --- RENDER (V45 HTML STRUCTURE) ---
     function renderAll() {
-        // Mode Buttons
+        // Buttons Update
         document.getElementById('btn-ind').className = appState.mode==='individual'?'mode-btn active':'mode-btn';
         document.getElementById('btn-fix').className = appState.mode==='fixed'?'mode-btn active':'mode-btn';
 
@@ -513,27 +582,26 @@
         
         appState.groups.forEach(g => {
             const ps = appState.players.filter(p => p.groupId === g.id);
-            ps.sort((a,b) => (b.points - a.points) || (b.wins - a.wins) || (b.balance - a.balance));
+            ps.sort((a,b) => (b.points+b.tieBonus)-(a.points+a.tieBonus) || (b.wins-a.wins) || (b.balance-a.balance));
 
             const col = document.createElement('div');
             col.className = 'column';
             col.innerHTML = `
-                <div class="col-header" onclick="moveSelectedTo('${g.id}')">
+                <div class="column-header" onclick="moveSelectedTo('${g.id}')">
                     <span>${g.name}</span>
-                    <button class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation();" style="color:#d32f2f; background:transparent;">✕</button>
+                    <button class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation();" style="color:#d32f2f; background:transparent; border:none; font-weight:900;">✕</button>
                 </div>
                 
-                <div class="player-list admin-only" id="list-${g.id}"></div>
+                <div class="player-pool admin-only" id="list-${g.id}"></div>
                 
                 <div class="admin-only" style="padding:10px; display:flex; gap:5px;">
-                    <button class="btn-auto" onclick="genAllMatches('${g.id}')">⚡ Auto</button>
-                    <button class="btn-manual" onclick="addManualMatch('${g.id}')">🖐 Manual</button>
+                    <button class="btn-gen" onclick="genAllMatches('${g.id}')">⚡ AUTO</button>
+                    <button class="btn-manual" onclick="addManualMatch('${g.id}')">🖐 MANUAL</button>
                 </div>
-                
-                <div class="alert-box" id="alert-${g.id}"></div>
-                <div id="matches-${g.id}"></div>
 
-                <div style="background:#343a40; color:white; font-size:0.8em; text-align:center; padding:5px; font-weight:bold;">CLASSIFICAÇÃO</div>
+                <div id="matches-${g.id}" style="padding:5px;"></div>
+
+                <div style="background:#333; color:white; font-size:0.8em; text-align:center; padding:5px; font-weight:bold;">CLASSIFICAÇÃO</div>
                 <table id="rank-${g.id}"><thead><tr><th>#</th><th>Nome</th><th>J</th><th>V</th><th>S</th><th>Pts</th></tr></thead><tbody></tbody></table>
             `;
             groupsDiv.appendChild(col);
@@ -541,59 +609,122 @@
             const lDiv = col.querySelector(`#list-${g.id}`);
             appState.players.filter(p => p.groupId === g.id).forEach(p => lDiv.appendChild(createCard(p)));
 
+            // MATCH RENDER (V45 Logic)
             const mDiv = col.querySelector(`#matches-${g.id}`);
-            appState.matches.filter(m => m.gid === g.id).forEach(m => mDiv.appendChild(createMatch(m, ps)));
+            const gMatches = appState.matches.filter(m => m.gid === g.id);
+            // Group matches by "Round" concept? In V50 we store simple array.
+            // Let's render as list of blocks.
+            if(gMatches.length > 0) {
+                const roundBlock = document.createElement('div');
+                roundBlock.className = 'round-block';
+                roundBlock.innerHTML = `<div class="round-header"><span>Partidas</span></div>`;
+                gMatches.forEach(m => roundBlock.appendChild(createMatchEl(m, ps)));
+                mDiv.appendChild(roundBlock);
+            }
 
             const tBody = col.querySelector('tbody');
             ps.forEach((p, i) => {
                 let tie = '';
                 if(i > 0) {
                     const prev = ps[i-1];
-                    if(prev.points===p.points && prev.balance===p.balance && prev.wins===p.wins && p.games>0) tie = '<span class="tie-icon">⚠️</span>';
+                    if(prev.points===p.points && prev.balance===p.balance && prev.wins===p.wins && p.games>0 && prev.tieBonus===0 && p.tieBonus===0) tie = '<span class="tie-indicator">⚠️</span>';
                 }
                 tBody.innerHTML += `<tr><td>${i+1}º</td><td style="text-align:left">${p.name} ${tie}</td><td>${p.games}</td><td>${p.wins}</td><td>${p.balance}</td><td>${p.points}</td></tr>`;
             });
         });
+        
+        // MATA MATA RENDER (if visible)
+        if(document.getElementById('tiebreaker-area').style.display === 'block') renderTieUI();
+        if(document.getElementById('finals-area').style.display === 'block') renderFinalsUI();
     }
 
     function createCard(p) {
         const d = document.createElement('div');
-        d.className = `card ${selectedPlayerId === p.id ? 'selected' : ''}`;
+        d.className = `player-card ${selectedPlayerId===p.id?'selected':''}`;
         d.onclick = (e) => toggleSelection(p.id, e);
-        d.innerHTML = `<span>${p.name}</span> <span class="admin-only del-btn" onclick="deletePlayer('${p.id}'); event.stopPropagation()" style="color:#c00;">✕</span>`;
+        d.innerHTML = `<span>${p.name}</span><span class="admin-only del-player-btn" onclick="deletePlayer('${p.id}'); event.stopPropagation()">✕</span>`;
         return d;
     }
 
-    function createMatch(m, ps) {
+    function createMatchEl(m, ps) {
         const d = document.createElement('div');
-        d.className = `match-row ${m.saved ? 'saved' : ''}`;
+        d.className = `match-item ${m.saved?'locked-bg':''}`;
         
-        const n = (id) => appState.players.find(x => x.id === id)?.name || '?';
+        const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
+        const label = appState.mode==='fixed' 
+            ? `${n(m.p1)} <br><small style="color:#666">VS</small><br> ${n(m.p3)}`
+            : `${n(m.p1)} & ${n(m.p2)} <br><small style="color:#666">VS</small><br> ${n(m.p3)} & ${n(m.p4)}`;
+            
+        // DROPDOWNS FOR EDIT
         const sel = (slot, cur) => {
-            if(m.saved || document.body.classList.contains('viewer-mode')) return `<span>${n(cur)}</span>`;
-            let h = `<select onchange="updateMatchPlayer('${m.mid}','${slot}',this.value)" style="max-width:80px">`;
+            let h = `<select onchange="updateMatchPlayers('${m.mid}','${slot}',this.value)" style="max-width:90px">`;
             ps.forEach(p => h+=`<option value="${p.id}" ${p.id===cur?'selected':''}>${p.name}</option>`);
-            return h + '</select>';
+            return h+'</select>';
         };
-
-        let vsHtml = '';
-        if(appState.mode === 'fixed') {
-             vsHtml = `${sel('p1', m.p1)} <span style="color:#999; font-size:0.8em">vs</span> ${sel('p3', m.p3)}`;
-        } else {
-             vsHtml = `${sel('p1', m.p1)} & ${sel('p2', m.p2)} <span style="color:#999; font-size:0.8em">vs</span> ${sel('p3', m.p3)} & ${sel('p4', m.p4)}`;
-        }
+        const editHtml = appState.mode==='fixed'
+            ? `${sel('p1',m.p1)} vs ${sel('p3',m.p3)}`
+            : `${sel('p1',m.p1)} & ${sel('p2',m.p2)} vs ${sel('p3',m.p3)} & ${sel('p4',m.p4)}`;
 
         d.innerHTML = `
-            <div class="teams-vs">${vsHtml}</div>
-            <div class="inputs-area">
-                <input type="tel" id="s1-${m.mid}" value="${m.s1}" class="score-box" ${m.saved?'disabled':''}>
-                <input type="tel" id="s2-${m.mid}" value="${m.s2}" class="score-box" ${m.saved?'disabled':''}>
-                <button class="btn-match ${m.saved?'saved':''} admin-only" onclick="saveScore('${m.mid}')">${m.saved?'✎':'OK'}</button>
-                ${!m.saved ? `<button class="admin-only" onclick="deleteMatch('${m.mid}')" style="background:#c00; padding:8px 10px;">✕</button>` : ''}
+            ${!m.saved ? `<button class="btn-edit-match admin-only" onclick="toggleEditPlayers('${m.mid}')">✎</button>` : ''}
+            <div class="match-teams" id="t-${m.mid}">${label}</div>
+            <div id="e-${m.mid}" style="display:none; text-align:center; margin-bottom:5px;">
+                ${editHtml} <br><button onclick="toggleEditPlayers('${m.mid}')" style="margin-top:5px; font-size:0.8em;">OK</button>
+            </div>
+            <div class="match-inputs" id="in-${m.mid}">
+                <input type="tel" id="s1-${m.mid}" value="${m.s1}" class="score-input" ${m.saved?'disabled':''}>
+                x
+                <input type="tel" id="s2-${m.mid}" value="${m.s2}" class="score-input" ${m.saved?'disabled':''}>
+                <button id="btn-${m.mid}" class="btn-match-action admin-only ${m.saved?'saved':''}" onclick="saveMatch('${m.mid}')">${m.saved?'Alterar':'Salvar'}</button>
+                ${!m.saved ? `<button class="admin-only" onclick="delRound('${m.mid}')" style="background:transparent; border:none; color:#c00; font-weight:bold;">✕</button>` : ''}
             </div>
         `;
         return d;
     }
+
+    // --- MATA MATA & TIES ---
+    window.startFinalsFlow = function() {
+        let ties = [];
+        appState.groups.forEach(g => {
+            const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=>(b.points-a.points)||(b.wins-a.wins)||(b.balance-a.balance));
+            for(let i=0; i<ps.length-1; i++) {
+                if(ps[i].games>0 && ps[i].points===ps[i+1].points && ps[i].balance===ps[i+1].balance && ps[i].tieBonus===0 && ps[i+1].tieBonus===0) {
+                    ties.push({g:g.name, p1:ps[i], p2:ps[i+1]});
+                }
+            }
+        });
+        
+        if(ties.length > 0) {
+            document.getElementById('board').style.display='none';
+            document.getElementById('tiebreaker-area').style.display='block';
+            const c = document.getElementById('tie-list-container');
+            c.innerHTML = '';
+            ties.forEach(t => {
+                c.innerHTML += `<div style="background:#eee; padding:10px; margin-bottom:10px; border-radius:5px;">
+                    <div>${t.g}: ${t.p1.name} vs ${t.p2.name}</div>
+                    <button class="btn-manual" onclick="solveTie('${t.p1.id}','${t.p2.id}')">${t.p1.name} Vence</button>
+                    <button class="btn-manual" onclick="solveTie('${t.p2.id}','${t.p1.id}')">${t.p2.name} Vence</button>
+                </div>`;
+            });
+        } else {
+            document.getElementById('board').style.display='none';
+            document.getElementById('finals-area').style.display='block';
+            const c = document.getElementById('groups-config-container');
+            c.innerHTML = '';
+            appState.groups.forEach(g => c.innerHTML+=`<div>${g.name}: <input id="q-${g.id}" type="number" value="2" style="width:40px;"> classificados</div>`);
+        }
+    }
+
+    window.solveTie = function(w, l) {
+        if(!appState.tieMatches) appState.tieMatches=[];
+        appState.tieMatches.push({winnerId:w});
+        recalcStats(); saveToCloud(); startFinalsFlow();
+    }
+    window.exitTieBreaker = function() { document.getElementById('tiebreaker-area').style.display='none'; document.getElementById('board').style.display='flex'; }
+    window.exitFinals = function() { document.getElementById('finals-area').style.display='none'; document.getElementById('board').style.display='flex'; }
+
+    // (Simplified for Cloud - Expansion available via Desktop Backup)
+    window.generateFixedPairs = function() { alert("Use o botão 'Baixar Backup' e gerencie as chaves na versão Desktop para controle total."); }
 </script>
 </body>
 </html>
