@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Arena - V70 (Correção Imagens)</title>
+    <title>BT Arena - V71 (Visual Torneios)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -60,11 +60,18 @@
         .card-title { font-weight: 700; font-size: 1.1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
         .card-subtitle { font-size: 0.75em; opacity: 0.8; margin-top: 2px; }
         
-        /* CATEGORIA VISUAL */
+        /* ESTILOS DE CATEGORIA & TORNEIO (SEM FOTO) */
         .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
         .bg-masc { background: var(--blue-masc); }
         .bg-fem { background: var(--pink-fem); }
         .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
+        
+        /* NOVO: Estilo do Torneio (Gradiente Laranja/Azul) */
+        .bg-tourney { 
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .bg-tourney .material-icons { font-size: 4em; color: white; opacity: 0.3; }
 
         /* AÇÕES CARD */
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
@@ -96,7 +103,7 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* RANKING */
+        /* RANKING TABLE */
         .rank-table { width: 100%; border-collapse: collapse; background: white; }
         .rank-table th { background: #333; color: white; padding: 8px; font-size: 0.8em; }
         .rank-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
@@ -105,7 +112,7 @@
         .rank-2 .rank-pos { background: #C0C0C0; color: #000; }
         .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
 
-        /* APP */
+        /* APP STYLES */
         .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
         .header-controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
         .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; justify-content: center; }
@@ -307,7 +314,6 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // --- SEU EMAIL (COM PONTO) ---
     const SUPER_ADMIN = "lucas.sibie@gmail.com"; 
 
     const firebaseConfig = {
@@ -472,7 +478,7 @@
         document.getElementById(id).classList.add('active');
     }
 
-    // --- LOADERS ---
+    // --- LEVEL 1: ARENAS ---
     function loadArenas() {
         onValue(ref(db, 'arenas'), (snap) => {
             const list = document.getElementById('grid-arenas'); list.innerHTML = '';
@@ -490,17 +496,33 @@
         const div = document.createElement('div');
         div.className = 'std-card';
         let content = '';
+        
         if(type === 'category') {
             const bgClass = `bg-${imgOrClass.type}`;
             content = `<div class="cat-card-content ${bgClass}">${imgOrClass.short}</div>`;
+        } else if (type === 'tournament') {
+            // NOVO: CARD DE TORNEIO SEM FOTO (GRADIENTE)
+            content = `<div class="cat-card-content bg-tourney"><span class="material-icons">emoji_events</span></div>`;
         } else {
+            // ARENA (COM FOTO)
             content = `<img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">`;
         }
-        div.innerHTML = `${content}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}'); event.stopPropagation()">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div></div>` : ''}`;
+
+        div.innerHTML = `
+            ${content}
+            <div class="card-overlay">
+                <div class="card-title">${name}</div>
+                ${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}
+            </div>
+            ${isOwner ? `<div class="card-actions">
+                <div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}'); event.stopPropagation()">✎</div>
+                <div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div>
+            </div>` : ''}`;
         div.onclick = onClick;
         return div;
     }
 
+    // --- LEVEL 2: CATEGORIES ---
     window.enterArena = (id, data) => {
         curArenaId = id;
         document.getElementById('title-arena').innerText = data.name;
@@ -522,6 +544,7 @@
         });
     }
 
+    // --- LEVEL 3: TOURNAMENTS & RANKING ---
     window.enterCategory = (id, data) => {
         curCatId = id;
         curCatData = data;
@@ -541,6 +564,7 @@
                 const d = data[key];
                 const isOwner = user && (user.uid === d.owner || user.email === SUPER_ADMIN);
                 const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : '');
+                // Passando 'tournament' no type para ativar o gradiente
                 list.appendChild(createCard(key, d.name, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub));
             });
         });
@@ -562,6 +586,7 @@
         });
     }
 
+    // --- LEVEL 4: APP ---
     window.enterApp = (tId, name, pwd, ownerId) => {
         curTourneyId = tId;
         document.getElementById('t-title-header').innerText = name;
