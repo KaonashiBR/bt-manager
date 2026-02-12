@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Arena - V65</title>
+    <title>BT Arena - V66 (Drive Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -16,6 +16,7 @@
             --secondary: #004e98;
             --bg-body: #f4f6f8;
             --text-dark: #333;
+            --google-red: #db4437;
         }
 
         body { 
@@ -24,7 +25,7 @@
             -webkit-tap-highlight-color: transparent; height: 100vh; display: flex; flex-direction: column;
         }
 
-        /* --- HEADER & NAV --- */
+        /* --- NAVBAR --- */
         .navbar {
             background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100;
@@ -36,11 +37,11 @@
         .user-name { font-size: 0.85em; font-weight: 600; color: #555; display: none; }
         @media(min-width: 600px) { .user-name { display: block; } }
 
-        /* --- TELAS GERAIS --- */
+        /* --- TELAS --- */
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
 
-        /* --- TELA 1: ARENAS (GRID) --- */
+        /* --- TELA 1: ARENAS --- */
         .arenas-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
         
@@ -51,18 +52,17 @@
         
         .arena-card {
             background: white; border-radius: 12px; overflow: hidden; position: relative;
-            aspect-ratio: 1 / 1; /* Quadrado Perfeito */
+            aspect-ratio: 1 / 1; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s;
         }
         .arena-card:active { transform: scale(0.97); }
         .arena-img { width: 100%; height: 100%; object-fit: cover; }
         .arena-overlay {
             position: absolute; bottom: 0; left: 0; width: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            padding: 15px 10px 10px; color: white;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 20px 10px 10px; color: white;
         }
         .arena-name { font-weight: 700; font-size: 1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-        .arena-count { font-size: 0.7em; opacity: 0.8; }
         
         .btn-add-float {
             position: fixed; bottom: 20px; right: 20px; width: 56px; height: 56px;
@@ -72,7 +72,7 @@
             border: none; cursor: pointer; z-index: 900;
         }
 
-        /* --- TELA 2: LISTA DE TORNEIOS (LOBBY) --- */
+        /* --- TELA 2: LOBBY --- */
         .back-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; }
         .arena-hero { 
             background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; 
@@ -90,7 +90,7 @@
         .t-name { font-weight: 700; color: #333; }
         .t-date { font-size: 0.75em; color: #888; }
 
-        /* --- TELA 3: APP (TABELAS V63) --- */
+        /* --- TELA 3: APP --- */
         .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
         .conn-dot { width: 8px; height: 8px; background: #0f0; border-radius: 50%; display: inline-block; box-shadow: 0 0 5px #0f0; margin-right: 5px; }
         
@@ -108,27 +108,22 @@
         /* Tabela */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
         .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; font-size: 1.1em; }
-        /* Cores */
         .gh-0 { background: #00b050 !important; color: white !important; }
         .gh-1 { background: #00b0f0 !important; color: black !important; }
         .gh-2 { background: #ffff00 !important; color: black !important; }
         .gh-3 { background: #ff0000 !important; color: white !important; }
-        
         .bt-table td { border: 1px solid #999; padding: 4px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #eef; }
         
         .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; font-size: 1.1em; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; }
 
-        /* Visibilidade */
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
         
-        /* Board */
         .board { display: flex; flex-direction: column; gap: 15px; }
         @media(min-width: 900px) { .board { flex-direction: row; flex-wrap: wrap; } .column { flex: 1 1 40%; } }
         
-        /* Loading */
         #loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index: 2000; display: flex; justify-content: center; align-items: center; flex-direction: column;}
     </style>
 </head>
@@ -151,31 +146,24 @@
     <div class="arenas-header">
         <h2 class="section-title">Arenas</h2>
     </div>
-    
-    <div id="arenas-grid" class="arenas-grid">
-        </div>
-
+    <div id="arenas-grid" class="arenas-grid"></div>
     <button id="btn-add-arena" class="btn-add-float" onclick="addArena()" style="display:none;">+</button>
-    <div style="text-align:center; margin-top:50px; color:#999; font-size:0.8em;">Toque no ícone de usuário no topo para fazer Login.</div>
+    <div style="text-align:center; margin-top:50px; color:#999; font-size:0.8em;">Toque no ícone de usuário para Login.</div>
 </div>
 
 <div id="screen-lobby" class="screen">
     <div class="back-bar" onclick="showScreen('screen-arenas')">
-        <span class="material-icons">arrow_back</span> Voltar para Arenas
+        <span class="material-icons">arrow_back</span> Voltar
     </div>
-
     <div class="arena-hero">
         <img id="lobby-arena-img" class="hero-img" src="">
         <div>
-            <h2 id="lobby-arena-name" style="margin:0; font-size:1.4em;">Arena Nome</h2>
-            <div style="font-size:0.8em; color:#777;">Torneios Ativos</div>
+            <h2 id="lobby-arena-name" style="margin:0; font-size:1.4em;">Arena</h2>
+            <div style="font-size:0.8em; color:#777;">Torneios</div>
         </div>
     </div>
-
-    <button id="btn-create-tourney" onclick="createTournament()" class="btn-std btn-org" style="width:100%; padding:15px; font-size:1em; margin-bottom:20px; display:none;">+ CRIAR NOVO TORNEIO</button>
-
-    <div id="tournament-list" class="tournament-list">
-        </div>
+    <button id="btn-create-tourney" onclick="createTournament()" class="btn-std btn-org" style="width:100%; padding:15px; font-size:1em; margin-bottom:20px; display:none;">+ CRIAR TORNEIO</button>
+    <div id="tournament-list" class="tournament-list"></div>
 </div>
 
 <div id="screen-app" class="screen">
@@ -188,9 +176,7 @@
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; margin-left:10px;">🔒</button>
         </div>
     </div>
-
     <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
-
     <div class="header-controls admin-only">
         <div class="row">
             <input type="text" id="pName" class="inp-std auth-input" placeholder="Nome Jogador...">
@@ -203,7 +189,6 @@
             <button onclick="resetT()" class="btn-std btn-red">⚠ Reset</button>
         </div>
     </div>
-
     <div class="board">
         <div class="column" id="col-pool" style="background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:10px;">
             <div style="background:var(--secondary); color:white; padding:10px; font-weight:bold; display:flex; justify-content:space-between;">
@@ -221,7 +206,6 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, off, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // --- CONFIGURAÇÃO (Troque se necessário, mas essa é a sua) ---
     const firebaseConfig = {
         apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
         authDomain: "beach-tennis-manager-92f17.firebaseapp.com",
@@ -231,72 +215,71 @@
         appId: "1:311372138486:web:50c9e403ad877ab094e9d7"
     };
 
-    // --- SUPER ADMIN (COLOQUE SEU EMAIL AQUI) ---
-    const ADMIN_EMAILS = ["lucassibie@gmail.com", "lucas.sibie@gmail.com"];
+    // --- COLOQUE SEU EMAIL AQUI ---
+    const SUPER_ADMIN = "lucas.sibie@gmail.com"; 
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
     const googleProvider = new GoogleAuthProvider();
 
-    // Estado Global
     let user = null;
     let currentArenaId = null;
-    let currentTourneyId = null;
     let tourneyRef = null;
     let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
     let selectedPid = null;
 
-    // --- AUTH ---
     onAuthStateChanged(auth, (u) => {
         document.getElementById('loading').style.display = 'none';
         user = u;
         if(user) {
             document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = user.displayName.split(' ')[0];
-            document.getElementById('btn-add-arena').style.display = 'flex'; // Logado pode criar arena
+            document.getElementById('btn-add-arena').style.display = 'flex'; 
         } else {
             document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = "Visitante";
             document.getElementById('btn-add-arena').style.display = 'none';
         }
-        loadArenas(); // Recarrega para atualizar permissões
+        loadArenas(); 
     });
 
     window.handleLoginClick = async () => {
-        if(user) {
-            if(confirm(`Logado como ${user.displayName}.\nDeseja sair?`)) signOut(auth);
-        } else {
-            try { await signInWithPopup(auth, googleProvider); } 
-            catch(e) { alert("Erro login Google: Verifique Domínios Autorizados no Firebase.\n" + e.message); }
-        }
+        if(user) { if(confirm(`Sair da conta ${user.displayName}?`)) signOut(auth); } 
+        else { try { await signInWithPopup(auth, googleProvider); } catch(e) { alert("Erro Google (Ative o domínio no Firebase): " + e.message); } }
     }
 
-    // --- NAVEGAÇÃO ---
     window.showScreen = (id) => {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
     }
 
-    // --- TELA 1: ARENAS ---
+    // --- HELPER: GOOGLE DRIVE FIX ---
+    function fixDriveLink(url) {
+        if (url && url.includes('drive.google.com') && url.includes('/file/d/')) {
+            const id = url.match(/\/d\/(.*?)\//)[1];
+            return `https://drive.google.com/uc?export=view&id=${id}`;
+        }
+        return url;
+    }
+
+    // --- ARENAS ---
     function loadArenas() {
         onValue(ref(db, 'arenas'), (snap) => {
-            const list = document.getElementById('arenas-grid');
-            list.innerHTML = '';
+            const list = document.getElementById('arenas-grid'); list.innerHTML = '';
             const data = snap.val();
-            if(!data) { list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#999;">Nenhuma arena criada. Seja o primeiro!</div>'; return; }
+            if(!data) { list.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:20px; color:#999;">Nenhuma arena.</div>'; return; }
             
             Object.keys(data).forEach(key => {
                 const a = data[key];
                 const card = document.createElement('div');
                 card.className = 'arena-card';
                 card.innerHTML = `
-                    <img src="${a.img || 'https://images.unsplash.com/photo-1629255850937-29337b01d36a?w=400'}" class="arena-img">
+                    <img src="${a.img || 'https://via.placeholder.com/150'}" class="arena-img">
                     <div class="arena-overlay">
                         <div class="arena-name">${a.name}</div>
                         ${(user && (user.uid === a.owner || user.email === SUPER_ADMIN)) ? `<div style="font-size:0.7em; color:#f88;" onclick="delArena('${key}'); event.stopPropagation()">[EXCLUIR]</div>` : ''}
-                    </div>
-                `;
+                    </div>`;
                 card.onclick = () => enterArena(key, a);
                 list.appendChild(card);
             });
@@ -304,58 +287,38 @@
     }
 
     window.addArena = () => {
-        if(!user) return alert("Faça login primeiro!");
-        const name = prompt("Nome da Arena / Local:");
+        if(!user) return alert("Login necessário");
+        const name = prompt("Nome da Arena:");
         if(!name) return;
-        const img = prompt("Link da Foto (URL) (Opcional):", "https://images.unsplash.com/photo-1596726673193-47a323793268?w=400");
+        let img = prompt("Link da Foto (URL ou Google Drive):", "https://images.unsplash.com/photo-1596726673193-47a323793268?w=400");
+        img = fixDriveLink(img); // AUTO FIX AQUI
         
-        push(ref(db, 'arenas'), {
-            name: name,
-            img: img,
-            owner: user.uid,
-            createdAt: Date.now()
-        });
+        push(ref(db, 'arenas'), { name: name, img: img, owner: user.uid, createdAt: Date.now() });
     }
 
-    window.delArena = (id) => {
-        if(confirm("Tem certeza? Isso apagará TODOS os torneios desta arena!")) {
-            remove(ref(db, `arenas/${id}`));
-            remove(ref(db, `tournaments/${id}`)); // Apaga dados filhos
-        }
-    }
+    window.delArena = (id) => { if(confirm("Apagar arena?")) { remove(ref(db, `arenas/${id}`)); remove(ref(db, `tournaments/${id}`)); } }
 
-    // --- TELA 2: LOBBY DA ARENA ---
     window.enterArena = (id, data) => {
         currentArenaId = id;
         document.getElementById('lobby-arena-name').innerText = data.name;
         document.getElementById('lobby-arena-img').src = data.img || "https://via.placeholder.com/60";
-        
-        // Botão Criar Torneio
         document.getElementById('btn-create-tourney').style.display = user ? 'block' : 'none';
-        
         showScreen('screen-lobby');
         loadTournaments(id);
     }
 
     function loadTournaments(arenaId) {
         onValue(ref(db, `tournaments_meta/${arenaId}`), (snap) => {
-            const list = document.getElementById('tournament-list');
-            list.innerHTML = '';
+            const list = document.getElementById('tournament-list'); list.innerHTML = '';
             const data = snap.val();
-            if(!data) { list.innerHTML = '<div style="color:#999; text-align:center;">Nenhum torneio ativo aqui.</div>'; return; }
+            if(!data) { list.innerHTML = '<div style="color:#999; text-align:center;">Nenhum torneio.</div>'; return; }
 
             Object.keys(data).reverse().forEach(key => {
                 const t = data[key];
                 const isOwner = user && t.owner === user.uid;
                 const div = document.createElement('div');
                 div.className = `t-card ${isOwner?'my-t':''}`;
-                div.innerHTML = `
-                    <div>
-                        <div class="t-name">${t.name}</div>
-                        <div class="t-date">${new Date(t.date).toLocaleDateString('pt-BR')} ${isOwner?'(MEU)':''}</div>
-                    </div>
-                    <div>➔</div>
-                `;
+                div.innerHTML = `<div><div class="t-name">${t.name}</div><div class="t-date">${new Date(t.date).toLocaleDateString('pt-BR')} ${isOwner?'(MEU)':''}</div></div><div>➔</div>`;
                 div.onclick = () => enterApp(key, t.name, t.pwd, t.owner);
                 list.appendChild(div);
             });
@@ -366,238 +329,95 @@
         if(!user) return;
         const name = prompt("Nome do Torneio:");
         if(!name) return;
-        const pwd = prompt("Senha Admin (para ajudantes):", "1234");
-        
-        // 1. Cria Metadata (Lista)
+        const pwd = prompt("Senha Admin:", "1234");
         const newRef = push(ref(db, `tournaments_meta/${currentArenaId}`));
         const tId = newRef.key;
         set(newRef, { name, owner: user.uid, pwd, date: Date.now() });
-
-        // 2. Inicializa Dados
-        set(ref(db, `tournaments_data/${tId}`), {
-            mode: 'individual', players:[], groups:[], matches:[], groupCount:0,
-            pwd: pwd, owner: user.uid
-        }).then(() => enterApp(tId, name, pwd, user.uid));
+        set(ref(db, `tournaments_data/${tId}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: pwd, owner: user.uid })
+        .then(() => enterApp(tId, name, pwd, user.uid));
     }
 
-    // --- TELA 3: APP (GERENCIADOR) ---
     window.enterApp = (tId, name, pwd, ownerId) => {
-        currentTourneyId = tId;
         document.getElementById('t-title-header').innerText = name;
         showScreen('screen-app');
-
-        // Admin automático
         const isOwner = user && (user.uid === ownerId || user.email === SUPER_ADMIN);
-        if(isOwner) {
-            document.body.classList.remove('viewer-mode');
-            document.getElementById('btn-lock').innerText = '🔓';
-        } else {
-            document.body.classList.add('viewer-mode');
-            document.getElementById('btn-lock').innerText = '🔒';
-        }
+        if(isOwner) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; } 
+        else { document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; }
 
         if(tourneyRef) off(tourneyRef);
         tourneyRef = ref(db, `tournaments_data/${tId}`);
-        
         document.getElementById('loading').style.display = 'flex';
         onValue(tourneyRef, (snap) => {
             document.getElementById('loading').style.display = 'none';
             const d = snap.val();
-            if(d) {
-                appState = d;
-                ['players','groups','matches'].forEach(k => {if(!appState[k]) appState[k]=[]});
-            } else {
-                appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId};
-            }
+            if(d) { appState = d; ['players','groups','matches'].forEach(k => {if(!appState[k]) appState[k]=[]}); }
+            else { appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId}; }
             renderApp();
         });
     }
 
-    window.exitTournament = () => {
-        if(tourneyRef) off(tourneyRef);
-        showScreen('screen-lobby');
-    }
-
+    window.exitTournament = () => { if(tourneyRef) off(tourneyRef); showScreen('screen-lobby'); }
     window.tryAdmin = () => {
         if(!document.body.classList.contains('viewer-mode')) return;
         const p = prompt("Senha:");
-        if(p === appState.pwd || (user && user.email === SUPER_ADMIN)) {
-            document.body.classList.remove('viewer-mode');
-            document.getElementById('btn-lock').innerText = '🔓';
-        } else alert("Senha incorreta");
+        if(p === appState.pwd || (user && user.email === SUPER_ADMIN)) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; } else alert("Senha incorreta");
     }
-
     function save() { if(tourneyRef) set(tourneyRef, appState); }
 
-    // --- LÓGICA DO APP (ADD PLAYER, GRUPO, ETC) ---
     const pInput = document.getElementById('pName');
     if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
 
-    window.addPlayer = () => {
-        const n = document.getElementById('pName').value.trim();
-        if(!n) return;
-        appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0});
-        document.getElementById('pName').value=''; document.getElementById('pName').focus(); save();
-    }
-    window.addGroup = () => {
-        appState.groupCount++;
-        appState.groups.push({id:'g'+Date.now(), name: "GRUPO "+String.fromCharCode(64+appState.groupCount)});
-        save();
-    }
+    window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); }
+    window.addGroup = () => { appState.groupCount++; appState.groups.push({id:'g'+Date.now(), name: "GRUPO "+String.fromCharCode(64+appState.groupCount)}); save(); }
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
     window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); } }
-    
     window.toggleSel = (pid,e) => { if(document.body.classList.contains('viewer-mode'))return; e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
     window.moveSel = (gid) => { if(!selectedPid)return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); save();} }
-    
-    window.distribute = () => {
-        const pool = appState.players.filter(p=>p.groupId==='pool');
-        if(!pool.length || !confirm("Distribuir?")) return;
-        pool.forEach(p=>{
-            appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length);
-            if(appState.groups.length) p.groupId=appState.groups[0].id;
-        });
-        save();
-    }
-
+    window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); save(); }
     window.delGroup = (gid) => { if(confirm("Excluir?")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); }}
     window.delPlayer = (pid) => { if(confirm("Excluir?")) { appState.players=appState.players.filter(p=>p.id!==pid); save(); }}
 
-    // --- MATCH LOGIC ---
     window.genMatches = (gid) => {
         const ps=appState.players.filter(p=>p.groupId===gid);
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4");
-        
-        // Histórico
-        let hist=new Set();
-        appState.matches.filter(m=>m.gid===gid && m.saved).forEach(m=>{
-            if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-'));
-            else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); }
-        });
-
-        if(appState.mode==='fixed') {
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) {
-                const k=[ps[i].id,ps[j].id].sort().join('-');
-                if(!hist.has(k)) addM(gid, ps[i].id, 'd', ps[j].id, 'd');
-            }
-        } else if(ps.length===5) {
-            if(appState.matches.filter(m=>m.gid===gid).length && !confirm("Rodada 5?")) return;
-            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>addM(gid, ps[r[0]].id, ps[r[1]].id, ps[r[2]].id, ps[r[3]].id));
-        } else {
-            // Sorteio
-            let pairs=[];
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) {
-                const k=[ps[i].id,ps[j].id].sort().join('-');
-                if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id});
-            }
-            if(!pairs.length) return alert("Sem combinações novas.");
-            pairs.sort(()=>Math.random()-0.5);
-            
-            let count=0;
-            while(pairs.length) {
-                let pA=pairs[0], found=false;
-                for(let k=1; k<pairs.length; k++) {
-                    let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]);
-                    if(all.size===4) { addM(gid,pA.p1,pA.p2,pB.p1,pB.p2); pairs.splice(k,1); pairs.splice(0,1); found=true; count++; break; }
-                }
-                if(!found) pairs.splice(0,1);
-            }
-            if(!count) alert("Não consegui casar jogos.");
-        }
+        let hist=new Set(); appState.matches.filter(m=>m.gid===gid && m.saved).forEach(m=>{ if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-')); else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); } });
+        if(appState.mode==='fixed') { for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) addM(gid, ps[i].id, 'd', ps[j].id, 'd'); } } 
+        else if(ps.length===5) { if(appState.matches.filter(m=>m.gid===gid).length && !confirm("Rodada 5?")) return; [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>addM(gid, ps[r[0]].id, ps[r[1]].id, ps[r[2]].id, ps[r[3]].id)); } 
+        else { let pairs=[]; for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id}); } if(!pairs.length) return alert("Sem combinações."); pairs.sort(()=>Math.random()-0.5); let count=0; while(pairs.length) { let pA=pairs[0], found=false; for(let k=1; k<pairs.length; k++) { let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); if(all.size===4) { addM(gid,pA.p1,pA.p2,pB.p1,pB.p2); pairs.splice(k,1); pairs.splice(0,1); found=true; count++; break; } } if(!found) pairs.splice(0,1); } if(!count) alert("Não consegui casar."); }
         save();
     }
     
     function addM(gid,p1,p2,p3,p4) { appState.matches.push({mid:'m'+Date.now()+Math.random(), gid, p1,p2,p3,p4, s1:'', s2:'', saved:false}); }
-    
-    window.addManual = (gid) => { 
-        const ps=appState.players.filter(p=>p.groupId===gid); 
-        if(ps.length<2) return alert("Poucos jogadores");
-        addM(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id); save();
-    }
-
-    window.saveS = (mid) => {
-        const m = appState.matches.find(x=>x.mid===mid);
-        const s1=document.getElementById(`s1-${mid}`).value, s2=document.getElementById(`s2-${mid}`).value;
-        if(m.saved) { m.saved=false; } else { if(s1===''||s2==='') return; m.s1=parseInt(s1); m.s2=parseInt(s2); m.saved=true; }
-        recalc(); save();
-    }
+    window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addM(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id); save(); }
+    window.saveS = (mid) => { const m = appState.matches.find(x=>x.mid===mid), s1=document.getElementById(`s1-${mid}`).value, s2=document.getElementById(`s2-${mid}`).value; if(m.saved) { m.saved=false; } else { if(s1===''||s2==='') return; m.s1=parseInt(s1); m.s2=parseInt(s2); m.saved=true; } recalc(); save(); }
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
-
-    function recalc() {
-        appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;});
-        appState.matches.forEach(m=>{
-            if(m.saved) {
-                const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} };
-                run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1);
-                if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); }
-            }
-        });
-    }
+    function recalc() { appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); appState.matches.forEach(m=>{ if(m.saved) { const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } } }); }
 
     function renderApp() {
-        // Estilo dos botões de modo
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
-
-        // Pool
-        const pl = document.getElementById('pool-list'); pl.innerHTML='';
-        const poolPs = appState.players.filter(p=>p.groupId==='pool');
-        document.getElementById('pool-cnt').innerText = poolPs.length;
-        poolPs.forEach(p => {
-            const d = document.createElement('div'); d.className=`card ${selectedPid===p.id?'selected':''}`;
-            d.onclick=(e)=>window.toggleSel(p.id,e);
-            d.innerHTML = `<span>${p.name}</span> <b style="color:red" class="admin-only" onclick="delPlayer('${p.id}');event.stopPropagation()">✕</b>`;
-            pl.appendChild(d);
-        });
-
-        // Grupos
+        const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
+        poolPs.forEach(p => { const d = document.createElement('div'); d.className=`card ${selectedPid===p.id?'selected':''}`; d.onclick=(e)=>window.toggleSel(p.id,e); d.innerHTML = `<span>${p.name}</span> <b style="color:red" class="admin-only" onclick="delPlayer('${p.id}');event.stopPropagation()">✕</b>`; pl.appendChild(d); });
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='column';
-            
-            let h = `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px;">
-                <div class="admin-only" style="display:flex; gap:5px;">
-                    <button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button>
-                    <button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button>
-                </div>
-            </div>`;
-
-            // Tabela Jogos
+            let h = `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px;"><div class="admin-only" style="display:flex; gap:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div></div>`;
             if(ms.length) {
                 h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}" onclick="moveSel('${g.id}')">${g.name} <span class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation()" style="float:right; cursor:pointer;">✕</span></th></tr></thead><tbody>`;
                 ms.forEach(m => {
                     const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
                     const t1 = appState.mode==='fixed' ? n(m.p1) : `${n(m.p1)}<br><small>/${n(m.p2)}</small>`;
                     const t2 = appState.mode==='fixed' ? n(m.p3) : `${n(m.p3)}<br><small>/${n(m.p4)}</small>`;
-                    h += `<tr>
-                        <td style="text-align:right">${t1}</td><td></td>
-                        <td style="padding:0"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td>
-                        <td>x</td>
-                        <td style="padding:0"><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td>
-                        <td></td><td style="text-align:left">${t2}</td>
-                        <td class="admin-only" style="width:40px">
-                            <button class="btn-ok-mini ${m.saved?'saved':''}" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>
-                            ${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}
-                        </td>
-                    </tr>`;
+                    h += `<tr><td style="text-align:right">${t1}</td><td></td><td style="padding:0"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td>x</td><td style="padding:0"><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td></td><td style="text-align:left">${t2}</td><td class="admin-only" style="width:40px"><button class="btn-ok-mini ${m.saved?'saved':''}" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                 });
                 h += `</tbody></table>`;
-            } else {
-                h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">${g.name} (Vazio)</div>`;
-            }
-
-            // Ranking
-            if(ps.length) {
-                h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`;
-                ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left">${p.name}</td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`);
-                h += `</table>`;
-            }
+            } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">${g.name} (Vazio)</div>`; }
+            if(ps.length) { h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`; ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left">${p.name}</td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); h += `</table>`; }
             col.innerHTML = h; gc.appendChild(col);
         });
     }
 </script>
 </body>
 </html>
-
