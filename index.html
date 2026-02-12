@@ -139,8 +139,9 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+    // USANDO VERSÃO ESTÁVEL (10.12.2) PARA GARANTIR CONEXÃO
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
@@ -153,9 +154,9 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'tournament_v47'); // Unique path for data
+    const dbRef = ref(db, 'tournament_v47'); // Caminho único dos dados
 
-    // GLOBAL STATE
+    // ESTADO GLOBAL
     let appState = { 
         players: [], 
         groups: [], 
@@ -165,35 +166,41 @@
     
     let selectedPlayerId = null;
 
-    // --- FIREBASE LISTENERS (REALTIME READ) ---
+    // --- FIREBASE LISTENERS (LER DADOS) ---
     onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('connection-status').innerText = "Online ✅";
-        document.getElementById('connection-status').style.color = "#4caf50";
+        
+        // Esconde o Loading e Mostra Online
+        const loadScreen = document.getElementById('loading');
+        if(loadScreen) loadScreen.style.display = 'none';
+        
+        const statusEl = document.getElementById('connection-status');
+        if(statusEl) {
+            statusEl.innerText = "Online ✅";
+            statusEl.style.color = "#4caf50";
+        }
         
         if (data) {
             appState = data;
-            // Ensure arrays exist
             if(!appState.players) appState.players = [];
             if(!appState.groups) appState.groups = [];
             if(!appState.matches) appState.matches = [];
         } else {
-            // New database
             appState = { players: [], groups: [], matches: [], groupCounter: 0 };
         }
         renderAll();
     }, (error) => {
-        document.getElementById('connection-status').innerText = "Erro ❌";
+        document.getElementById('connection-status').innerText = "Erro: " + error.message;
         console.error(error);
+        alert("Erro de permissão! Verifique se o Banco de Dados está no 'Modo Teste'.");
     });
 
-    // --- FIREBASE WRITERS (ACTIONS) ---
+    // --- FIREBASE WRITERS (SALVAR) ---
     function saveToCloud() {
         set(dbRef, appState).catch(err => alert("Erro ao salvar: " + err));
     }
 
-    // --- EXPOSE FUNCTIONS TO HTML WINDOW ---
+    // --- FUNÇÕES GLOBAIS (JANELA) ---
     window.toggleAdmin = function() {
         if(document.body.classList.contains('viewer-mode')) {
             const pass = prompt("Senha de Admin:");
@@ -246,7 +253,7 @@
         event.stopPropagation();
         if(selectedPlayerId === pid) selectedPlayerId = null;
         else selectedPlayerId = pid;
-        renderAll(); // Re-render to show selection highlight
+        renderAll(); 
     }
 
     window.moveSelectedTo = function(targetGid) {
@@ -256,7 +263,7 @@
         if(p) {
             p.groupId = targetGid;
             selectedPlayerId = null;
-            recalcStats(); // Recalculate if moved
+            recalcStats(); 
             saveToCloud();
         }
     }
@@ -266,10 +273,7 @@
         if(pool.length === 0 || appState.groups.length === 0) return alert("Nada para distribuir.");
         if(!confirm("Distribuir automaticamente?")) return;
         
-        let gIdx = 0;
         pool.forEach(p => {
-            // Simple distribution: fill sequentially
-            // Better: find smallest group
             appState.groups.sort((a,b) => {
                 const cA = appState.players.filter(x => x.groupId === a.id).length;
                 const cB = appState.players.filter(x => x.groupId === b.id).length;
@@ -285,39 +289,12 @@
         appState.players = appState.players.filter(p => p.id !== pid);
         saveToCloud();
     }
-
-    window.genMatches = function(gid) {
-        const ps = appState.players.filter(p => p.groupId === gid);
-        if(ps.length < 4) return alert("Precisa de 4 jogadores.");
-        
-        // Remove existing matches for this group? No, append.
-        // Simple logic: Create random pairs
-        let pairs = [];
-        for(let i=0; i<ps.length; i++) {
-            for(let j=i+1; j<ps.length; j++) {
-                pairs.push([ps[i], ps[j]]);
-            }
-        }
-        
-        // Very basic match generation (Random 2 vs 2)
-        // For production: use the robust logic from V46. Simplified here for Cloud demo.
-        const p1 = ps[0], p2 = ps[1], p3 = ps[2], p4 = ps[3];
-        
-        // Check if manual match needed
-        const newMatch = {
-            mid: 'm-' + Date.now(),
-            gid: gid,
-            p1: ps[0].id, p2: ps[1].id, p3: ps[2].id, p4: ps[3].id,
-            s1: '', s2: '', saved: false
-        };
-        
-        appState.matches.push(newMatch);
-        saveToCloud();
-    }
     
     window.addManualMatch = function(gid) {
         const ps = appState.players.filter(p => p.groupId === gid);
-        if(ps.length < 4) return alert("Mínimo 4 jogadores");
+        if(ps.length < 4) return alert("Mínimo 4 jogadores no grupo para criar jogo.");
+        
+        // Cria jogo com os 4 primeiros (dummy) para depois editar
         const newMatch = {
             mid: 'm-' + Date.now(),
             gid: gid,
@@ -334,10 +311,8 @@
         const s2El = document.getElementById(`s2-${mid}`);
         
         if(m.saved) {
-            // Edit mode
             m.saved = false; 
         } else {
-            // Save mode
             const s1 = parseInt(s1El.value);
             const s2 = parseInt(s2El.value);
             if(isNaN(s1) || isNaN(s2)) return alert("Preencha o placar");
@@ -352,7 +327,7 @@
         if(m) { m[slot] = pid; saveToCloud(); }
     }
 
-    // --- LOGIC: STATS CALCULATION ---
+    // --- LÓGICA: CÁLCULOS ---
     function recalcStats() {
         appState.players.forEach(p => { p.games = 0; p.wins = 0; p.balance = 0; p.points = 0; });
         
@@ -372,133 +347,95 @@
         });
     }
 
-    // --- RENDERERS ---
+    // --- RENDERIZAÇÃO (Visual) ---
     function renderAll() {
-        // Render Pool
+        // Render Banco
         const poolDiv = document.getElementById('pool-list');
-        poolDiv.innerHTML = '';
-        const poolPlayers = appState.players.filter(p => p.groupId === 'pool');
-        document.getElementById('pool-count').innerText = `(${poolPlayers.length})`;
-        
-        poolPlayers.forEach(p => {
-            const el = createPlayerCard(p);
-            poolDiv.appendChild(el);
-        });
+        if(poolDiv) {
+            poolDiv.innerHTML = '';
+            const poolPlayers = appState.players.filter(p => p.groupId === 'pool');
+            document.getElementById('pool-count').innerText = `(${poolPlayers.length})`;
+            poolPlayers.forEach(p => poolDiv.appendChild(createPlayerCard(p)));
+        }
 
-        // Render Groups
+        // Render Grupos
         const groupsDiv = document.getElementById('groups-container');
-        groupsDiv.innerHTML = '';
-        
-        appState.groups.forEach(g => {
-            const gPlayers = appState.players.filter(p => p.groupId === g.id);
-            // Sort for Ranking
-            gPlayers.sort((a,b) => (b.points - a.points) || (b.wins - a.wins) || (b.balance - a.balance));
+        if(groupsDiv) {
+            groupsDiv.innerHTML = '';
+            appState.groups.forEach(g => {
+                const gPlayers = appState.players.filter(p => p.groupId === g.id);
+                // Ordenar por pontos
+                gPlayers.sort((a,b) => (b.points - a.points) || (b.wins - a.wins) || (b.balance - a.balance));
 
-            const col = document.createElement('div');
-            col.className = 'column';
-            col.innerHTML = `
-                <div class="column-header" onclick="window.moveSelectedTo('${g.id}')">
-                    <span>${g.name} (${gPlayers.length})</span>
-                    <button class="admin-only" onclick="window.delGroup('${g.id}'); event.stopPropagation();" style="background:transparent; color:#d32f2f; padding:0;">✕</button>
-                </div>
-                <div class="player-pool" id="list-${g.id}"></div>
-                
-                <div class="admin-only" style="padding:10px; display:flex; gap:5px;">
-                    <button class="btn-group" onclick="window.addManualMatch('${g.id}')" style="font-size:0.8em; padding:8px;">+ Jogo Manual</button>
-                </div>
+                const col = document.createElement('div');
+                col.className = 'column';
+                col.innerHTML = `
+                    <div class="column-header" onclick="window.moveSelectedTo('${g.id}')">
+                        <span>${g.name} (${gPlayers.length})</span>
+                        <button class="admin-only" onclick="window.delGroup('${g.id}'); event.stopPropagation();" style="background:transparent; color:#d32f2f; padding:0;">✕</button>
+                    </div>
+                    <div class="player-pool" id="list-${g.id}"></div>
+                    
+                    <div class="admin-only" style="padding:10px; display:flex; gap:5px;">
+                        <button class="btn-group" onclick="window.addManualMatch('${g.id}')" style="font-size:0.8em; padding:8px;">+ Jogo Manual</button>
+                    </div>
 
-                <div id="matches-${g.id}"></div>
+                    <div id="matches-${g.id}"></div>
 
-                <div style="background:#333; color:white; padding:5px; font-size:0.8em; text-align:center; font-weight:bold; margin-top:10px;">CLASSIFICAÇÃO</div>
-                <table id="rank-${g.id}">
-                    <thead><tr><th>#</th><th>Nome</th><th>J</th><th>V</th><th>S</th><th>Pts</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-            `;
-            groupsDiv.appendChild(col);
-
-            // Render Players in Group (Visual only, mainly for selection/deletion)
-            const listDiv = col.querySelector(`#list-${g.id}`);
-            // Show players in list (unordered or ranked? Let's keep unordered for editing)
-            // Actually, showing them in ranking table is enough, but we need the cards to move them back
-            appState.players.filter(p => p.groupId === g.id).forEach(p => {
-                listDiv.appendChild(createPlayerCard(p));
-            });
-
-            // Render Matches
-            const matchesDiv = col.querySelector(`#matches-${g.id}`);
-            const gMatches = appState.matches.filter(m => m.gid === g.id);
-            gMatches.forEach(m => {
-                matchesDiv.appendChild(createMatchCard(m, gPlayers));
-            });
-
-            // Render Ranking Table Rows
-            const tbody = col.querySelector(`#rank-${g.id} tbody`);
-            gPlayers.forEach((p, idx) => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${idx+1}º</td>
-                        <td style="text-align:left;">${p.name}</td>
-                        <td>${p.games}</td>
-                        <td>${p.wins}</td>
-                        <td>${p.balance}</td>
-                        <td>${p.points}</td>
-                    </tr>
+                    <div style="background:#333; color:white; padding:5px; font-size:0.8em; text-align:center; font-weight:bold; margin-top:10px;">CLASSIFICAÇÃO</div>
+                    <table id="rank-${g.id}">
+                        <thead><tr><th>#</th><th>Nome</th><th>J</th><th>V</th><th>S</th><th>Pts</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
                 `;
+                groupsDiv.appendChild(col);
+
+                // Jogadores (Visual)
+                const listDiv = col.querySelector(`#list-${g.id}`);
+                appState.players.filter(p => p.groupId === g.id).forEach(p => listDiv.appendChild(createPlayerCard(p)));
+
+                // Partidas
+                const matchesDiv = col.querySelector(`#matches-${g.id}`);
+                const gMatches = appState.matches.filter(m => m.gid === g.id);
+                gMatches.forEach(m => matchesDiv.appendChild(createMatchCard(m, gPlayers)));
+
+                // Tabela
+                const tbody = col.querySelector(`#rank-${g.id} tbody`);
+                gPlayers.forEach((p, idx) => {
+                    tbody.innerHTML += `<tr><td>${idx+1}º</td><td style="text-align:left;">${p.name}</td><td>${p.games}</td><td>${p.wins}</td><td>${p.balance}</td><td>${p.points}</td></tr>`;
+                });
             });
-        });
+        }
     }
 
     function createPlayerCard(p) {
         const div = document.createElement('div');
         div.className = `player-card ${selectedPlayerId === p.id ? 'selected' : ''}`;
         div.onclick = (e) => window.toggleSelection(p.id, e);
-        div.innerHTML = `
-            <span>${p.name}</span>
-            <span class="admin-only" onclick="window.deletePlayer('${p.id}'); event.stopPropagation();" style="color:#d32f2f; font-weight:900; margin-left:10px;">✕</span>
-        `;
+        div.innerHTML = `<span>${p.name}</span><span class="admin-only" onclick="window.deletePlayer('${p.id}'); event.stopPropagation();" style="color:#d32f2f; font-weight:900; margin-left:10px;">✕</span>`;
         return div;
     }
 
     function createMatchCard(m, groupPlayers) {
         const div = document.createElement('div');
         div.className = `match-item ${m.saved ? 'saved' : ''}`;
-        
-        // Helper to get name
-        const n = (id) => {
-            const pl = appState.players.find(x => x.id === id);
-            return pl ? pl.name : '???';
-        };
-
-        // Selector generator (only visible in edit mode/admin)
+        const n = (id) => { const pl = appState.players.find(x => x.id === id); return pl ? pl.name : '???'; };
         const makeSel = (slot, currId) => {
             if(m.saved || document.body.classList.contains('viewer-mode')) return `<span style="font-size:1.1em">${n(currId)}</span>`;
-            
             let html = `<select onchange="window.changePlayerInMatch('${m.mid}', '${slot}', this.value)" style="max-width:100px;">`;
-            groupPlayers.forEach(p => {
-                html += `<option value="${p.id}" ${p.id === currId ? 'selected' : ''}>${p.name}</option>`;
-            });
-            html += `</select>`;
-            return html;
+            groupPlayers.forEach(p => { html += `<option value="${p.id}" ${p.id === currId ? 'selected' : ''}>${p.name}</option>`; });
+            html += `</select>`; return html;
         };
-
         div.innerHTML = `
-            <div class="match-teams">
-                ${makeSel('p1', m.p1)} & ${makeSel('p2', m.p2)}
-                <div style="font-size:0.7em; color:#888; margin:2px 0;">VS</div>
-                ${makeSel('p3', m.p3)} & ${makeSel('p4', m.p4)}
-            </div>
+            <div class="match-teams">${makeSel('p1', m.p1)} & ${makeSel('p2', m.p2)}<div style="font-size:0.7em; color:#888; margin:2px 0;">VS</div>${makeSel('p3', m.p3)} & ${makeSel('p4', m.p4)}</div>
             <div class="match-inputs">
-                <input type="tel" id="s1-${m.mid}" value="${m.s1}" class="score-input ${m.saved ? 'score-display' : ''}" ${m.saved ? 'readonly' : ''}>
-                <input type="tel" id="s2-${m.mid}" value="${m.s2}" class="score-input ${m.saved ? 'score-display' : ''}" ${m.saved ? 'readonly' : ''}>
-                <button class="btn-save-match admin-only ${m.saved ? 'saved' : ''}" onclick="window.saveMatchScore('${m.mid}')">
-                    ${m.saved ? '✎' : 'OK'}
-                </button>
-            </div>
-        `;
+                <input type="tel" pattern="[0-9]*" id="s1-${m.mid}" value="${m.s1}" class="score-input ${m.saved ? 'score-display' : ''}" ${m.saved ? 'readonly' : ''}>
+                <input type="tel" pattern="[0-9]*" id="s2-${m.mid}" value="${m.s2}" class="score-input ${m.saved ? 'score-display' : ''}" ${m.saved ? 'readonly' : ''}>
+                <button class="btn-save-match admin-only ${m.saved ? 'saved' : ''}" onclick="window.saveMatchScore('${m.mid}')">${m.saved ? '✎' : 'OK'}</button>
+            </div>`;
         return div;
     }
-
 </script>
 </body>
 </html>
+
