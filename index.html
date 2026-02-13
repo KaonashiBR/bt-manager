@@ -4,129 +4,250 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#004e98">
+    <meta name="theme-color" content="#0f172a">
     
-    <title>BT Manager - V89 (Validação)</title>
+    <title>BT Manager - V90 (Visual Pro)</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #ff6b00;
-            --secondary: #004e98;
-            --bg-body: #f4f6f8;
-            --text-dark: #333;
-            --blue-masc: #2196F3;
-            --pink-fem: #E91E63;
-            --fav-color: #ff3b30;
+            /* Palette Beach Pro */
+            --primary: #FF6B6B; /* Coral Vibrante */
+            --primary-dark: #EE5253;
+            --secondary: #0F172A; /* Azul Noturno (Dark Navy) */
+            --accent: #4ECDC4; /* Turquesa Água */
+            --bg-body: #F8FAFC; /* Branco Gelo/Areia muito suave */
+            --surface: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            
+            /* Gradients */
+            --grad-primary: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            --grad-ocean: linear-gradient(135deg, #0F172A 0%, #334155 100%);
+            --grad-glass: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(148, 163, 184, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(148, 163, 184, 0.1), 0 2px 4px -1px rgba(148, 163, 184, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(148, 163, 184, 0.1), 0 4px 6px -2px rgba(148, 163, 184, 0.05);
         }
 
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; -webkit-tap-highlight-color: transparent; height: 100vh; display: flex; flex-direction: column; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-main); 
+            margin: 0; 
+            -webkit-tap-highlight-color: transparent; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+        }
 
-        /* NAVBAR */
-        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
-        .nav-logo { font-weight: 800; font-size: 0.95em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-        .nav-logo span { font-size: 1.4em; }
-        .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
-        .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd; object-fit: cover; }
-        .user-name { font-size: 0.8em; font-weight: 600; color: #555; display: none; }
-        @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.2em; } }
+        h1, h2, h3, .card-title, .nav-logo { font-family: 'Poppins', sans-serif; }
+
+        /* NAVBAR - Glassmorphism */
+        .navbar { 
+            background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 12px 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky; top: 0; z-index: 100; 
+        }
+        .nav-logo { 
+            font-weight: 800; font-size: 1.1em; color: var(--secondary); 
+            display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;
+            letter-spacing: -0.5px;
+        }
+        .nav-logo span { font-size: 1.4em; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        
+        .nav-user { 
+            display: flex; align-items: center; gap: 10px; cursor: pointer; 
+            padding: 6px 12px; border-radius: 30px; 
+            background: rgba(0,0,0,0.03); transition: all 0.2s; 
+        }
+        .nav-user:active { transform: scale(0.95); background: rgba(0,0,0,0.06); }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: var(--shadow-sm); }
+        .user-name { font-size: 0.85em; font-weight: 600; color: var(--secondary); display: none; }
+        @media(min-width: 600px) { .user-name { display: block; } }
 
         /* TELAS */
-        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; box-sizing: border-box; }
-        .screen.active { display: flex; flex-direction: column; }
+        .screen { display: none; flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; box-sizing: border-box; }
+        .screen.active { display: flex; flex-direction: column; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* CARDS */
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; width: 100%; }
-        .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
-        .std-card:active { transform: scale(0.97); }
-        .card-img { width: 100%; height: 100%; object-fit: cover; }
-        .card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 10px 10px; color: white; }
-        .card-title { font-weight: 700; font-size: 1.1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
-        .card-subtitle { font-size: 0.75em; opacity: 0.8; margin-top: 2px; }
-        .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-        .bg-masc { background: var(--blue-masc); } .bg-fem { background: var(--pink-fem); } .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
-        .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
-        .bg-tourney .material-icons { font-size: 4em; color: white; opacity: 0.3; }
-        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
-        .btn-icon-circle { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.9); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
-        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
-        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        /* CARDS MODERNOS */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; width: 100%; }
         
-        /* APP ELEMENTS */
-        .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
-        .header-controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
-        button.btn-std { border: none; border-radius: 4px; padding: 10px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.85em; width: 100%; margin-bottom: 5px; }
-        .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; }
-        input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; }
-        .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
+        .std-card {
+            background: var(--surface); border-radius: 24px; overflow: hidden; position: relative;
+            aspect-ratio: 4 / 5; 
+            box-shadow: var(--shadow-md); cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .std-card:active { transform: scale(0.96); }
+        .std-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
 
-        /* TABELA */
-        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
-        .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; }
-        .gh-0 { background: #00b050 !important; color: white !important; } .gh-1 { background: #00b0f0 !important; color: black !important; } .gh-2 { background: #ffff00 !important; color: black !important; } .gh-3 { background: #ff0000 !important; color: white !important; }
-        .bt-table td { border: 1px solid #999; padding: 4px; text-align: center; vertical-align: middle; font-weight: 700; }
-        .bt-table tr:nth-child(even) { background: #eef; }
-        .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
-        .tbl-input:disabled { border: none; background: transparent; }
-        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .card-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0) 100%);
+            padding: 40px 15px 15px; color: white;
+        }
+        .card-title { font-weight: 700; font-size: 1.15em; line-height: 1.1; margin-bottom: 4px; }
+        .card-subtitle { font-size: 0.8em; opacity: 0.9; font-weight: 400; }
+        
+        /* CATEGORIA COLORS */
+        .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 5em; font-family: 'Poppins'; }
+        .bg-masc { background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); }
+        .bg-fem { background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%); }
+        .bg-mista { background: linear-gradient(135deg, #3B82F6 0%, #EC4899 100%); }
+        .bg-tourney { background: var(--grad-primary); }
+        .bg-tourney .material-icons { font-size: 4em; color: white; opacity: 0.4; }
 
-        /* BRACKET VISUAL */
-        .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
-        .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; display:flex; flex-direction:column; justify-content:center; }
-        .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
-        .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
-        .match-score { font-weight: 900; color: #333; }
+        /* HEADER & BAR */
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .section-title { font-size: 1.8em; font-weight: 800; color: var(--secondary); margin: 0; letter-spacing: -1px; }
+        .back-btn { display: flex; align-items: center; gap: 8px; color: var(--text-muted); cursor: pointer; font-weight: 600; font-size: 0.95em; margin-bottom: 20px; transition: color 0.2s; }
+        .back-btn:hover { color: var(--primary); }
 
-        /* LIVE COURT */
-        .court-live-card { background: white; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .court-header { background: #333; color: white; padding: 8px 12px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
-        .court-status { font-size: 0.75em; text-transform: uppercase; background: #000; padding: 2px 6px; border-radius: 4px; }
-        .court-status.live { background: #d32f2f; color: white; } .court-status.free { background: #2e7d32; color: white; }
-        .court-body { padding: 15px; text-align: center; }
-        .live-match-box { background: #f0f4f8; padding: 10px; border-radius: 8px; border: 1px solid #cce; margin-bottom: 10px; }
-        .live-vs { font-size: 1.2em; font-weight: 900; color: #555; margin: 5px 0; }
-        .live-team { font-size: 1.1em; font-weight: 600; color: #000; }
-        .live-inputs { display: flex; justify-content: center; gap: 10px; margin-top: 10px; align-items: center; }
-        .live-input { width: 50px; height: 50px; font-size: 1.5em; text-align: center; border: 2px solid #ccc; border-radius: 6px; font-weight: bold; }
-        .live-input:focus { border-color: var(--primary); outline: none; }
-        .next-up-box { font-size: 0.8em; color: #666; background: #fafafa; padding: 8px; border-radius: 4px; margin-top: 10px; border: 1px dashed #ccc; }
-        .history-list { display: none; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
-        .history-item { display: flex; justify-content: space-between; font-size: 0.85em; padding: 4px 0; border-bottom: 1px solid #f9f9f9; }
+        .status-bar { 
+            background: var(--secondary); color: white; padding: 12px 16px; 
+            border-radius: 16px; display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 15px; font-size: 0.9em; font-weight: 600; box-shadow: var(--shadow-md);
+        }
 
-        /* TABS INSIDE APP */
-        .app-tabs { display: flex; background: #eee; margin-bottom: 15px; border-radius: 6px; padding: 4px; }
-        .app-tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
-        .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .view-section { display: none; } .view-section.active { display: block; }
+        /* BUTTONS - PILL SHAPE */
+        button.btn-std { 
+            border: none; border-radius: 50px; padding: 12px 20px; 
+            font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; 
+            font-size: 0.85em; width: 100%; margin-bottom: 8px; letter-spacing: 0.5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        button.btn-std:active { transform: scale(0.97); }
+        
+        .btn-org { background: var(--grad-primary); box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3); }
+        .btn-blue { background: #3B82F6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+        .btn-red { background: #EF4444; color: white; }
+        .btn-green { background: #10B981; color: white; }
+        .btn-gold { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; }
 
-        /* RANKING */
-        .rank-table { width: 100%; border-collapse: collapse; background: white; }
-        .rank-table th { background: #333; color: white; padding: 8px; font-size: 0.8em; }
-        .rank-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
-        .rank-pos { width: 30px; height: 30px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 0.9em; }
-        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
+        input.inp-std { 
+            width: 100%; padding: 14px; border: 2px solid #E2E8F0; background: #F8FAFC;
+            border-radius: 12px; box-sizing: border-box; margin-bottom: 10px; font-family: 'Inter'; font-size: 1em; outline: none; transition: border-color 0.2s;
+        }
+        input.inp-std:focus { border-color: var(--primary); background: white; }
 
+        .btn-add-float { 
+            position: fixed; bottom: 80px; right: 25px; width: 64px; height: 64px; 
+            background: var(--grad-primary); color: white; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 2.2em; box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4); 
+            border: none; cursor: pointer; z-index: 900; transition: transform 0.2s;
+        }
+        .btn-add-float:active { transform: scale(0.9); }
+
+        /* LIVE COURT CARDS */
+        .court-live-card { 
+            background: white; border-radius: 20px; border: none; 
+            margin-bottom: 20px; overflow: hidden; box-shadow: var(--shadow-md); 
+        }
+        .court-header { 
+            background: white; color: var(--secondary); padding: 15px 20px; 
+            font-weight: 800; font-size: 1.1em; font-family: 'Poppins';
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .court-status { 
+            font-size: 0.7em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; font-weight: 700;
+        }
+        .court-status.live { background: #FEE2E2; color: #EF4444; }
+        .court-status.free { background: #D1FAE5; color: #10B981; }
+        
+        .court-body { padding: 20px; text-align: center; }
+        
+        .live-match-box { 
+            background: #F8FAFC; padding: 20px; border-radius: 16px; 
+            border: 2px solid #E2E8F0; margin-bottom: 15px; 
+        }
+        .live-vs { font-size: 0.9em; font-weight: 900; color: var(--text-muted); margin: 8px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .live-team { font-size: 1.2em; font-weight: 700; color: var(--secondary); font-family: 'Poppins'; }
+        
+        .live-inputs { display: flex; justify-content: center; gap: 15px; margin-top: 15px; align-items: center; }
+        .live-input { 
+            width: 60px; height: 60px; font-size: 1.8em; text-align: center; 
+            border: 2px solid #CBD5E1; border-radius: 12px; font-weight: 800; color: var(--secondary);
+            background: white;
+        }
+        .live-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2); }
+        
+        .next-up-box { 
+            font-size: 0.9em; color: var(--text-muted); background: white; 
+            padding: 12px; border-radius: 12px; margin-top: 15px; border: 1px dashed #CBD5E1; display:flex; align-items:center; justify-content:center; gap:5px;
+        }
+
+        /* TABS */
+        .app-tabs { display: flex; background: #F1F5F9; margin-bottom: 20px; border-radius: 12px; padding: 5px; }
+        .app-tab { 
+            flex: 1; text-align: center; padding: 10px; cursor: pointer; 
+            font-weight: 700; font-size: 0.85em; border-radius: 8px; color: #64748B; 
+            transition: all 0.2s;
+        }
+        .app-tab.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); }
+
+        /* BRACKET */
+        .bracket-container { overflow-x: auto; padding: 20px 0; }
+        .match-card { 
+            background: white; border: 1px solid #E2E8F0; border-radius: 12px; 
+            padding: 10px; min-width: 180px; box-shadow: var(--shadow-sm); 
+            display:flex; flex-direction:column; justify-content:center; 
+        }
+        .match-team { padding: 6px; border-bottom: 1px solid #F1F5F9; display: flex; justify-content: space-between; font-weight: 500; }
+        .match-team.winner { font-weight: 700; background: #ECFDF5; color: #047857; border-radius: 4px; }
+        .match-score { font-weight: 800; }
+
+        /* RANKING TABLE */
+        .rank-table th { background: var(--secondary); color: white; padding: 12px; font-size: 0.8em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .rank-table td { padding: 12px; border-bottom: 1px solid #F1F5F9; color: var(--text-main); font-weight: 600; }
+        .rank-table tr:nth-child(even) { background: #F8FAFC; }
+        .rank-pos { width: 32px; height: 32px; background: #E2E8F0; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 0.9em; font-weight: 800; color: #64748B; }
+        .rank-1 .rank-pos { background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%); color: white; }
+        .rank-2 .rank-pos { background: linear-gradient(135deg, #E2E8F0 0%, #94A3B8 100%); color: white; }
+        .rank-3 .rank-pos { background: linear-gradient(135deg, #FDBA74 0%, #EA580C 100%); color: white; }
+
+        /* UTILS */
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
-        .viewer-mode .court-select { pointer-events: none; border: none; background: transparent; appearance: none; }
-        .viewer-mode .live-input { border:none; background:transparent; }
+        .viewer-mode .live-input { border:none; background:transparent; font-size: 2em; }
         
-        .board { display: flex; flex-direction: column; gap: 15px; }
+        .board { display: flex; flex-direction: column; gap: 20px; }
         @media(min-width: 900px) { .board { flex-direction: row; flex-wrap: wrap; } .column { flex: 1 1 40%; } }
         
-        #loading { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index: 3000; display: flex; justify-content: center; align-items: center; flex-direction: column;}
-        
-        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 10px 5px; font-size: 0.7em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
+        /* FOOTER */
+        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(5px); color: #94A3B8; text-align: center; padding: 12px 0; font-size: 0.75em; font-weight: 500; border-top: 1px solid #334155; z-index: 1000; }
         .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
 
-        #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-queue { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
-        .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-google { background: #db4437; } .btn-logout { background: #555; }
-        .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .queue-court { font-weight:900; color:var(--primary); background: #fff3e0; padding: 2px 6px; border-radius: 4px; margin-right: 8px;}
-        .queue-match { font-size: 0.9em; font-weight: 600; color: #444; flex: 1; }
+        /* QUEUE */
+        .queue-item { 
+            background: white; padding: 15px; margin-bottom: 8px; 
+            border-left: 6px solid var(--primary); text-align: left; 
+            border-radius: 8px; box-shadow: var(--shadow-sm); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .queue-court { font-weight: 900; color: var(--primary); background: #FFF1F2; padding: 4px 8px; border-radius: 6px; margin-right: 10px; font-size: 0.85em; }
+        .queue-match { font-size: 0.95em; font-weight: 600; color: var(--text-main); flex: 1; }
+
+        /* MODAL */
+        .modal-box { padding: 30px; border-radius: 24px; box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,0.8); }
+        .modal-title { color: var(--secondary); font-family: 'Poppins'; margin-bottom: 25px; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -136,7 +257,7 @@
 <div class="navbar">
     <div class="nav-logo" onclick="window.goHome()">
         <span>🎾</span>
-        <div>Beach Tennis Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div>
+        <div>Beach Tennis Manager<br><small style="font-weight:500; color:var(--text-muted); font-size:0.7em;">por Lucas Sibie</small></div>
     </div>
     <div class="nav-user" onclick="openLoginModal()">
         <span id="nav-username" class="user-name">Visitante</span>
@@ -153,7 +274,7 @@
 
 <div id="screen-categories" class="screen">
     <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Arenas</div>
-    <div class="header-bar"><div><h2 class="section-title" id="title-arena">Nome Arena</h2><div style="font-size:0.8em; color:#777;">Categorias</div></div></div>
+    <div class="header-bar"><div><h2 class="section-title" id="title-arena">Nome Arena</h2><div style="font-size:0.9em; color:var(--text-muted);">Categorias</div></div></div>
     <div id="grid-categories" class="grid-container"></div>
     <button id="btn-add-cat" class="btn-add-cat-float btn-add-float" onclick="openModal('category')" style="display:none;">+</button>
 </div>
@@ -166,32 +287,32 @@
         <div id="grid-tournaments" class="grid-container"></div>
         <button id="btn-add-tourney" class="btn-add-float" onclick="openModal('tournament')" style="display:none;">+</button>
     </div>
-    <div id="tab-ranking" class="tab-content"><div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd;"><table class="rank-table" id="table-ranking"></table></div></div>
+    <div id="tab-ranking" class="tab-content"><div style="background:white; border-radius:16px; overflow:hidden; border:1px solid #E2E8F0; box-shadow:var(--shadow-sm);"><table class="rank-table" id="table-ranking"></table></div></div>
 </div>
 
 <div id="screen-app" class="screen">
     <div class="status-bar">
         <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.1em;">arrow_back</span> Sair</div>
-        <div style="display:flex; align-items:center; gap:5px;">
+        <div style="display:flex; align-items:center; gap:10px;">
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
             <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
             <button onclick="openQueue()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">list_alt</span></button>
-            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
+            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid rgba(255,255,255,0.3); padding:4px 8px; color:white; border-radius:8px;">🔒</button>
         </div>
     </div>
-    <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
+    <h2 id="t-title-header" style="text-align:center; margin:10px 0 20px 0; text-transform:uppercase; font-size:1.4em; color:var(--secondary);">Torneio</h2>
     
-    <div class="admin-only" style="background:white; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
+    <div class="admin-only" style="background:white; padding:20px; border-radius:16px; border:1px solid #E2E8F0; margin-bottom:20px; box-shadow:var(--shadow-sm);">
         <div style="display:flex; gap:10px; margin-bottom:10px;">
             <input type="text" id="pName" list="player-suggestions" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
             <datalist id="player-suggestions"></datalist>
-            <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
-            <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
+            <button class="btn-std btn-org" style="width:auto; margin:0;" onclick="addPlayer()">+ Add</button>
+            <button class="btn-std btn-blue" style="width:auto; margin:0;" onclick="addGroup()">+ Grupo</button>
         </div>
         <div style="display:flex; gap:5px; flex-wrap:wrap;">
             <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
             <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std" style="width:auto;">Fixas</button>
-            <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Gerar Mata-Mata</button>
+            <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Mata-Mata</button>
             <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
             <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
         </div>
@@ -208,12 +329,12 @@
 
     <div id="view-table" class="view-section">
         <div class="board">
-            <div class="column" id="col-pool" style="background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:10px;">
-                <div style="background:var(--secondary); color:white; padding:10px; font-weight:bold; display:flex; justify-content:space-between;">
+            <div class="column" id="col-pool" style="background:white; border-radius:16px; border:1px solid #E2E8F0; padding-bottom:10px; overflow:hidden; box-shadow:var(--shadow-sm);">
+                <div style="background:var(--secondary); color:white; padding:12px; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
                     <span>RESERVAS (<span id="pool-cnt">0</span>)</span>
-                    <button class="admin-only btn-std" style="background:white; color:var(--secondary); width:auto; padding:2px 8px;" onclick="distribute()">Distribuir</button>
+                    <button class="admin-only btn-std" style="background:rgba(255,255,255,0.2); color:white; width:auto; padding:4px 10px; margin:0; font-size:0.7em;" onclick="distribute()">Distribuir</button>
                 </div>
-                <div id="pool-list" style="padding:10px; display:flex; flex-wrap:wrap; gap:5px;"></div>
+                <div id="pool-list" style="padding:15px; display:flex; flex-wrap:wrap; gap:8px;"></div>
             </div>
             <div id="groups-container" style="display:contents;"></div>
         </div>
@@ -237,7 +358,7 @@
     <div class="modal-box">
         <h3 class="modal-title">Fila de Jogos</h3>
         <div id="queue-list" style="max-height:60vh; overflow-y:auto;"></div>
-        <button class="btn-std btn-red" onclick="document.getElementById('modal-queue').style.display='none'" style="margin-top:15px;">Fechar</button>
+        <button class="btn-std btn-red" onclick="document.getElementById('modal-queue').style.display='none'" style="margin-top:20px;">Fechar</button>
     </div>
 </div>
 
@@ -269,8 +390,8 @@
 <div id="modal-knockout">
     <div class="modal-box">
         <h3 class="modal-title">Configurar Mata-Mata</h3>
-        <p style="font-size:0.8em; color:#666;">Defina quantos classificam de cada grupo:</p>
-        <div id="knockout-config-list" style="max-height:50vh; overflow-y:auto; margin-bottom:15px;"></div>
+        <p style="font-size:0.8em; color:#666; margin-bottom:15px;">Defina quantos classificam de cada grupo:</p>
+        <div id="knockout-config-list" style="max-height:50vh; overflow-y:auto; margin-bottom:20px;"></div>
         <div style="display:flex; gap:10px;"><button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button></div>
     </div>
 </div>
@@ -281,7 +402,7 @@
         <label class="modal-label">🥇 1º Lugar</label><select id="sel-win-1" class="inp-std auth-input"></select>
         <label class="modal-label">🥈 2º Lugar</label><select id="sel-win-2" class="inp-std auth-input"></select>
         <label class="modal-label">🥉 3º Lugar</label><select id="sel-win-3" class="inp-std auth-input"></select>
-        <div style="display:flex; gap:10px; margin-top:15px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div>
+        <div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div>
     </div>
 </div>
 
@@ -686,7 +807,6 @@
         if(s1 < 0 || s2 < 0) return alert("Sem negativos.");
         if(s1 > 30 || s2 > 30) { if(!confirm(`Placar alto (${s1}x${s2}). Confirma?`)) return; }
         
-        // Logic check standard set (6)
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) {
              if(!confirm("Jogo parece não ter acabado. Salvar?")) return;
         }
