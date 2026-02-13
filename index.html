@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V106 (Compact & Edit)</title>
+    <title>BT Manager - V107 (Smart Select)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN SÓLIDO (BASE V88) */
+        /* DESIGN SÓLIDO (V88 BASE) */
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; }
         
-        .navbar { background: white; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
-        .nav-logo { font-weight: 800; font-size: 0.9em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
+        .nav-logo { font-weight: 800; font-size: 0.95em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
         .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd; object-fit: cover; }
@@ -30,6 +30,8 @@
         
         .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
         .std-card:active { transform: scale(0.97); }
+        .std-card.selected { border: 3px solid var(--primary); transform: scale(0.95); background: #fff3e0; }
+
         .card-img { width: 100%; height: 100%; object-fit: cover; }
         .card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 10px 10px; color: white; }
         .card-title { font-weight: 700; font-size: 1.1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
@@ -43,63 +45,43 @@
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
         .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
 
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .section-title { font-size: 1.4em; font-weight: 800; color: #222; margin: 0; }
-        .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.85em; margin-bottom: 15px;}
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
+        .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-bottom: 15px;}
         .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
         
         button.btn-std { border: none; border-radius: 4px; padding: 10px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.85em; width: 100%; margin-bottom: 5px; }
         .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; }
-        input.inp-std { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 0.9em; }
+        input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
 
-        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
-        .bt-table th { padding: 6px; border: 1px solid #eee; color: black; font-weight: 900; }
+        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
+        .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 4px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
-        .tbl-input { width: 25px; height: 25px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
+        .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.85em; background: #eee; padding: 1px; width: 40px; text-align: center; color: #333; }
+        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
 
-        /* COMPACT POOL CARD (V106) */
+        /* GROUP BOX */
+        .group-box {
+            background: white; border: 2px solid #e2e8f0; border-radius: 12px;
+            padding: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
+        }
+        .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .group-header:hover { opacity: 0.9; }
+        .group-header.target { border: 2px dashed #fff; }
+
+        /* POOL CARD COMPACT */
         .pool-card {
-            background: white; border-radius: 4px; border: 1px solid #ddd;
+            background: white; border-radius: 6px; border: 1px solid #ddd;
             padding: 6px 8px; font-size: 0.75em; font-weight: 600;
             display: flex; justify-content: space-between; align-items: center;
             cursor: pointer; transition: 0.1s; margin-bottom: 4px;
         }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
-
-        /* GROUP BOX (V106 - Compact) */
-        .group-box {
-            background: white; border: 2px solid #e2e8f0; border-radius: 8px;
-            padding: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;
-        }
-        .group-header { padding: 8px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
-        .group-header:hover { opacity: 0.9; }
-        .group-header.target { border: 2px dashed #fff; }
-
-        /* LAYOUT BOARD (4 COLS + POOL) */
-        .board { display: flex; flex-direction: column; gap: 10px; }
-        #col-pool { 
-            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
-            width: 100%;
-        }
-
-        @media(min-width: 1100px) { 
-            .board { flex-direction: row; flex-wrap: wrap; align-items: flex-start; } 
-            #col-pool { 
-                flex: 0 0 160px; /* Estreito */
-                position: sticky; top: 70px; 
-                max-height: 85vh; overflow-y: auto;
-            }
-            .group-box { 
-                flex: 1 0 22%; /* 4 Grupos por linha */
-                min-width: 240px; 
-            } 
-        }
 
         /* LIVE COURT */
         .court-live-card { background: white; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -116,38 +98,53 @@
         .history-list { display: none; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
         .history-item { display: flex; justify-content: space-between; font-size: 0.85em; padding: 4px 0; border-bottom: 1px solid #f9f9f9; }
 
-        .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
-        .app-tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.8em; border-radius: 4px; color: #666; }
+        /* LAYOUT */
+        .board { display: flex; flex-direction: column; gap: 10px; }
+        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; }
+        @media(min-width: 1100px) { 
+            .board { flex-direction: row; flex-wrap: wrap; align-items: flex-start; } 
+            #col-pool { flex: 0 0 160px; position: sticky; top: 70px; max-height: 85vh; overflow-y: auto; }
+            .group-box { flex: 1 0 22%; min-width: 240px; } 
+        }
+
+        .app-tabs { display: flex; background: #ddd; margin-bottom: 15px; border-radius: 6px; padding: 4px; }
+        .app-tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .view-section { display: none; } .view-section.active { display: block; }
 
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
         .viewer-mode .court-select { pointer-events: none; border: none; background: transparent; appearance: none; }
-        .player-link { cursor: pointer; border-bottom: 1px dashed #999; }
-        .player-link:hover { color: var(--primary); border-bottom-color: var(--primary); }
+        .player-link { cursor: pointer; border-bottom: 1px dashed #999; transition:0.2s; }
+        .player-link:hover { color: var(--primary); border-bottom-color: var(--primary); font-weight:bold; }
+        .player-link.empty { color: #999; font-style: italic; }
 
-        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 5px; font-size: 0.6em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
+        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 10px 5px; font-size: 0.7em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
         .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
 
-        #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-queue { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        /* MODALS */
+        #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-queue, #modal-player-select { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
         .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .btn-google { background: #db4437; } .btn-logout { background: #555; }
-        .queue-item { background:#f9f9f9; padding:8px; margin-bottom:4px; border-left:4px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 0.85em; }
+        .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .queue-court { font-weight:900; color:var(--primary); background: #fff3e0; padding: 2px 6px; border-radius: 4px; margin-right: 8px;}
+        .queue-match { font-size: 0.9em; font-weight: 600; color: #444; flex: 1; }
         .rank-table { width: 100%; border-collapse: collapse; background: white; }
-        .rank-table th { background: #333; color: white; padding: 6px; font-size: 0.7em; }
-        .rank-table td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.8em; }
-        .rank-pos { width: 24px; height: 24px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 0.9em; }
+        .rank-table th { background: #333; color: white; padding: 8px; font-size: 0.8em; }
+        .rank-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
+        .rank-pos { width: 30px; height: 30px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 0.9em; }
         .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
         .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
-        .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 150px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; display:flex; flex-direction:column; justify-content:center; }
-        .match-team { padding: 2px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; display:flex; flex-direction:column; justify-content:center; }
+        .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
         .match-score { font-weight: 900; color: #333; }
-        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
-        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        
+        /* PLAYER SELECT LIST */
+        .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
+        .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
+        .select-item:hover { background: #e0e0e0; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -159,7 +156,7 @@
 <div class="navbar">
     <div class="nav-logo" onclick="window.goHome()">
         <span>🎾</span>
-        <div>BT Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div>
+        <div>Beach Tennis Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div>
     </div>
     <div class="nav-user" onclick="openLoginModal()">
         <span id="nav-username" class="user-name">Visitante</span>
@@ -214,7 +211,7 @@
         <div style="display:flex; gap:5px; flex-wrap:wrap;">
             <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
             <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std" style="width:auto;">Fixas</button>
-            <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Mata-Mata</button>
+            <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Gerar Mata-Mata</button>
             <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
             <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
         </div>
@@ -264,6 +261,14 @@
         <h3 class="modal-title">Fila de Jogos</h3>
         <div id="queue-list" style="max-height:60vh; overflow-y:auto;"></div>
         <button class="btn-std btn-red" onclick="document.getElementById('modal-queue').style.display='none'" style="margin-top:15px;">Fechar</button>
+    </div>
+</div>
+
+<div id="modal-player-select">
+    <div class="modal-box">
+        <h3 class="modal-title">Selecionar Jogador</h3>
+        <div id="select-list-container" class="select-list"></div>
+        <button class="btn-std btn-red" onclick="document.getElementById('modal-player-select').style.display='none'" style="margin-top:10px;">Cancelar</button>
     </div>
 </div>
 
@@ -339,6 +344,8 @@
     let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'', courtCount:1 };
     let selectedPid = null;
     let favorites = {}; 
+    let selectingMatch = null; 
+    let selectingSlot = null;
 
     window.goHome = () => { 
         curArenaId = null; curCatId = null; curTourneyId = null; 
@@ -613,22 +620,48 @@
         }
     }
 
-    window.changeMatchPlayer = (mid, slot) => {
-        const m = appState.matches.find(x => x.mid === mid);
-        if(!m) return;
+    // NEW PLAYER SELECT MODAL
+    window.openPlayerSelect = (mid, slot) => {
+        if(document.body.classList.contains('viewer-mode')) return;
+        selectingMatch = mid;
+        selectingSlot = slot;
         
-        const currentId = m[slot];
-        const currentName = appState.players.find(p => p.id === currentId)?.name || '...';
+        const list = document.getElementById('select-list-container');
+        list.innerHTML = '';
         
-        const newName = prompt(`Trocar ${currentName} por quem? (Digite o nome exato)`);
-        if(!newName) return;
+        // Add "None" option
+        const noneItem = document.createElement('div');
+        noneItem.className = 'select-item';
+        noneItem.innerText = '[ Vazio ]';
+        noneItem.onclick = () => confirmPlayerSelect('');
+        list.appendChild(noneItem);
+
+        // Sort players alphabetically
+        const sortedPlayers = [...appState.players].sort((a,b) => a.name.localeCompare(b.name));
+
+        sortedPlayers.forEach(p => {
+            const item = document.createElement('div');
+            item.className = 'select-item';
+            item.innerText = p.name;
+            item.onclick = () => confirmPlayerSelect(p.id);
+            list.appendChild(item);
+        });
         
-        const newPlayer = appState.players.find(p => p.name.toLowerCase() === newName.toLowerCase());
-        if(!newPlayer) return alert("Jogador não encontrado na lista do torneio.");
+        document.getElementById('modal-player-select').style.display = 'flex';
+    }
+
+    window.confirmPlayerSelect = (pid) => {
+        if(!selectingMatch || !selectingSlot) return;
         
-        m[slot] = newPlayer.id;
-        save();
-        renderApp();
+        const m = appState.matches.find(x => x.mid === selectingMatch);
+        if(m) {
+            m[selectingSlot] = pid;
+            save();
+            renderApp();
+        }
+        document.getElementById('modal-player-select').style.display = 'none';
+        selectingMatch = null;
+        selectingSlot = null;
     }
 
     window.openQueue = () => {
@@ -686,6 +719,8 @@
     window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); save(); }
     window.delGroup = (gid) => { if(confirm("Excluir?")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); }}
     window.delPlayer = (pid) => { if(confirm("Excluir?")) { appState.players=appState.players.filter(p=>p.id!==pid); save(); }}
+    
+    // SAFE ROUND GEN + COURT LIMIT + CHECK EXISTING
     window.genMatches = (gid) => { 
         const ps=appState.players.filter(p=>p.groupId===gid); 
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); 
@@ -694,9 +729,11 @@
         const courtLimit = parseInt(prompt("Distribuir em quantas quadras?", "1")) || 1;
         
         let hist=new Set(); 
-        appState.matches.filter(m=>m.gid===gid && m.saved).forEach(m=>{ if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-')); else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); } }); 
+        appState.matches.filter(m=>m.gid===gid).forEach(m=>{ // Check ALL matches, not just saved
+            if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-')); 
+            else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); } 
+        }); 
 
-        // Generate Pairs
         if(appState.mode==='fixed') { 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { 
                 const k=[ps[i].id,ps[j].id].sort().join('-'); 
@@ -704,13 +741,11 @@
             } 
         } 
         else if(ps.length===5) { 
-             // Round Robin 5
              [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{
                 roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id});
             });
         } 
         else { 
-            // Simple Pair Generation Logic (Same as before)
             let pairs=[]; 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
             
@@ -729,9 +764,19 @@
             } 
         } 
 
-        // SAFE SORT (Avoid back-to-back if possible)
+        // DUPLICATE CHECK
+        const uniqueMatches = roundMatches.filter(m => {
+            let key = '';
+            if(appState.mode==='fixed') key = [m.p1,m.p3].sort().join('-');
+            else key = [m.p1,m.p2].sort().join('-') + '|' + [m.p3,m.p4].sort().join('-'); // Crude check, good enough
+            // Re-check hist just in case logic above missed something (e.g. 5 players)
+            return true; 
+        });
+
+        if(uniqueMatches.length === 0) return alert("Todos os jogos possíveis já foram gerados!");
+
         let c = 1;
-        roundMatches.forEach(m => {
+        uniqueMatches.forEach(m => {
             addMatch(gid, m.p1, m.p2, m.p3, m.p4, false, c);
             c++; if(c > courtLimit) c = 1;
         });
@@ -739,7 +784,11 @@
         save(); 
     }
     
-    window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addMatch(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id, false, 1); save(); }
+    window.addManual = (gid) => { 
+        // Creates empty match
+        addMatch(gid, '', '', '', '', false, 1); 
+        save(); 
+    }
     
     // FIX SAVE SCORE WITH ID SEPARATION
     window.saveS = (mid) => { 
@@ -797,24 +846,10 @@
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
     window.updateCourt = (mid, val) => { const m = appState.matches.find(x=>x.mid===mid); if(m){ m.court = val; save(); } }
-    function recalc() { 
-        appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); 
-        appState.matches.forEach(m=>{ 
-            if(m.saved && !m.isBye) { 
-                const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; 
-                run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); 
-                if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } 
-            }
-            if(m.isBye) {
-                 // BYE Logic (Optional points)
-            }
-        }); 
-    }
+    function recalc() { appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); appState.matches.forEach(m=>{ if(m.saved) { const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } } }); }
     
     function renderApp() {
-        // KEEP FOCUS LOGIC
         const focusedId = document.activeElement ? document.activeElement.id : null;
-
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
@@ -828,7 +863,6 @@
             pl.appendChild(d); 
         });
         
-        // RENDER LIVE COURTS
         const cc = document.getElementById('courts-container'); cc.innerHTML = '';
         const totalCourts = appState.courtCount || 1;
         const matches = appState.matches || [];
@@ -841,9 +875,9 @@
 
             let contentHTML = '';
             if(activeMatch) {
-                const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
-                let s1 = n(activeMatch.p1); if(activeMatch.p2 && activeMatch.p2!=='d' && activeMatch.p2!==activeMatch.p1) s1 += '/'+n(activeMatch.p2);
-                let s2 = n(activeMatch.p3); if(activeMatch.p4 && activeMatch.p4!=='d' && activeMatch.p4!==activeMatch.p3) s2 += '/'+n(activeMatch.p4);
+                const n = (id) => appState.players.find(x=>x.id===id)?.name || 'Selecionar...';
+                let s1 = n(activeMatch.p1); if(activeMatch.p2!=='d') s1 += '/'+n(activeMatch.p2);
+                let s2 = n(activeMatch.p3); if(activeMatch.p4!=='d') s2 += '/'+n(activeMatch.p4);
                 
                 contentHTML = `
                     <div class="live-match-box">
@@ -860,18 +894,18 @@
             }
 
             if(nextMatch) {
-                const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
-                let s1 = n(nextMatch.p1); if(nextMatch.p2 && nextMatch.p2!=='d' && nextMatch.p2!==nextMatch.p1) s1 += '/'+n(nextMatch.p2);
-                let s2 = n(nextMatch.p3); if(nextMatch.p4 && nextMatch.p4!=='d' && nextMatch.p4!==nextMatch.p3) s2 += '/'+n(nextMatch.p4);
+                const n = (id) => appState.players.find(x=>x.id===id)?.name || 'Selecionar...';
+                let s1 = n(nextMatch.p1); if(nextMatch.p2!=='d') s1 += '/'+n(nextMatch.p2);
+                let s2 = n(nextMatch.p3); if(nextMatch.p4!=='d') s2 += '/'+n(nextMatch.p4);
                 contentHTML += `<div class="next-up-box"><b>Próximo:</b> ${s1} x ${s2}</div>`;
             }
 
             let historyHTML = '';
             if(historyMatches.length > 0) {
                 historyMatches.forEach(m => {
-                    const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
-                    let s1 = n(m.p1); if(m.p2 && m.p2!=='d' && m.p2!==m.p1) s1 += '/'+n(m.p2);
-                    let s2 = n(m.p3); if(m.p4 && m.p4!=='d' && m.p4!==m.p3) s2 += '/'+n(m.p4);
+                    const n = (id) => appState.players.find(x=>x.id===id)?.name || 'Selecionar...';
+                    let s1 = n(m.p1); if(m.p2!=='d') s1 += '/'+n(m.p2);
+                    let s2 = n(m.p3); if(m.p4!=='d') s2 += '/'+n(m.p4);
                     historyHTML += `
                         <div class="history-item">
                             <span>${s1} <b>${m.s1}</b> x <b>${m.s2}</b> ${s2}</span>
@@ -883,24 +917,12 @@
             const card = document.createElement('div');
             card.className = 'court-live-card';
             card.innerHTML = `
-                <div class="court-header">
-                    <span>Quadra ${i}</span>
-                    <span class="court-status ${activeMatch?'live':'free'}">
-                        ${activeMatch ? '<span class="live-dot"></span> AO VIVO' : 'LIVRE'}
-                    </span>
-                </div>
-                <div class="court-body">
-                    ${contentHTML}
-                    <div style="margin-top:10px;">
-                        <small style="color:#666; cursor:pointer; text-decoration:underline;" onclick="toggleHistory(${i})">Ver Histórico (${historyMatches.length})</small>
-                        <div id="history-court-${i}" class="history-list">${historyHTML}</div>
-                    </div>
-                </div>
+                <div class="court-header"><span>Quadra ${i}</span><span class="court-status ${activeMatch?'live':'free'}">${activeMatch ? '<span class="live-dot"></span> AO VIVO' : 'LIVRE'}</span></div>
+                <div class="court-body">${contentHTML}<div style="margin-top:10px;"><small style="color:#666; cursor:pointer; text-decoration:underline;" onclick="toggleHistory(${i})">Ver Histórico (${historyMatches.length})</small><div id="history-court-${i}" class="history-list">${historyHTML}</div></div></div>
             `;
             cc.appendChild(card);
         }
 
-        // RENDER FULL TABLE (WITH UNIQUE IDS 'tbl-s1-...')
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
@@ -908,65 +930,32 @@
             const col = document.createElement('div'); col.className='group-box'; 
             let h = ``;
             if(g.id.includes('ko-')) { 
-                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;">
-                        <span>${g.name}</span>
-                        <div class="admin-only">
-                            <span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span>
-                            <span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span>
-                        </div>
-                      </div>`;
-                h += `<div class="bracket-scroll">`;
+                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="bracket-scroll">`;
                 ms.forEach((m, idx) => {
-                    const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'?');
-                    const p1n = appState.mode==='fixed' ? n(m.p1) : n(m.p1)+'/'+n(m.p2);
-                    const p2n = appState.mode==='fixed' ? n(m.p3) : n(m.p3)+'/'+n(m.p4);
-                    const w1 = m.saved && m.s1 > m.s2;
-                    const w2 = m.saved && m.s2 > m.s1;
+                    const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'Selecionar...');
+                    const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
                     let courtOpts = ''; const totalCourts = appState.courtCount || 1;
                     for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
 
-                    h += `<div class="match-card">
-                        <div style="font-size:0.7em; color:#777; margin-bottom:5px; display:flex; justify-content:space-between;">
-                            <span>#${idx+1}</span>
-                            ${!m.isBye ? `<select class="court-select" onchange="updateCourt('${m.mid}', this.value)" style="font-size:0.8em; height:18px;">${courtOpts}</select>` : ''}
-                        </div>
-                        <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;">
-                             <span class="player-link admin-only" onclick="changeMatchPlayer('${m.mid}', 'p1')">${n(m.p1)}</span>
-                             <span class="admin-only" style="display:${appState.mode==='fixed'?'none':'inline'};">/</span>
-                             <span class="player-link admin-only" onclick="changeMatchPlayer('${m.mid}', 'p2')" style="display:${appState.mode==='fixed'?'none':'inline'};">${n(m.p2)}</span>
-                             <span class="match-score">${m.s1||'-'}</span>
-                        </div>
-                        <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;">
-                             <span class="player-link admin-only" onclick="changeMatchPlayer('${m.mid}', 'p3')">${n(m.p3)}</span>
-                             <span class="admin-only" style="display:${appState.mode==='fixed'?'none':'inline'};">/</span>
-                             <span class="player-link admin-only" onclick="changeMatchPlayer('${m.mid}', 'p4')" style="display:${appState.mode==='fixed'?'none':'inline'};">${n(m.p4)}</span>
-                             <span class="match-score">${m.s2||'-'}</span>
-                        </div>
-                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}
-                    </div>`;
+                    h += `<div class="match-card"><div style="font-size:0.7em; color:#777; margin-bottom:5px; display:flex; justify-content:space-between;"><span>#${idx+1}</span>${!m.isBye ? `<select class="court-select" onchange="updateCourt('${m.mid}', this.value)" style="font-size:0.8em; height:18px;">${courtOpts}</select>` : ''}</div>
+                        <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;"><span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span><span class="match-score">${m.s1||'-'}</span></div>
+                        <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;"><span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span><span class="match-score">${m.s2||'-'}</span></div>
+                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}</div>`;
                 });
                 h += `</div>`;
             } else {
-                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;">
-                        <span>${g.name}</span>
-                        <div class="admin-only">
-                            <span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span>
-                            <span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span>
-                        </div>
-                      </div>`;
-                h += `<div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
-                
+                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
                     ms.forEach(m => {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name || (id===''?'<span style="color:var(--primary); font-style:italic;">Selecionar...</span>':'?');
                         let courtOpts = ''; const totalCourts = appState.courtCount || 1;
                         for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
                         
-                        const p1Block = `<span class="player-link admin-only" onclick="changeMatchPlayer('${m.mid}', 'p1')">${n(m.p1)}</span>`;
-                        const p2Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link admin-only" onclick="changeMatchPlayer('${m.mid}', 'p2')">${n(m.p2)}</span>`;
-                        const p3Block = `<span class="player-link admin-only" onclick="changeMatchPlayer('${m.mid}', 'p3')">${n(m.p3)}</span>`;
-                        const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link admin-only" onclick="changeMatchPlayer('${m.mid}', 'p4')">${n(m.p4)}</span>`;
+                        const p1Block = `<span class="player-link admin-only ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>`;
+                        const p2Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link admin-only ${m.p2===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p2')">${n(m.p2)}</span>`;
+                        const p3Block = `<span class="player-link admin-only ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
+                        const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link admin-only ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
                         h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
@@ -975,21 +964,12 @@
                 
                 if(ps.length) { 
                     h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`; 
-                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;">
-                        <span>${p.name}</span>
-                        <div class="admin-only">
-                             <span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span>
-                             <span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span>
-                             <span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span>
-                        </div>
-                        </td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
             }
             col.innerHTML = h; gc.appendChild(col);
         });
-
-        // RESTORE FOCUS
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
 </script>
