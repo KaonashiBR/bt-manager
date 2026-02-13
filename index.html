@@ -4,237 +4,199 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V91 (Clean)</title>
+    <title>BT Manager - V92 (Híbrida)</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <style>
+        /* --- DESIGN V88 (SÓLIDO E LIMPO) --- */
         :root {
-            --primary: #ff6b00; /* Laranja Marca */
-            --secondary: #0f172a; /* Azul Escuro */
-            --bg-body: #f8fafc; /* Cinza Gelo */
-            --surface: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
+            --primary: #ff6b00;
+            --secondary: #004e98;
+            --bg-body: #f4f6f8;
+            --text-dark: #333;
+            --blue-masc: #2196F3;
+            --pink-fem: #E91E63;
+            --fav-color: #ff3b30;
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg-body); 
-            color: var(--text-main); 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg-body); color: var(--text-dark); margin: 0; 
+            -webkit-tap-highlight-color: transparent; height: 100vh; display: flex; flex-direction: column;
         }
-
-        h1, h2, h3, .card-title, .nav-logo { font-family: 'Poppins', sans-serif; }
 
         /* NAVBAR */
         .navbar { 
-            background: var(--surface); 
-            padding: 12px 20px; 
+            background: white; padding: 10px 15px; 
             display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; 
         }
         .nav-logo { 
-            font-weight: 700; font-size: 1.1em; color: var(--secondary); 
-            display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;
+            font-weight: 800; font-size: 0.95em; color: var(--secondary); 
+            display: flex; align-items: center; gap: 6px; letter-spacing: -0.3px; line-height: 1.2;
+            cursor: pointer; user-select: none;
         }
         .nav-logo span { font-size: 1.4em; }
         
-        .nav-user { 
-            display: flex; align-items: center; gap: 10px; cursor: pointer; 
-            padding: 6px 12px; border-radius: 50px; background: #f1f5f9; 
-        }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
-        .user-name { font-size: 0.85em; font-weight: 600; color: var(--text-main); display: none; }
-        @media(min-width: 600px) { .user-name { display: block; } }
+        .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; transition: background 0.2s; }
+        .nav-user:active { background: #eee; }
+        .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd; object-fit: cover; }
+        .user-name { font-size: 0.8em; font-weight: 600; color: #555; display: none; }
+        @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.2em; } }
 
-        /* LAYOUT & SCREENS */
-        .screen { display: none; flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 80px; }
-        .screen.active { display: flex; flex-direction: column; animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* TELAS */
+        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
+        .screen.active { display: flex; flex-direction: column; }
 
+        /* CARDS & GRID */
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .section-title { font-size: 1.5em; font-weight: 700; color: var(--secondary); margin: 0; }
-        .back-btn { display: flex; align-items: center; gap: 5px; color: var(--text-muted); cursor: pointer; font-weight: 600; font-size: 0.9em; margin-bottom: 15px; }
+        .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
+        .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-bottom: 15px;}
 
-        /* CARDS (CLEAN DESIGN) */
-        .grid-container { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 15px; width: 100%; 
-        }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; width: 100%; }
         
         .std-card {
-            background: var(--surface); border-radius: 16px; overflow: hidden; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border);
-            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-            display: flex; flex-direction: column;
-            aspect-ratio: 0.8; /* Slightly taller */
+            background: white; border-radius: 12px; overflow: hidden; position: relative;
+            aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s;
         }
-        .std-card:active { transform: scale(0.98); }
-        
-        .card-img-area {
-            height: 65%; width: 100%; position: relative; background: #eee;
-        }
+        .std-card:active { transform: scale(0.97); }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .card-body {
-            padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: center;
-            background: white;
+        .card-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 30px 10px 10px; color: white;
         }
-        .card-title { font-size: 1em; color: var(--secondary); line-height: 1.2; margin-bottom: 4px; }
-        .card-subtitle { font-size: 0.75em; color: var(--text-muted); font-weight: 500; }
-
-        /* Category Colors */
-        .cat-visual { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 800; font-size: 3.5em; font-family: 'Poppins'; }
-        .bg-masc { background: #3b82f6; }
-        .bg-fem { background: #ec4899; }
-        .bg-mista { background: linear-gradient(135deg, #3b82f6 50%, #ec4899 50%); }
-        .bg-tourney { background: var(--primary); }
-        .bg-tourney .material-icons { font-size: 3em; color: rgba(255,255,255,0.5); }
-
-        /* Actions & Fav */
-        .card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; z-index: 5; }
-        .btn-icon-circle { width: 32px; height: 32px; border-radius: 50%; background: white; color: var(--text-main); display: flex; justify-content: center; align-items: center; font-size: 1.1em; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .card-fav { position: absolute; top: 8px; left: 8px; z-index: 5; color: white; font-size: 1.6em; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        .card-fav.active { color: var(--danger); text-shadow: none; }
-
-        /* BUTTONS & INPUTS */
-        .btn-std { 
-            border: none; border-radius: 8px; padding: 12px; 
-            font-weight: 600; font-family: 'Inter'; text-transform: uppercase; letter-spacing: 0.5px;
-            color: white; cursor: pointer; font-size: 0.85em; width: 100%; margin-bottom: 8px;
-            transition: opacity 0.2s;
-        }
-        .btn-std:active { opacity: 0.8; }
+        .card-title { font-weight: 700; font-size: 1.1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
+        .card-subtitle { font-size: 0.75em; opacity: 0.8; margin-top: 2px; }
         
+        /* CATEGORIA VISUAL */
+        .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+        .bg-masc { background: var(--blue-masc); }
+        .bg-fem { background: var(--pink-fem); }
+        .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
+        .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
+        .bg-tourney .material-icons { font-size: 4em; color: white; opacity: 0.3; }
+
+        /* AÇÕES CARD */
+        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
+        .btn-icon-circle {
+            width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.9);
+            color: #333; display: flex; justify-content: center; align-items: center;
+            font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer;
+        }
+        .card-fav {
+            position: absolute; top: 10px; left: 10px; z-index: 10;
+            color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-size: 1.5em; transition: transform 0.2s;
+        }
+        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+
+        .btn-add-float {
+            position: fixed; bottom: 60px; right: 20px; width: 56px; height: 56px; 
+            background: var(--primary); color: white; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4);
+            border: none; cursor: pointer; z-index: 900;
+        }
+
+        /* APP ELEMENTS */
+        .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
+        .header-controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
+        .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; justify-content: center; }
+        
+        button.btn-std { border: none; border-radius: 4px; padding: 10px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.85em; width: 100%; margin-bottom: 5px; }
         .btn-org { background: var(--primary); }
         .btn-blue { background: var(--secondary); }
-        .btn-red { background: var(--danger); }
-        .btn-green { background: var(--success); }
-        .btn-gold { background: #f59e0b; color: white; }
+        .btn-red { background: #d32f2f; }
+        .btn-green { background: #2e7d32; }
+        .btn-gold { background: #FFD700; color: black; }
+        input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; }
 
-        input.inp-std { 
-            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
-            background: #f8fafc; font-size: 1em; outline: none; margin-bottom: 10px;
-        }
-        input.inp-std:focus { border-color: var(--primary); background: white; }
-
-        .btn-add-float { 
-            position: fixed; bottom: 70px; right: 20px; width: 56px; height: 56px; 
-            background: var(--primary); color: white; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; 
-            font-size: 2em; box-shadow: 0 4px 12px rgba(255, 107, 0, 0.4); 
-            border: none; cursor: pointer; z-index: 900; 
-        }
-
-        /* LIVE COURT CARDS */
-        .court-live-card { background: white; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .court-header { 
-            padding: 12px 15px; border-bottom: 1px solid var(--border); 
-            display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: var(--secondary);
-        }
-        .court-status { font-size: 0.75em; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; }
-        .court-status.live { background: #fee2e2; color: #b91c1c; }
-        .court-status.free { background: #d1fae5; color: #047857; }
+        /* COURT LIVE CARD (FEATURE V90, DESIGN V88) */
+        .court-live-card { background: white; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .court-header { background: #333; color: white; padding: 8px 12px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+        .court-status { font-size: 0.75em; text-transform: uppercase; background: #000; padding: 2px 6px; border-radius: 4px; }
+        .court-status.live { background: #d32f2f; color: white; }
+        .court-status.free { background: #2e7d32; color: white; }
         
-        .court-body { padding: 15px; }
+        .court-body { padding: 15px; text-align: center; }
         
         .live-match-box { 
-            background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 15px; text-align: center;
+            background: #f0f4f8; padding: 15px; border-radius: 8px; border: 1px solid #cce; margin-bottom: 10px; 
         }
-        .live-team { font-size: 1.1em; font-weight: 600; color: var(--text-main); }
-        .live-vs { font-size: 0.8em; color: var(--text-muted); margin: 5px 0; font-weight: 700; }
+        .live-vs { font-size: 1.2em; font-weight: 900; color: #555; margin: 5px 0; }
+        .live-team { font-size: 1.1em; font-weight: 600; color: #000; }
         
-        .live-inputs { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .live-inputs { display: flex; justify-content: center; gap: 10px; margin-top: 10px; align-items: center; }
         .live-input { 
-            width: 50px; height: 50px; text-align: center; font-size: 1.4em; font-weight: 700; 
-            border: 2px solid var(--border); border-radius: 8px; background: white; outline: none;
+            width: 50px; height: 50px; font-size: 1.5em; text-align: center; 
+            border: 2px solid #999; border-radius: 6px; font-weight: bold; background: white; color: black;
         }
-        .live-input:focus { border-color: var(--primary); }
+        
+        .next-up-box { font-size: 0.85em; color: #666; background: #fafafa; padding: 10px; border-radius: 4px; margin-top: 10px; border: 1px dashed #ccc; }
+        
+        .history-list { display: none; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
+        .history-item { display: flex; justify-content: space-between; font-size: 0.85em; padding: 6px 0; border-bottom: 1px solid #f9f9f9; }
 
-        .next-up-box { margin-top: 10px; padding: 10px; background: #fffbeb; border: 1px dashed #fcd34d; border-radius: 6px; font-size: 0.85em; color: #78350f; text-align: center; }
-        .history-list { display: none; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
-        .history-item { display: flex; justify-content: space-between; font-size: 0.85em; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
-
-        /* TABS */
-        .app-tabs { display: flex; background: #e2e8f0; padding: 4px; border-radius: 8px; margin-bottom: 15px; }
-        .app-tab { 
-            flex: 1; text-align: center; padding: 8px; cursor: pointer; 
-            font-size: 0.85em; font-weight: 600; border-radius: 6px; color: var(--text-muted); 
-        }
-        .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        /* TABS INSIDE APP */
+        .app-tabs { display: flex; background: #ddd; margin-bottom: 15px; border-radius: 6px; padding: 4px; }
+        .app-tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
+        .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .view-section { display: none; }
         .view-section.active { display: block; }
 
-        /* TABLES */
-        .rank-table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
-        .rank-table th { text-align: center; padding: 10px; background: #f1f5f9; color: var(--text-muted); font-weight: 600; }
-        .rank-table td { padding: 10px; border-bottom: 1px solid var(--border); text-align: center; color: var(--text-main); }
-        .rank-pos { width: 24px; height: 24px; border-radius: 50%; background: #e2e8f0; display: inline-flex; justify-content: center; align-items: center; font-weight: 700; font-size: 0.9em; }
-        .rank-1 .rank-pos { background: #fcd34d; color: #78350f; } 
-        .rank-2 .rank-pos { background: #94a3b8; color: white; } 
-        .rank-3 .rank-pos { background: #fdba74; color: #9a3412; }
+        /* BRACKET & TABLE */
+        .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
+        .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; display:flex; flex-direction:column; justify-content:center; }
+        .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
+        .match-score { font-weight: 900; color: #333; }
 
-        .bt-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 0.85em; border: 1px solid var(--border); }
-        .bt-table th { background: #f8fafc; padding: 8px; border-bottom: 1px solid var(--border); }
-        .bt-table td { padding: 8px; border-bottom: 1px solid var(--border); text-align: center; }
-        .tbl-input { width: 30px; padding: 4px; text-align: center; border: 1px solid var(--border); border-radius: 4px; }
-        .court-select { padding: 2px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.9em; }
+        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
+        .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; }
+        .gh-0 { background: #00b050 !important; color: white !important; }
+        .gh-1 { background: #00b0f0 !important; color: black !important; }
+        .gh-2 { background: #ffff00 !important; color: black !important; }
+        .gh-3 { background: #ff0000 !important; color: white !important; }
+        .bt-table td { border: 1px solid #999; padding: 4px; text-align: center; vertical-align: middle; font-weight: 700; }
+        .bt-table tr:nth-child(even) { background: #eef; }
+        .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
+        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
 
-        /* BRACKET */
-        .bracket-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; }
-        .match-card { min-width: 180px; background: white; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-size: 0.85em; }
-        .match-team { display: flex; justify-content: space-between; padding: 4px 0; }
-        .match-team.winner { font-weight: 700; color: var(--success); }
-
-        /* UTILS */
+        /* PERMISSIONS */
         .viewer-mode .admin-only { display: none !important; }
+        /* IMPORTANT: Inputs disabled ONLY in viewer mode, but .live-input overrides if inside active box */
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
-        .viewer-mode .court-select { pointer-events: none; border: none; background: transparent; appearance: none; }
-        .viewer-mode .live-input { border:none; background:transparent; font-size: 1.5em; }
-
-        .admin-panel { background: white; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .queue-item { background: white; border: 1px solid var(--border); padding: 10px; border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
-        .queue-court { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 700; color: var(--secondary); font-size: 0.8em; }
-
-        /* MODAL */
-        #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-queue { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(2px); }
-        .modal-box { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
-        .modal-title { margin-top: 0; color: var(--secondary); font-family: 'Poppins'; }
-
-        /* FOOTER */
-        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; color: var(--text-muted); text-align: center; padding: 10px; font-size: 0.7em; border-top: 1px solid var(--border); z-index: 1000; }
-        .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+        .viewer-mode .live-input { border:none; background:transparent; font-size: 2em; }
         
-        .status-bar { display: flex; justify-content: space-between; align-items: center; background: var(--secondary); color: white; padding: 10px 15px; border-radius: 10px; margin-bottom: 15px; }
+        .board { display: flex; flex-direction: column; gap: 15px; }
+        @media(min-width: 900px) { .board { flex-direction: row; flex-wrap: wrap; } .column { flex: 1 1 40%; } }
+        
+        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 10px 5px; font-size: 0.7em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
+        .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+
+        #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-queue { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-box { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
+        .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-google { background: #db4437; } .btn-logout { background: #555; }
+        .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .queue-court { font-weight:900; color:var(--primary); background: #fff3e0; padding: 2px 6px; border-radius: 4px; margin-right: 8px;}
+        .queue-match { font-size: 0.9em; font-weight: 600; color: #444; flex: 1; }
     </style>
 </head>
 <body class="viewer-mode">
 
-<div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:white;z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
+<div id="loading" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:3000; display:flex; justify-content:center; align-items:center; flex-direction:column;">
     <div style="font-size:3em;">🎾</div><b>Carregando...</b>
 </div>
 
 <div class="navbar">
     <div class="nav-logo" onclick="window.goHome()">
         <span>🎾</span>
-        <div>BT Manager<br><small style="font-weight:400; color:var(--text-muted);">por Lucas Sibie</small></div>
+        <div>Beach Tennis Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div>
     </div>
     <div class="nav-user" onclick="openLoginModal()">
         <span id="nav-username" class="user-name">Visitante</span>
@@ -246,50 +208,50 @@
     <div class="header-bar"><h2 class="section-title">Arenas</h2></div>
     <div id="grid-arenas" class="grid-container"></div>
     <button id="btn-add-arena" class="btn-add-float" onclick="openModal('arena')" style="display:none;">+</button>
-    <div style="text-align:center; margin-top:40px; color:var(--text-muted); font-size:0.85em;" id="msg-login">Clique no ícone de usuário para entrar.</div>
+    <div style="text-align:center; margin-top:50px; color:#999; font-size:0.8em;" id="msg-login">Clique no bonequinho para Login.</div>
 </div>
 
 <div id="screen-categories" class="screen">
-    <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar</div>
-    <div class="header-bar"><div><h2 class="section-title" id="title-arena">Nome Arena</h2><div style="font-size:0.9em; color:var(--text-muted);">Categorias</div></div></div>
+    <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Arenas</div>
+    <div class="header-bar"><div><h2 class="section-title" id="title-arena">Nome Arena</h2><div style="font-size:0.8em; color:#777;">Categorias</div></div></div>
     <div id="grid-categories" class="grid-container"></div>
-    <button id="btn-add-cat" class="btn-add-float" onclick="openModal('category')" style="display:none;">+</button>
+    <button id="btn-add-cat" class="btn-add-cat-float btn-add-float" onclick="openModal('category')" style="display:none;">+</button>
 </div>
 
 <div id="screen-tournaments" class="screen">
-    <div class="back-btn" onclick="showScreen('screen-categories')"><span class="material-icons">arrow_back</span> Voltar</div>
+    <div class="back-btn" onclick="showScreen('screen-categories')"><span class="material-icons">arrow_back</span> Voltar para Categorias</div>
     <div class="header-bar"><div><h2 class="section-title" id="title-cat">Categoria</h2></div></div>
     <div class="tabs"><div class="tab active" onclick="switchTab('tournaments')">TORNEIOS</div><div class="tab" onclick="switchTab('ranking')">RANKING</div></div>
     <div id="tab-tournaments" class="tab-content active">
         <div id="grid-tournaments" class="grid-container"></div>
         <button id="btn-add-tourney" class="btn-add-float" onclick="openModal('tournament')" style="display:none;">+</button>
     </div>
-    <div id="tab-ranking" class="tab-content"><div style="background:white; border-radius:12px; overflow:hidden; border:1px solid var(--border);"><table class="rank-table" id="table-ranking"></table></div></div>
+    <div id="tab-ranking" class="tab-content"><div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd;"><table class="rank-table" id="table-ranking"></table></div></div>
 </div>
 
 <div id="screen-app" class="screen">
     <div class="status-bar">
         <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.1em;">arrow_back</span> Sair</div>
-        <div style="display:flex; align-items:center; gap:8px;">
-            <span style="width:8px; height:8px; background:#4ade80; border-radius:50%;"></span>
-            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">share</span></button>
-            <button onclick="openQueue()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">list</span></button>
-            <button onclick="tryAdmin()" id="btn-lock" style="background:rgba(255,255,255,0.2); border:none; padding:4px 8px; color:white; border-radius:6px;">🔒</button>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
+            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
+            <button onclick="openQueue()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">list_alt</span></button>
+            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
         </div>
     </div>
-    <h2 id="t-title-header" style="text-align:center; margin:10px 0 20px 0; font-size:1.2em; color:var(--text-main);">Torneio</h2>
+    <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
     
-    <div class="admin-only admin-panel">
+    <div class="admin-only" style="background:white; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
         <div style="display:flex; gap:10px; margin-bottom:10px;">
-            <input type="text" id="pName" list="player-suggestions" class="inp-std" style="margin:0;" placeholder="Nome do Jogador..." autocomplete="off">
+            <input type="text" id="pName" list="player-suggestions" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
             <datalist id="player-suggestions"></datalist>
-            <button class="btn-std btn-org" style="width:auto; margin:0;" onclick="addPlayer()">Add</button>
-            <button class="btn-std btn-blue" style="width:auto; margin:0;" onclick="addGroup()">Grupo</button>
+            <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
+            <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
         </div>
         <div style="display:flex; gap:5px; flex-wrap:wrap;">
             <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
             <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std" style="width:auto;">Fixas</button>
-            <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Mata-Mata</button>
+            <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Gerar Mata-Mata</button>
             <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
             <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
         </div>
@@ -306,10 +268,10 @@
 
     <div id="view-table" class="view-section">
         <div class="board">
-            <div class="column" id="col-pool" style="background:white; border-radius:12px; border:1px solid var(--border); padding-bottom:10px;">
-                <div style="background:var(--secondary); color:white; padding:10px; font-weight:600; display:flex; justify-content:space-between; border-radius: 12px 12px 0 0;">
+            <div class="column" id="col-pool" style="background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:10px;">
+                <div style="background:var(--secondary); color:white; padding:10px; font-weight:bold; display:flex; justify-content:space-between;">
                     <span>RESERVAS (<span id="pool-cnt">0</span>)</span>
-                    <button class="admin-only btn-std" style="background:rgba(255,255,255,0.2); color:white; width:auto; padding:2px 8px; margin:0; font-size:0.7em;" onclick="distribute()">Distribuir</button>
+                    <button class="admin-only btn-std" style="background:white; color:var(--secondary); width:auto; padding:2px 8px;" onclick="distribute()">Distribuir</button>
                 </div>
                 <div id="pool-list" style="padding:10px; display:flex; flex-wrap:wrap; gap:5px;"></div>
             </div>
@@ -323,8 +285,11 @@
 <div id="modal-login">
     <div class="modal-box">
         <h3 class="modal-title">Entrar</h3>
-        <button class="btn-std btn-org" onclick="doGoogleLogin()">Google (Gmail)</button>
-        <button class="btn-std btn-red" onclick="closeLoginModal()">Cancelar</button>
+        <button class="btn-login-opt btn-google" onclick="doGoogleLogin()">
+            <span style="background:white; color:#db4437; border-radius:50%; width:20px; height:20px; display:flex; justify-content:center; align-items:center; font-weight:900;">G</span> 
+            Google (Gmail)
+        </button>
+        <button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button>
     </div>
 </div>
 
@@ -364,7 +329,7 @@
 <div id="modal-knockout">
     <div class="modal-box">
         <h3 class="modal-title">Configurar Mata-Mata</h3>
-        <p style="font-size:0.8em; color:#666; margin-bottom:10px;">Defina quantos classificam de cada grupo:</p>
+        <p style="font-size:0.8em; color:#666;">Defina quantos classificam de cada grupo:</p>
         <div id="knockout-config-list" style="max-height:50vh; overflow-y:auto; margin-bottom:15px;"></div>
         <div style="display:flex; gap:10px;"><button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button></div>
     </div>
@@ -550,30 +515,11 @@
 
     function createCard(id, name, imgOrClass, isOwner, type, onClick, subtitle='') {
         const div = document.createElement('div'); div.className = 'std-card'; let content = '';
-        
-        const isFav = favorites[id]; const heartIcon = isFav ? 'favorite' : 'favorite_border'; const heartClass = isFav ? 'card-fav active' : 'card-fav'; 
-        const heartHTML = (type === 'arena') ? `<span class="material-icons ${heartClass}" onclick="toggleFavorite('${id}', event)">${heartIcon}</span>` : '';
-        const actionsHTML = isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}'); event.stopPropagation()">✎</div><div class="btn-icon-circle" style="color:var(--danger);" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div></div>` : '';
-
-        if(type === 'category') { 
-            const bgClass = `bg-${imgOrClass.type}`; 
-            div.innerHTML = `
-                <div class="card-img-area"><div class="cat-card-content ${bgClass}">${imgOrClass.short}</div>${actionsHTML}</div>
-                <div class="card-body"><div class="card-title">${name}</div></div>
-            `;
-        } else if (type === 'tournament') { 
-            div.innerHTML = `
-                <div class="card-img-area"><div class="cat-card-content bg-tourney"><span class="material-icons">emoji_events</span></div>${actionsHTML}</div>
-                <div class="card-body"><div class="card-title">${name}</div><div class="card-subtitle">${subtitle}</div></div>
-            `;
-        } else { 
-            // Arena
-            div.innerHTML = `
-                <div class="card-img-area"><img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">${heartHTML}${actionsHTML}</div>
-                <div class="card-body"><div class="card-title">${name}</div></div>
-            `;
-        }
-
+        if(type === 'category') { const bgClass = `bg-${imgOrClass.type}`; content = `<div class="cat-card-content ${bgClass}">${imgOrClass.short}</div>`; } 
+        else if (type === 'tournament') { content = `<div class="cat-card-content bg-tourney"><span class="material-icons">emoji_events</span></div>`; } 
+        else { content = `<img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">`; }
+        const isFav = favorites[id]; const heartIcon = isFav ? 'favorite' : 'favorite_border'; const heartClass = isFav ? 'card-fav active' : 'card-fav'; const heartHTML = (type === 'arena') ? `<span class="material-icons ${heartClass}" onclick="toggleFavorite('${id}', event)">${heartIcon}</span>` : '';
+        div.innerHTML = `${content}${heartHTML}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}'); event.stopPropagation()">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div></div>` : ''}`;
         div.onclick = onClick; return div;
     }
 
@@ -581,7 +527,7 @@
     function loadCategories(arenaId) { onValue(ref(db, `categories/${arenaId}`), (snap) => { const list = document.getElementById('grid-categories'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; } Object.keys(data).forEach(key => { const d = data[key]; const isOwner = localAdmin || (user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email))); list.appendChild(createCard(key, d.name, {type: d.type, short: d.short}, isOwner, 'category', () => enterCategory(key, d))); }); }); }
     window.enterCategory = (id, data) => { curCatId = id; curCatData = data; document.getElementById('title-cat').innerText = data.name; document.getElementById('btn-add-tourney').style.display = (user || localAdmin) ? 'flex' : 'none'; switchTab('tournaments'); showScreen('screen-tournaments'); loadTournaments(id); }
     function loadTournaments(catId) { onValue(ref(db, `tournaments_meta/${catId}`), (snap) => { const list = document.getElementById('grid-tournaments'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; } Object.keys(data).forEach(key => { const d = data[key]; const isOwner = localAdmin || (user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email))); const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : ''); list.appendChild(createCard(key, d.name, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub)); }); }); }
-    function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th>#</th><th>Nome</th><th>Pts</th><th>J</th><th>V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-weight:700;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
+    function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th>#</th><th>Nome</th><th>Pts</th><th>J</th><th>V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-size:1.1em;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
 
     window.enterApp = (tId, name, pwd, ownerId) => {
         curTourneyId = tId; document.getElementById('t-title-header').innerText = name; showScreen('screen-app');
@@ -782,6 +728,7 @@
     
     window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addMatch(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id, false, 1); save(); }
     
+    // EDIT SCORE FIX (V89/V92)
     window.saveS = (mid) => { 
         const s1_el = document.getElementById(`s1-${mid}`);
         const s2_el = document.getElementById(`s2-${mid}`);
@@ -810,6 +757,21 @@
             m.saved = true;
             recalc();
             save();
+        }
+    }
+
+    // EDIT HISTORY BUTTON
+    window.editScore = (mid) => {
+        const m = appState.matches.find(x=>x.mid===mid);
+        if(m && confirm("Editar resultado deste jogo?")) {
+            const newS1 = prompt("Placar Time 1:", m.s1);
+            const newS2 = prompt("Placar Time 2:", m.s2);
+            if(newS1 !== null && newS2 !== null) {
+                m.s1 = parseInt(newS1);
+                m.s2 = parseInt(newS2);
+                recalc();
+                save();
+            }
         }
     }
 
@@ -854,7 +816,7 @@
                     </div>
                 `;
             } else {
-                contentHTML = `<div style="padding:20px; color:var(--text-muted); font-style:italic;">Quadra Livre</div>`;
+                contentHTML = `<div style="padding:20px; color:#999; font-style:italic;">Quadra Livre</div>`;
             }
 
             if(nextMatch) {
@@ -873,7 +835,7 @@
                     historyHTML += `
                         <div class="history-item">
                             <span>${s1} <b>${m.s1}</b> x <b>${m.s2}</b> ${s2}</span>
-                            <span class="admin-only" style="color:#3b82f6; cursor:pointer;" onclick="saveS('${m.mid}')">✎</span>
+                            <span class="admin-only" style="color:#007bff; cursor:pointer;" onclick="editScore('${m.mid}')">✎</span>
                         </div>`;
                 });
             }
@@ -888,7 +850,7 @@
                 <div class="court-body">
                     ${contentHTML}
                     <div style="margin-top:10px;">
-                        <small style="color:var(--text-muted); cursor:pointer; text-decoration:underline;" onclick="toggleHistory(${i})">Ver Histórico (${historyMatches.length})</small>
+                        <small style="color:#666; cursor:pointer; text-decoration:underline;" onclick="toggleHistory(${i})">Ver Histórico (${historyMatches.length})</small>
                         <div id="history-court-${i}" class="history-list">${historyHTML}</div>
                     </div>
                 </div>
@@ -904,7 +866,7 @@
             const col = document.createElement('div'); col.className='column';
             let h = ``;
             if(g.id.includes('ko-')) { 
-                h += `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px; background:var(--secondary); color:white; padding:5px; font-weight:bold; border-radius:4px;">${g.name} <span class="admin-only" style="float:right; color:red;" onclick="delGroup('${g.id}');event.stopPropagation()">✕</span></div>`;
+                h += `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px; background:black; color:white; padding:5px; font-weight:bold; border-radius:4px;">${g.name} <span class="admin-only" style="float:right; color:red;" onclick="delGroup('${g.id}');event.stopPropagation()">✕</span></div>`;
                 h += `<div class="bracket-scroll">`;
                 ms.forEach((m, idx) => {
                     const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'?');
@@ -916,20 +878,20 @@
                     for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
 
                     h += `<div class="match-card">
-                        <div style="font-size:0.7em; color:var(--text-muted); margin-bottom:5px; display:flex; justify-content:space-between;">
+                        <div style="font-size:0.7em; color:#777; margin-bottom:5px; display:flex; justify-content:space-between;">
                             <span>#${idx+1}</span>
                             ${!m.isBye ? `<select class="court-select" onchange="updateCourt('${m.mid}', this.value)" style="font-size:0.8em; height:18px;">${courtOpts}</select>` : ''}
                         </div>
                         <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;"><span>${p1n}</span><span class="match-score">${m.s1||'-'}</span></div>
                         <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;"><span>${p2n}</span><span class="match-score">${m.s2||'-'}</span></div>
-                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;"><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;"><button class="btn-ok-mini" style="background:var(--success); color:white; border:none; border-radius:3px;" onclick="saveS('${m.mid}')">OK</button></div>` : ''}
+                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;"><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;"><button class="btn-ok-mini" style="background:green; color:white; border:none; border-radius:3px;" onclick="saveS('${m.mid}')">OK</button></div>` : ''}
                     </div>`;
                 });
                 h += `</div>`;
             } else {
                 h += `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px;"><div class="admin-only" style="display:flex; gap:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div></div>`;
                 if(ms.length) {
-                    h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}" onclick="moveSel('${g.id}')">${g.name} <span class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation()" style="float:right; cursor:pointer; font-weight:400;">✕</span></th></tr></thead><tbody>`;
+                    h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}" onclick="moveSel('${g.id}')">${g.name} <span class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation()" style="float:right; cursor:pointer;">✕</span></th></tr></thead><tbody>`;
                     ms.forEach(m => {
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
                         const t1 = appState.mode==='fixed' ? n(m.p1) : `${n(m.p1)}<br><small>/${n(m.p2)}</small>`;
