@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V102 (Fix Edit)</title>
+    <title>BT Manager - V104 (Return to Pool)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN SÓLIDO (V88) */
+        /* DESIGN SÓLIDO (V88 BASE) */
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; }
         
@@ -56,14 +56,24 @@
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
 
-        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
-        .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; }
-        .gh-0 { background: #00b050 !important; color: white !important; } .gh-1 { background: #00b0f0 !important; color: black !important; } .gh-2 { background: #ffff00 !important; color: black !important; } .gh-3 { background: #ff0000 !important; color: white !important; }
-        .bt-table td { border: 1px solid #999; padding: 4px; text-align: center; vertical-align: middle; font-weight: 700; }
-        .bt-table tr:nth-child(even) { background: #eef; }
+        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
+        .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
+        .bt-table td { border: 1px solid #eee; padding: 4px; text-align: center; vertical-align: middle; font-weight: 700; }
+        .bt-table tr:nth-child(even) { background: #f9f9f9; }
         .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
+
+        /* GROUP BOX STYLE (NEW V103) */
+        .group-box {
+            background: white;
+            border: 2px solid #e2e8f0; /* Borda Sólida */
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; gap: 10px;
+            margin-bottom: 20px;
+        }
 
         /* GROUP HEADER INTERACTIVE */
         .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
@@ -573,6 +583,17 @@
         }
     }
 
+    window.returnToPool = (pid) => {
+        if(confirm("Voltar jogador para a reserva?")) {
+            const p = appState.players.find(x => x.id === pid);
+            if(p) {
+                p.groupId = 'pool';
+                p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0;
+                save();
+            }
+        }
+    }
+
     window.openQueue = () => {
         const list = document.getElementById('queue-list'); list.innerHTML = '';
         const pending = appState.matches.filter(m => !m.saved && !m.isBye).sort((a,b) => a.court - b.court);
@@ -859,7 +880,7 @@
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
             const ms = appState.matches.filter(m=>m.gid===g.id);
-            const col = document.createElement('div'); col.className='column';
+            const col = document.createElement('div'); col.className='group-box'; // Changed to group-box class
             let h = ``;
             if(g.id.includes('ko-')) { 
                 h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;">
@@ -915,8 +936,13 @@
                 
                 if(ps.length) { 
                     h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`; 
-                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left;">
-                        ${p.name} <span class="admin-only" onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666; margin-left:5px;">✎</span>
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;">
+                        <span>${p.name}</span>
+                        <div class="admin-only">
+                             <span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span>
+                             <span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span>
+                             <span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span>
+                        </div>
                         </td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
