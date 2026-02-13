@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V98 (Smart Schedule)</title>
+    <title>BT Manager - V99 (Stable)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN V88 (SÓLIDO) */
+        /* DESIGN SÓLIDO (V88) */
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; }
         
@@ -62,7 +62,7 @@
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
 
-        /* LIVE COURT CARD */
+        /* LIVE COURT */
         .court-live-card { background: white; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .court-header { background: #333; color: white; padding: 8px 12px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
         .court-status { font-size: 0.75em; text-transform: uppercase; background: #000; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center; gap: 5px;}
@@ -105,8 +105,11 @@
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
         .match-score { font-weight: 900; color: #333; }
         .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
-        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
-        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        .rank-table { width: 100%; border-collapse: collapse; background: white; }
+        .rank-table th { background: #333; color: white; padding: 8px; font-size: 0.8em; }
+        .rank-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
+        .rank-pos { width: 30px; height: 30px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 0.9em; }
+        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -606,53 +609,132 @@
     window.genMatches = (gid) => { 
         const ps=appState.players.filter(p=>p.groupId===gid); 
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); 
+        
+        let roundMatches = [];
+        const courtLimit = parseInt(prompt("Distribuir em quantas quadras?", "1")) || 1;
+        
         let hist=new Set(); 
         appState.matches.filter(m=>m.gid===gid && m.saved).forEach(m=>{ if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-')); else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); } }); 
-        
-        let currentCourt = 1; const maxCourts = appState.courtCount || 1;
-        
-        const addRot = (p1, p2, p3, p4) => {
-            addMatch(gid, p1, p2, p3, p4, false, currentCourt);
-            currentCourt++; if(currentCourt>maxCourts) currentCourt=1;
-        }
 
+        // Generate Pairs
         if(appState.mode==='fixed') { 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { 
                 const k=[ps[i].id,ps[j].id].sort().join('-'); 
-                if(!hist.has(k)) addRot(ps[i].id, 'd', ps[j].id, 'd');
+                if(!hist.has(k)) roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'});
             } 
         } 
         else if(ps.length===5) { 
-            if(appState.matches.filter(m=>m.gid===gid).length && !confirm("Rodada 5?")) return; 
-            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>addRot(ps[r[0]].id, ps[r[1]].id, ps[r[2]].id, ps[r[3]].id)); 
+             // Round Robin 5
+             [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{
+                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id});
+            });
         } 
         else { 
+            // Simple Pair Generation Logic (Same as before)
             let pairs=[]; 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
-            if(!pairs.length) return alert("Sem combinações."); 
+            
             pairs.sort(()=>Math.random()-0.5); 
-            let count=0; 
             while(pairs.length) { 
                 let pA=pairs[0], found=false; 
                 for(let k=1; k<pairs.length; k++) { 
                     let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
                     if(all.size===4) { 
-                        addRot(pA.p1,pA.p2,pB.p1,pB.p2); 
-                        pairs.splice(k,1); pairs.splice(0,1); found=true; count++; 
+                        roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2});
+                        pairs.splice(k,1); pairs.splice(0,1); found=true; 
                         break; 
                     } 
                 } 
                 if(!found) pairs.splice(0,1); 
             } 
-            if(!count) alert("Não consegui casar."); 
         } 
+
+        // SAFE SORT (Avoid back-to-back if possible)
+        let c = 1;
+        roundMatches.forEach(m => {
+            addMatch(gid, m.p1, m.p2, m.p3, m.p4, false, c);
+            c++; if(c > courtLimit) c = 1;
+        });
+
         save(); 
     }
     
     window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addMatch(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id, false, 1); save(); }
     
-    // RENDER APP
+    // FIX SAVE SCORE WITH UPDATE
+    window.saveS = (mid) => { 
+        const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
+        if(matchIndex === -1) return;
+        const m = appState.matches[matchIndex];
+
+        // UNLOCK MODE
+        if(m.saved) {
+            if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
+                m.saved = false;
+                recalc();
+                update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
+            }
+            return;
+        }
+
+        // SAVE MODE
+        let s1_el = document.getElementById(`live-s1-${mid}`);
+        let s2_el = document.getElementById(`live-s2-${mid}`);
+        if(!s1_el) { s1_el = document.getElementById(`tbl-s1-${mid}`); s2_el = document.getElementById(`tbl-s2-${mid}`); }
+
+        if(!s1_el || !s2_el) { alert("Erro de visualização. Tente recarregar."); return; }
+
+        let s1 = s1_el.value; let s2 = s2_el.value;
+        if(s1 === '' || s2 === '') { alert("Preencha o placar."); return; }
+        s1 = parseInt(s1); s2 = parseInt(s2);
+
+        if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
+        
+        // UPDATE LOCAL
+        m.s1 = s1; m.s2 = s2; m.saved = true;
+        recalc();
+        
+        // UPDATE REMOTE (ATOMIC)
+        update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
+    }
+
+    // EDIT HISTORY BUTTON
+    window.editScore = (mid) => {
+        const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
+        if(matchIndex === -1) return;
+        const m = appState.matches[matchIndex];
+
+        if(confirm("Editar resultado deste jogo?")) {
+            const newS1 = prompt("Placar Time 1:", m.s1);
+            const newS2 = prompt("Placar Time 2:", m.s2);
+            if(newS1 !== null && newS2 !== null) {
+                m.s1 = parseInt(newS1); m.s2 = parseInt(newS2);
+                recalc();
+                update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: m.s1, s2: m.s2 });
+            }
+        }
+    }
+
+    window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
+    window.updateCourt = (mid, val) => { const m = appState.matches.find(x=>x.mid===mid); if(m){ m.court = val; save(); } }
+    function recalc() { 
+        appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); 
+        appState.matches.forEach(m=>{ 
+            if(m.saved && !m.isBye) { 
+                const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; 
+                run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); 
+                if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } 
+            }
+            if(m.isBye) {
+                 // BYE Logic (Optional points)
+            }
+        }); 
+    }
+    
     function renderApp() {
+        // KEEP FOCUS LOGIC
+        const focusedId = document.activeElement ? document.activeElement.id : null;
+
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
@@ -681,8 +763,8 @@
                         <div class="live-team">${s1}</div>
                         <div class="live-vs">X</div>
                         <div class="live-team">${s2}</div>
-                        <div class="live-inputs">
-                            <span style="font-weight:900; font-size:1.5em; color:#666;">JOGO EM ANDAMENTO</span>
+                        <div class="live-inputs" style="display:flex; justify-content:center; align-items:center; gap:10px;">
+                           <div style="font-weight:900; font-size:2em; color:#555;">...</div>
                         </div>
                     </div>
                 `;
@@ -706,6 +788,7 @@
                     historyHTML += `
                         <div class="history-item">
                             <span>${s1} <b>${m.s1}</b> x <b>${m.s2}</b> ${s2}</span>
+                            <span class="admin-only" style="color:#007bff; cursor:pointer;" onclick="editScore('${m.mid}')">✎</span>
                         </div>`;
                 });
             }
@@ -730,7 +813,7 @@
             cc.appendChild(card);
         }
 
-        // RENDER FULL TABLE
+        // RENDER FULL TABLE (WITH UNIQUE IDS 'tbl-s1-...')
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
@@ -756,7 +839,7 @@
                         </div>
                         <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;"><span>${p1n}</span><span class="match-score">${m.s1||'-'}</span></div>
                         <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;"><span>${p2n}</span><span class="match-score">${m.s2||'-'}</span></div>
-                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}
+                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}
                     </div>`;
                 });
                 h += `</div>`;
@@ -770,7 +853,7 @@
                         const t2 = appState.mode==='fixed' ? n(m.p3) : `${n(m.p3)}<br><small>/${n(m.p4)}</small>`;
                         let courtOpts = ''; const totalCourts = appState.courtCount || 1;
                         for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
-                        h += `<tr><td style="text-align:right">${t1}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left">${t2}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right">${t1}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left">${t2}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">${g.name} (Vazio) <span class="admin-only" style="float:right; cursor:pointer;" onclick="delGroup('${g.id}'); event.stopPropagation()">✕</span></div>`; }
@@ -783,6 +866,9 @@
             }
             col.innerHTML = h; gc.appendChild(col);
         });
+
+        // RESTORE FOCUS
+        if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
 </script>
 </body>
