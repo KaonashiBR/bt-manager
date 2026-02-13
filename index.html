@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V88</title>
+    <title>BT Manager - V89 (Validação)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -44,12 +44,10 @@
         .card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 10px 10px; color: white; }
         .card-title { font-weight: 700; font-size: 1.1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
         .card-subtitle { font-size: 0.75em; opacity: 0.8; margin-top: 2px; }
-        
         .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
         .bg-masc { background: var(--blue-masc); } .bg-fem { background: var(--pink-fem); } .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
         .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
         .bg-tourney .material-icons { font-size: 4em; color: white; opacity: 0.3; }
-
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
         .btn-icon-circle { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.9); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
@@ -63,7 +61,7 @@
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
 
-        /* TABELA DE JOGOS */
+        /* TABELA */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
         .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; }
         .gh-0 { background: #00b050 !important; color: white !important; } .gh-1 { background: #00b0f0 !important; color: black !important; } .gh-2 { background: #ffff00 !important; color: black !important; } .gh-3 { background: #ff0000 !important; color: white !important; }
@@ -80,12 +78,11 @@
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
         .match-score { font-weight: 900; color: #333; }
 
-        /* COURT LIVE CARD */
+        /* LIVE COURT */
         .court-live-card { background: white; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .court-header { background: #333; color: white; padding: 8px 12px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
         .court-status { font-size: 0.75em; text-transform: uppercase; background: #000; padding: 2px 6px; border-radius: 4px; }
-        .court-status.live { background: #d32f2f; color: white; }
-        .court-status.free { background: #2e7d32; color: white; }
+        .court-status.live { background: #d32f2f; color: white; } .court-status.free { background: #2e7d32; color: white; }
         .court-body { padding: 15px; text-align: center; }
         .live-match-box { background: #f0f4f8; padding: 10px; border-radius: 8px; border: 1px solid #cce; margin-bottom: 10px; }
         .live-vs { font-size: 1.2em; font-weight: 900; color: #555; margin: 5px 0; }
@@ -94,7 +91,6 @@
         .live-input { width: 50px; height: 50px; font-size: 1.5em; text-align: center; border: 2px solid #ccc; border-radius: 6px; font-weight: bold; }
         .live-input:focus { border-color: var(--primary); outline: none; }
         .next-up-box { font-size: 0.8em; color: #666; background: #fafafa; padding: 8px; border-radius: 4px; margin-top: 10px; border: 1px dashed #ccc; }
-        
         .history-list { display: none; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; }
         .history-item { display: flex; justify-content: space-between; font-size: 0.85em; padding: 4px 0; border-bottom: 1px solid #f9f9f9; }
 
@@ -102,8 +98,7 @@
         .app-tabs { display: flex; background: #eee; margin-bottom: 15px; border-radius: 6px; padding: 4px; }
         .app-tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .view-section { display: none; }
-        .view-section.active { display: block; }
+        .view-section { display: none; } .view-section.active { display: block; }
 
         /* RANKING */
         .rank-table { width: 100%; border-collapse: collapse; background: white; }
@@ -125,10 +120,13 @@
         .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 10px 5px; font-size: 0.7em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
         .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
 
-        #modal-overlay, #modal-login, #modal-knockout, #modal-finals { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-queue { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
         .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .btn-google { background: #db4437; } .btn-logout { background: #555; }
+        .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .queue-court { font-weight:900; color:var(--primary); background: #fff3e0; padding: 2px 6px; border-radius: 4px; margin-right: 8px;}
+        .queue-match { font-size: 0.9em; font-weight: 600; color: #444; flex: 1; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -177,6 +175,7 @@
         <div style="display:flex; align-items:center; gap:5px;">
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
             <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
+            <button onclick="openQueue()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">list_alt</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
         </div>
     </div>
@@ -231,6 +230,14 @@
             Google (Gmail)
         </button>
         <button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button>
+    </div>
+</div>
+
+<div id="modal-queue">
+    <div class="modal-box">
+        <h3 class="modal-title">Fila de Jogos</h3>
+        <div id="queue-list" style="max-height:60vh; overflow-y:auto;"></div>
+        <button class="btn-std btn-red" onclick="document.getElementById('modal-queue').style.display='none'" style="margin-top:15px;">Fechar</button>
     </div>
 </div>
 
@@ -559,6 +566,27 @@
         if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } }
     }
 
+    window.openQueue = () => {
+        const list = document.getElementById('queue-list'); list.innerHTML = '';
+        const pending = appState.matches.filter(m => !m.saved && !m.isBye).sort((a,b) => a.court - b.court);
+        
+        if(pending.length === 0) {
+            list.innerHTML = '<div style="padding:10px; color:#777;">Fila vazia.</div>'; 
+        } else {
+            pending.forEach(m => {
+                const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
+                let s1 = n(m.p1); if(m.p2 && m.p2!=='d' && m.p2!==m.p1) s1 += '/'+n(m.p2);
+                let s2 = n(m.p3); if(m.p4 && m.p4!=='d' && m.p4!==m.p3) s2 += '/'+n(m.p4);
+                
+                const div = document.createElement('div'); 
+                div.className = 'queue-item'; 
+                div.innerHTML = `<span class="queue-court">Q${m.court}</span> <span class="queue-match">${s1} <b style="color:var(--primary); margin:0 5px;">X</b> ${s2}</span>`; 
+                list.appendChild(div);
+            });
+        }
+        document.getElementById('modal-queue').style.display = 'flex';
+    }
+
     window.toggleHistory = (court) => {
         const el = document.getElementById(`history-court-${court}`);
         if(el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
@@ -640,7 +668,39 @@
     }
     
     window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addMatch(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id, false, 1); save(); }
-    window.saveS = (mid) => { const m = appState.matches.find(x=>x.mid===mid), s1=document.getElementById(`s1-${mid}`).value, s2=document.getElementById(`s2-${mid}`).value; if(m.saved) { m.saved=false; } else { if(s1===''||s2==='') return; m.s1=parseInt(s1); m.s2=parseInt(s2); m.saved=true; } recalc(); save(); }
+    
+    window.saveS = (mid) => { 
+        const s1_el = document.getElementById(`s1-${mid}`);
+        const s2_el = document.getElementById(`s2-${mid}`);
+        if(!s1_el || !s2_el) return;
+
+        let s1 = s1_el.value;
+        let s2 = s2_el.value;
+
+        if(s1 === '' || s2 === '') return;
+        if(isNaN(s1) || isNaN(s2)) return alert("Apenas números.");
+        
+        s1 = parseInt(s1);
+        s2 = parseInt(s2);
+
+        if(s1 < 0 || s2 < 0) return alert("Sem negativos.");
+        if(s1 > 30 || s2 > 30) { if(!confirm(`Placar alto (${s1}x${s2}). Confirma?`)) return; }
+        
+        // Logic check standard set (6)
+        if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) {
+             if(!confirm("Jogo parece não ter acabado. Salvar?")) return;
+        }
+        
+        const m = appState.matches.find(x=>x.mid===mid);
+        if(m) {
+            m.s1 = s1;
+            m.s2 = s2;
+            m.saved = true;
+            recalc();
+            save();
+        }
+    }
+
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
     window.updateCourt = (mid, val) => { const m = appState.matches.find(x=>x.mid===mid); if(m){ m.court = val; save(); } }
     function recalc() { appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); appState.matches.forEach(m=>{ if(m.saved) { const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } } }); }
