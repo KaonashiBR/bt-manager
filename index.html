@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
     
-    <title>BT Manager - V84 (Estável)</title>
+    <title>BT Manager - V85</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -33,10 +33,10 @@
         @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.2em; } }
 
         /* TELAS */
-        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 80px; box-sizing: border-box; }
+        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
 
-        /* GRID CARDS */
+        /* CARDS */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; width: 100%; }
         .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
         .std-card:active { transform: scale(0.97); }
@@ -55,26 +55,23 @@
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
         .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
         
-        /* HEADER & CONTROLS */
-        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
-        .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-bottom: 15px;}
+        /* APP ELEMENTS */
         .status-bar { background: #333; color: white; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.8em; font-weight: bold; }
-        .admin-panel { background:white; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px; }
-
-        /* BUTTONS & INPUTS */
-        button.btn-std { border: none; border-radius: 4px; padding: 10px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.85em; width: 100%; margin-bottom: 5px;}
+        .header-controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ddd; }
+        .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; justify-content: center; }
+        button.btn-std { border: none; border-radius: 4px; padding: 10px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.85em; width: 100%; margin-bottom: 5px; }
         .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; }
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 56px; height: 56px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
 
-        /* TABELA DE JOGOS */
+        /* TABELA */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 15px; background: white; border: 1px solid #999; }
         .bt-table th { padding: 8px; border: 1px solid #999; color: black; font-weight: 900; }
         .gh-0 { background: #00b050 !important; color: white !important; } .gh-1 { background: #00b0f0 !important; color: black !important; } .gh-2 { background: #ffff00 !important; color: black !important; } .gh-3 { background: #ff0000 !important; color: white !important; }
         .bt-table td { border: 1px solid #999; padding: 4px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #eef; }
         .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
+        .tbl-input:disabled { border: none; background: transparent; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
 
         /* BRACKET (CHAVES) VISUAL */
@@ -110,15 +107,19 @@
         .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 10px 5px; font-size: 0.7em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
         .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
 
-        /* MODAL */
+        /* MODALS */
         #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-queue { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: white; width: 100%; max-width: 400px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
         .modal-title { margin: 0 0 20px; font-size: 1.3em; color: var(--secondary); text-align: center; }
         .modal-label { font-size: 0.9em; color: #666; margin-bottom: 5px; display: block; font-weight: 600; margin-top: 10px; text-align: left; }
         .preview-img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background: #eee; border: 1px solid #ddd;}
         
-        .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); }
-        .queue-court { font-weight:900; color:var(--primary); margin-right:10px; }
+        .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-google { background: #db4437; } .btn-logout { background: #555; }
+
+        .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .queue-court { font-weight:900; color:var(--primary); background: #fff3e0; padding: 2px 6px; border-radius: 4px; margin-right: 8px;}
+        .queue-match { font-size: 0.9em; font-weight: 600; color: #444; flex: 1; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -140,14 +141,14 @@
     <div class="header-bar"><h2 class="section-title">Arenas</h2></div>
     <div id="grid-arenas" class="grid-container"></div>
     <button id="btn-add-arena" class="btn-add-float" onclick="openModal('arena')" style="display:none;">+</button>
-    <div style="text-align:center; margin-top:50px; color:#999; font-size:0.8em;" id="msg-login">Clique no bonequinho para Login.</div>
+    <div style="text-align:center; margin-top:50px; color:#999; font-size:0.8em;" id="msg-login">Toque no ícone de usuário para Login.</div>
 </div>
 
 <div id="screen-categories" class="screen">
     <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Arenas</div>
     <div class="header-bar"><div><h2 class="section-title" id="title-arena">Nome Arena</h2><div style="font-size:0.8em; color:#777;">Categorias</div></div></div>
     <div id="grid-categories" class="grid-container"></div>
-    <button id="btn-add-cat" class="btn-add-float" onclick="openModal('category')" style="display:none;">+</button>
+    <button id="btn-add-cat" class="btn-add-cat-float btn-add-float" onclick="openModal('category')" style="display:none;">+</button>
 </div>
 
 <div id="screen-tournaments" class="screen">
@@ -173,7 +174,7 @@
     </div>
     <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
     
-    <div class="admin-only admin-panel">
+    <div class="admin-only" style="background:white; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px;">
         <div style="display:flex; gap:10px; margin-bottom:10px;">
             <input type="text" id="pName" list="player-suggestions" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
             <datalist id="player-suggestions"></datalist>
@@ -205,9 +206,12 @@
 
 <div id="modal-login">
     <div class="modal-box">
-        <h3 class="modal-title">Entrar</h3>
-        <button class="btn-std btn-org" onclick="doGoogleLogin()">Google (Gmail)</button>
-        <button class="btn-std btn-red" onclick="closeLoginModal()">Cancelar</button>
+        <h3 class="modal-title">Entrar no BT Arena</h3>
+        <button class="btn-login-opt btn-google" onclick="doGoogleLogin()">
+            <span style="background:white; color:#db4437; border-radius:50%; width:20px; height:20px; display:flex; justify-content:center; align-items:center; font-weight:900;">G</span> 
+            Google (Gmail)
+        </button>
+        <button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button>
     </div>
 </div>
 
@@ -346,6 +350,8 @@
         if(!user) return alert("Faça login para favoritar.");
         const isFav = favorites[id] ? null : true; 
         update(ref(db, `users/${user.uid}/favorites`), { [id]: isFav });
+        e.target.classList.toggle('active');
+        e.target.innerText = isFav ? 'favorite' : 'favorite_border';
     }
 
     function loadArenaPlayers(arenaId) {
@@ -487,7 +493,7 @@
         const gid = `g-ko-${Date.now()}`;
         appState.groups.push({ id: gid, name: `MATA-MATA (Chave de ${size})` });
 
-        // Simple Pairing for simplicity
+        // Pairing logic
         for(let i=0; i<size/2; i++) {
             const high = qualified[i];
             const lowIndex = size - 1 - i;
@@ -521,12 +527,22 @@
 
     window.openQueue = () => {
         const list = document.getElementById('queue-list'); list.innerHTML = '';
-        const pending = appState.matches.filter(m => !m.saved).sort((a,b) => a.court - b.court);
-        if(pending.length === 0) list.innerHTML = '<div style="padding:10px; color:#777;">Fila vazia.</div>'; 
-        else pending.forEach(m => {
-            const p1 = appState.players.find(x=>x.id===m.p1)?.name || '?'; const p3 = appState.players.find(x=>x.id===m.p3)?.name || '?';
-            const div = document.createElement('div'); div.className = 'queue-item'; div.innerHTML = `<span class="queue-court">Q${m.court}</span> ${p1} x ${p3}`; list.appendChild(div);
-        });
+        const pending = appState.matches.filter(m => !m.saved && !m.isBye).sort((a,b) => a.court - b.court);
+        
+        if(pending.length === 0) {
+            list.innerHTML = '<div style="padding:10px; color:#777;">Fila vazia.</div>'; 
+        } else {
+            pending.forEach(m => {
+                const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
+                let s1 = n(m.p1); if(m.p2 && m.p2!=='d' && m.p2!==m.p1) s1 += '/'+n(m.p2);
+                let s2 = n(m.p3); if(m.p4 && m.p4!=='d' && m.p4!==m.p3) s2 += '/'+n(m.p4);
+                
+                const div = document.createElement('div'); 
+                div.className = 'queue-item'; 
+                div.innerHTML = `<span class="queue-court">Q${m.court}</span> <span class="queue-match">${s1} <b style="color:var(--primary); margin:0 5px;">X</b> ${s2}</span>`; 
+                list.appendChild(div);
+            });
+        }
         document.getElementById('modal-queue').style.display = 'flex';
     }
 
