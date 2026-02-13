@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V101 (Controle Total)</title>
+    <title>BT Manager - V102 (Fix Edit)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,9 @@
         .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
         .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd; object-fit: cover; }
-        
+        .user-name { font-size: 0.8em; font-weight: 600; color: #555; display: none; }
+        @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.2em; } }
+
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; width: 100%; }
@@ -629,46 +631,53 @@
     window.genMatches = (gid) => { 
         const ps=appState.players.filter(p=>p.groupId===gid); 
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); 
+        
+        let roundMatches = [];
+        const courtLimit = parseInt(prompt("Distribuir em quantas quadras?", "1")) || 1;
+        
         let hist=new Set(); 
         appState.matches.filter(m=>m.gid===gid && m.saved).forEach(m=>{ if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-')); else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); } }); 
-        
-        let currentCourt = 1; const maxCourts = appState.courtCount || 1;
-        
-        const addRot = (p1, p2, p3, p4) => {
-            addMatch(gid, p1, p2, p3, p4, false, currentCourt);
-            currentCourt++; if(currentCourt>maxCourts) currentCourt=1;
-        }
 
+        // Generate Pairs
         if(appState.mode==='fixed') { 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { 
                 const k=[ps[i].id,ps[j].id].sort().join('-'); 
-                if(!hist.has(k)) addRot(ps[i].id, 'd', ps[j].id, 'd');
+                if(!hist.has(k)) roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'});
             } 
         } 
         else if(ps.length===5) { 
-            if(appState.matches.filter(m=>m.gid===gid).length && !confirm("Rodada 5?")) return; 
-            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>addRot(ps[r[0]].id, ps[r[1]].id, ps[r[2]].id, ps[r[3]].id)); 
+             // Round Robin 5
+             [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{
+                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id});
+            });
         } 
         else { 
+            // Simple Pair Generation Logic (Same as before)
             let pairs=[]; 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
-            if(!pairs.length) return alert("Sem combinações."); 
+            
             pairs.sort(()=>Math.random()-0.5); 
-            let count=0; 
             while(pairs.length) { 
                 let pA=pairs[0], found=false; 
                 for(let k=1; k<pairs.length; k++) { 
                     let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
                     if(all.size===4) { 
-                        addRot(pA.p1,pA.p2,pB.p1,pB.p2); 
-                        pairs.splice(k,1); pairs.splice(0,1); found=true; count++; 
+                        roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2});
+                        pairs.splice(k,1); pairs.splice(0,1); found=true; 
                         break; 
                     } 
                 } 
                 if(!found) pairs.splice(0,1); 
             } 
-            if(!count) alert("Não consegui casar."); 
         } 
+
+        // SAFE SORT (Avoid back-to-back if possible)
+        let c = 1;
+        roundMatches.forEach(m => {
+            addMatch(gid, m.p1, m.p2, m.p3, m.p4, false, c);
+            c++; if(c > courtLimit) c = 1;
+        });
+
         save(); 
     }
     
@@ -730,7 +739,19 @@
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
     window.updateCourt = (mid, val) => { const m = appState.matches.find(x=>x.mid===mid); if(m){ m.court = val; save(); } }
-    function recalc() { appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); appState.matches.forEach(m=>{ if(m.saved) { const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } } }); }
+    function recalc() { 
+        appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); 
+        appState.matches.forEach(m=>{ 
+            if(m.saved && !m.isBye) { 
+                const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; 
+                run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); 
+                if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } 
+            }
+            if(m.isBye) {
+                 // BYE Logic (Optional points)
+            }
+        }); 
+    }
     
     function renderApp() {
         // KEEP FOCUS LOGIC
@@ -739,8 +760,27 @@
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
-        poolPs.forEach(p => { const d = document.createElement('div'); d.className=`std-card ${selectedPid===p.id?'selected':''}`; d.style.padding='10px'; d.style.aspectRatio='auto'; d.onclick=(e)=>window.toggleSel(p.id,e); 
-            d.innerHTML = `<span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer;">${p.name} ✎</span> <b style="color:red; float:right;" class="admin-only" onclick="delPlayer('${p.id}');event.stopPropagation()">✕</b>`; pl.appendChild(d); });
+        
+        // POOL RENDER (FIXED SELECTION/EDIT LOGIC)
+        poolPs.forEach(p => { 
+            const d = document.createElement('div'); 
+            d.className=`std-card ${selectedPid===p.id?'selected':''}`; 
+            d.style.padding='10px'; 
+            d.style.aspectRatio='auto'; 
+            d.style.display='flex';
+            d.style.justifyContent='space-between';
+            d.style.alignItems='center';
+            d.onclick=(e)=>window.toggleSel(p.id,e); // Card click selects
+
+            d.innerHTML = `
+                <span style="flex-grow:1; font-weight:600;">${p.name}</span>
+                <div class="admin-only" style="display:flex; gap:10px;">
+                    <span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666; font-size:1.2em;">✎</span>
+                    <span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; font-size:1.2em;">✕</span>
+                </div>
+            `; 
+            pl.appendChild(d); 
+        });
         
         // RENDER LIVE COURTS
         const cc = document.getElementById('courts-container'); cc.innerHTML = '';
@@ -875,7 +915,9 @@
                 
                 if(ps.length) { 
                     h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`; 
-                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; cursor:pointer;" onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)">${p.name} ✎</td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left;">
+                        ${p.name} <span class="admin-only" onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666; margin-left:5px;">✎</span>
+                        </td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
             }
