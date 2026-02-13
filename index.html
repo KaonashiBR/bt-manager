@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V109 (Auto Lock)</title>
+    <title>BT Manager - V110 (Viewer Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,11 +126,16 @@
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
         .viewer-mode .court-select { pointer-events: none; border: none; background: transparent; appearance: none; }
+        
         .player-link { cursor: pointer; border-bottom: 1px dashed #999; transition:0.2s; }
         .player-link:hover { color: var(--primary); border-bottom-color: var(--primary); font-weight:bold; }
         .player-link.empty { color: #999; font-style: italic; }
+        
+        /* VIEWER FIX FOR NAMES */
+        .viewer-mode .player-link { cursor: default; border-bottom: none; pointer-events: none; }
+        .viewer-mode .player-link:hover { color: inherit; font-weight: normal; }
 
-        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 5px; font-size: 0.6em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
+        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 10px 5px; font-size: 0.7em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
         .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
 
         /* MODALS */
@@ -156,6 +161,9 @@
         .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
+        
+        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
+        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
     </style>
 </head>
 <body class="viewer-mode">
@@ -167,7 +175,7 @@
 <div class="navbar">
     <div class="nav-logo" onclick="window.goHome()">
         <span>🎾</span>
-        <div>BT Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div>
+        <div>Beach Tennis Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div>
     </div>
     <div class="nav-user" onclick="openLoginModal()">
         <span id="nav-username" class="user-name">Visitante</span>
@@ -862,7 +870,9 @@
     }
     
     function renderApp() {
+        // KEEP FOCUS LOGIC
         const focusedId = document.activeElement ? document.activeElement.id : null;
+
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
@@ -876,6 +886,7 @@
             pl.appendChild(d); 
         });
         
+        // RENDER LIVE COURTS
         const cc = document.getElementById('courts-container'); cc.innerHTML = '';
         const totalCourts = appState.courtCount || 1;
         const matches = appState.matches || [];
@@ -936,6 +947,7 @@
             cc.appendChild(card);
         }
 
+        // RENDER FULL TABLE (WITH UNIQUE IDS 'tbl-s1-...')
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
@@ -943,7 +955,14 @@
             const col = document.createElement('div'); col.className='group-box'; 
             let h = ``;
             if(g.id.includes('ko-')) { 
-                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="bracket-scroll">`;
+                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;">
+                        <span>${g.name}</span>
+                        <div class="admin-only">
+                            <span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span>
+                            <span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span>
+                        </div>
+                      </div>`;
+                h += `<div class="bracket-scroll">`;
                 ms.forEach((m, idx) => {
                     const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'Selecionar...');
                     const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
@@ -951,13 +970,27 @@
                     for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
 
                     h += `<div class="match-card"><div style="font-size:0.7em; color:#777; margin-bottom:5px; display:flex; justify-content:space-between;"><span>#${idx+1}</span>${!m.isBye ? `<select class="court-select" onchange="updateCourt('${m.mid}', this.value)" style="font-size:0.8em; height:18px;">${courtOpts}</select>` : ''}</div>
-                        <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;"><span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span><span class="match-score">${m.s1||'-'}</span></div>
-                        <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;"><span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span><span class="match-score">${m.s2||'-'}</span></div>
+                        <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;">
+                             <span class="player-link ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
+                             <span class="match-score">${m.s1||'-'}</span>
+                        </div>
+                        <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;">
+                             <span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
+                             <span class="match-score">${m.s2||'-'}</span>
+                        </div>
                         ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}</div>`;
                 });
                 h += `</div>`;
             } else {
-                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;">
+                        <span>${g.name}</span>
+                        <div class="admin-only">
+                            <span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span>
+                            <span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span>
+                        </div>
+                      </div>`;
+                h += `<div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
                     ms.forEach(m => {
@@ -965,10 +998,10 @@
                         let courtOpts = ''; const totalCourts = appState.courtCount || 1;
                         for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
                         
-                        const p1Block = `<span class="player-link admin-only ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>`;
-                        const p2Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link admin-only ${m.p2===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p2')">${n(m.p2)}</span>`;
-                        const p3Block = `<span class="player-link admin-only ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
-                        const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link admin-only ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
+                        const p1Block = `<span class="player-link ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>`;
+                        const p2Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p2===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p2')">${n(m.p2)}</span>`;
+                        const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
+                        const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
                         h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
@@ -983,6 +1016,8 @@
             }
             col.innerHTML = h; gc.appendChild(col);
         });
+
+        // RESTORE FOCUS
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
 </script>
