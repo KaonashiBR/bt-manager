@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V99 (Stable)</title>
+    <title>BT Manager - V101 (Controle Total)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,15 +21,16 @@
         .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
         .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd; object-fit: cover; }
-        .user-name { font-size: 0.8em; font-weight: 600; color: #555; display: none; }
-        @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.2em; } }
-
+        
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; width: 100%; }
         
         .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
         .std-card:active { transform: scale(0.97); }
+        /* PLAYER SELECTED STATE */
+        .std-card.selected { border: 3px solid var(--primary); transform: scale(0.95); background: #fff3e0; }
+
         .card-img { width: 100%; height: 100%; object-fit: cover; }
         .card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 10px 10px; color: white; }
         .card-title { font-weight: 700; font-size: 1.1em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
@@ -61,6 +62,11 @@
         .tbl-input { width: 30px; height: 30px; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
+
+        /* GROUP HEADER INTERACTIVE */
+        .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .group-header:hover { opacity: 0.9; }
+        .group-header.target { border: 2px dashed #fff; }
 
         /* LIVE COURT */
         .court-live-card { background: white; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -99,17 +105,18 @@
         .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .queue-court { font-weight:900; color:var(--primary); background: #fff3e0; padding: 2px 6px; border-radius: 4px; margin-right: 8px;}
         .queue-match { font-size: 0.9em; font-weight: 600; color: #444; flex: 1; }
-        
-        .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; display:flex; flex-direction:column; justify-content:center; }
-        .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
-        .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
-        .match-score { font-weight: 900; color: #333; }
-        .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
         .rank-table { width: 100%; border-collapse: collapse; background: white; }
         .rank-table th { background: #333; color: white; padding: 8px; font-size: 0.8em; }
         .rank-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
         .rank-pos { width: 30px; height: 30px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 0.9em; }
         .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
+        .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
+        .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; display:flex; flex-direction:column; justify-content:center; }
+        .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
+        .match-score { font-weight: 900; color: #333; }
+        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
+        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
     </style>
 </head>
 <body class="viewer-mode">
@@ -179,6 +186,9 @@
             <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Gerar Mata-Mata</button>
             <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
             <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
+        </div>
+        <div style="margin-top:10px; font-size:0.8em; color:#666; text-align:center;">
+            <span class="material-icons" style="font-size:1em; vertical-align:middle;">touch_app</span> Clique no jogador e depois no Grupo para mover.
         </div>
     </div>
 
@@ -544,11 +554,21 @@
         }); 
     }
 
-    // --- NEW: RENAME & QUEUE ---
+    // --- NEW: RENAME & QUEUE & MOVE ---
     window.editName = (pid, oldName, e) => {
         e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return;
         const newName = prompt("Novo nome:", oldName);
         if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } }
+    }
+
+    window.renameGroup = (gid, e) => {
+        e.stopPropagation();
+        if(document.body.classList.contains('viewer-mode')) return;
+        const g = appState.groups.find(x => x.id === gid);
+        if(g) {
+            const newName = prompt("Novo nome do grupo:", g.name);
+            if(newName) { g.name = newName; save(); }
+        }
     }
 
     window.openQueue = () => {
@@ -609,59 +629,52 @@
     window.genMatches = (gid) => { 
         const ps=appState.players.filter(p=>p.groupId===gid); 
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); 
-        
-        let roundMatches = [];
-        const courtLimit = parseInt(prompt("Distribuir em quantas quadras?", "1")) || 1;
-        
         let hist=new Set(); 
         appState.matches.filter(m=>m.gid===gid && m.saved).forEach(m=>{ if(appState.mode==='fixed') hist.add([m.p1,m.p3].sort().join('-')); else { hist.add([m.p1,m.p2].sort().join('-')); hist.add([m.p3,m.p4].sort().join('-')); } }); 
+        
+        let currentCourt = 1; const maxCourts = appState.courtCount || 1;
+        
+        const addRot = (p1, p2, p3, p4) => {
+            addMatch(gid, p1, p2, p3, p4, false, currentCourt);
+            currentCourt++; if(currentCourt>maxCourts) currentCourt=1;
+        }
 
-        // Generate Pairs
         if(appState.mode==='fixed') { 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { 
                 const k=[ps[i].id,ps[j].id].sort().join('-'); 
-                if(!hist.has(k)) roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'});
+                if(!hist.has(k)) addRot(ps[i].id, 'd', ps[j].id, 'd');
             } 
         } 
         else if(ps.length===5) { 
-             // Round Robin 5
-             [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{
-                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id});
-            });
+            if(appState.matches.filter(m=>m.gid===gid).length && !confirm("Rodada 5?")) return; 
+            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>addRot(ps[r[0]].id, ps[r[1]].id, ps[r[2]].id, ps[r[3]].id)); 
         } 
         else { 
-            // Simple Pair Generation Logic (Same as before)
             let pairs=[]; 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); if(!hist.has(k)) pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
-            
+            if(!pairs.length) return alert("Sem combinações."); 
             pairs.sort(()=>Math.random()-0.5); 
+            let count=0; 
             while(pairs.length) { 
                 let pA=pairs[0], found=false; 
                 for(let k=1; k<pairs.length; k++) { 
                     let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
                     if(all.size===4) { 
-                        roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2});
-                        pairs.splice(k,1); pairs.splice(0,1); found=true; 
+                        addRot(pA.p1,pA.p2,pB.p1,pB.p2); 
+                        pairs.splice(k,1); pairs.splice(0,1); found=true; count++; 
                         break; 
                     } 
                 } 
                 if(!found) pairs.splice(0,1); 
             } 
+            if(!count) alert("Não consegui casar."); 
         } 
-
-        // SAFE SORT (Avoid back-to-back if possible)
-        let c = 1;
-        roundMatches.forEach(m => {
-            addMatch(gid, m.p1, m.p2, m.p3, m.p4, false, c);
-            c++; if(c > courtLimit) c = 1;
-        });
-
         save(); 
     }
     
     window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addMatch(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id, false, 1); save(); }
     
-    // FIX SAVE SCORE WITH UPDATE
+    // FIX SAVE SCORE WITH ID SEPARATION
     window.saveS = (mid) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -717,19 +730,7 @@
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
     window.updateCourt = (mid, val) => { const m = appState.matches.find(x=>x.mid===mid); if(m){ m.court = val; save(); } }
-    function recalc() { 
-        appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); 
-        appState.matches.forEach(m=>{ 
-            if(m.saved && !m.isBye) { 
-                const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; 
-                run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); 
-                if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } 
-            }
-            if(m.isBye) {
-                 // BYE Logic (Optional points)
-            }
-        }); 
-    }
+    function recalc() { appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); appState.matches.forEach(m=>{ if(m.saved) { const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } } }); }
     
     function renderApp() {
         // KEEP FOCUS LOGIC
@@ -821,7 +822,13 @@
             const col = document.createElement('div'); col.className='column';
             let h = ``;
             if(g.id.includes('ko-')) { 
-                h += `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px; background:black; color:white; padding:5px; font-weight:bold; border-radius:4px;">${g.name} <span class="admin-only" style="float:right; color:red;" onclick="delGroup('${g.id}');event.stopPropagation()">✕</span></div>`;
+                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;">
+                        <span>${g.name}</span>
+                        <div class="admin-only">
+                            <span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span>
+                            <span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span>
+                        </div>
+                      </div>`;
                 h += `<div class="bracket-scroll">`;
                 ms.forEach((m, idx) => {
                     const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'?');
@@ -844,9 +851,17 @@
                 });
                 h += `</div>`;
             } else {
-                h += `<div onclick="moveSel('${g.id}')" style="cursor:pointer; margin-bottom:5px;"><div class="admin-only" style="display:flex; gap:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div></div>`;
+                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;">
+                        <span>${g.name}</span>
+                        <div class="admin-only">
+                            <span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span>
+                            <span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span>
+                        </div>
+                      </div>`;
+                h += `<div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                
                 if(ms.length) {
-                    h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}" onclick="moveSel('${g.id}')">${g.name} <span class="admin-only" onclick="delGroup('${g.id}'); event.stopPropagation()" style="float:right; cursor:pointer;">✕</span></th></tr></thead><tbody>`;
+                    h += `<table class="bt-table"><thead><tr><th colspan="7" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
                     ms.forEach(m => {
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || '?';
                         const t1 = appState.mode==='fixed' ? n(m.p1) : `${n(m.p1)}<br><small>/${n(m.p2)}</small>`;
@@ -856,7 +871,7 @@
                         h += `<tr><td style="text-align:right">${t1}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left">${t2}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
-                } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">${g.name} (Vazio) <span class="admin-only" style="float:right; cursor:pointer;" onclick="delGroup('${g.id}'); event.stopPropagation()">✕</span></div>`; }
+                } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
                 
                 if(ps.length) { 
                     h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`; 
