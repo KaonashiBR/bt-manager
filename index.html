@@ -5,18 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V97 (Bug Fix)</title>
+    <title>BT Manager - V98 (Smart Schedule)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; }
+        /* DESIGN V88 (SÓLIDO) */
+        :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; }
         
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         .nav-logo { font-weight: 800; font-size: 0.95em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+        .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
         .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: #ddd; object-fit: cover; }
         .user-name { font-size: 0.8em; font-weight: 600; color: #555; display: none; }
@@ -38,7 +40,9 @@
         .bg-tourney .material-icons { font-size: 4em; color: white; opacity: 0.3; }
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
         .btn-icon-circle { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.9); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
-        
+        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
+        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
         .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 0.9em; margin-bottom: 15px;}
@@ -58,7 +62,7 @@
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 0.9em; background: #eee; padding: 2px; width: 45px; text-align: center; color: #333; }
 
-        /* LIVE COURT */
+        /* LIVE COURT CARD */
         .court-live-card { background: white; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .court-header { background: #333; color: white; padding: 8px 12px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
         .court-status { font-size: 0.75em; text-transform: uppercase; background: #000; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center; gap: 5px;}
@@ -95,16 +99,12 @@
         .queue-item { background:#f9f9f9; padding:10px; margin-bottom:5px; border-left:5px solid var(--secondary); text-align:left; border-radius:4px; box-shadow:0 1px 2px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .queue-court { font-weight:900; color:var(--primary); background: #fff3e0; padding: 2px 6px; border-radius: 4px; margin-right: 8px;}
         .queue-match { font-size: 0.9em; font-weight: 600; color: #444; flex: 1; }
-        .rank-table { width: 100%; border-collapse: collapse; background: white; }
-        .rank-table th { background: #333; color: white; padding: 8px; font-size: 0.8em; }
-        .rank-table td { padding: 8px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; }
-        .rank-pos { width: 30px; height: 30px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 0.9em; }
-        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
-        .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
+        
         .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; display:flex; flex-direction:column; justify-content:center; }
         .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
         .match-score { font-weight: 900; color: #333; }
+        .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.5em; transition: transform 0.2s; }
         .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
     </style>
@@ -146,7 +146,7 @@
     <div class="tabs"><div class="tab active" onclick="switchTab('tournaments')">TORNEIOS</div><div class="tab" onclick="switchTab('ranking')">RANKING</div></div>
     <div id="tab-tournaments" class="tab-content active">
         <div id="grid-tournaments" class="grid-container"></div>
-        <button id="btn-add-tourney" class="btn-add-float" onclick="openModal('tournament')" style="display:none;">+</button>
+        <button id="btn-add-tourney" class="btn-add-tourney-float btn-add-float" onclick="openModal('tournament')" style="display:none;">+</button>
     </div>
     <div id="tab-ranking" class="tab-content"><div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd;"><table class="rank-table" id="table-ranking"></table></div></div>
 </div>
@@ -651,82 +651,7 @@
     
     window.addManual = (gid) => { const ps=appState.players.filter(p=>p.groupId===gid); if(ps.length<2) return alert("Poucos jogadores"); addMatch(gid, ps[0].id, ps[0].id, ps[0].id, ps[0].id, false, 1); save(); }
     
-    // FIX SAVE SCORE WITH ID SEPARATION
-    window.saveS = (mid) => { 
-        const m = appState.matches.find(x=>x.mid===mid);
-        if(!m) return;
-
-        // UNLOCK MODE
-        if(m.saved) {
-            if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
-                m.saved = false;
-                recalc();
-                save();
-            }
-            return;
-        }
-
-        // SAVE MODE
-        // Try to get from LIVE input first
-        let s1_el = document.getElementById(`live-s1-${mid}`);
-        let s2_el = document.getElementById(`live-s2-${mid}`);
-        
-        // If not found (user is in TABLE view), get from TABLE input
-        if(!s1_el) {
-            s1_el = document.getElementById(`tbl-s1-${mid}`);
-            s2_el = document.getElementById(`tbl-s2-${mid}`);
-        }
-
-        if(!s1_el || !s2_el) {
-            alert("Erro: Campo de placar não encontrado. Tente recarregar.");
-            return;
-        }
-
-        let s1 = s1_el.value;
-        let s2 = s2_el.value;
-
-        if(s1 === '' || s2 === '') {
-            alert("Preencha o placar.");
-            return;
-        }
-        if(isNaN(s1) || isNaN(s2)) return alert("Apenas números.");
-        
-        s1 = parseInt(s1);
-        s2 = parseInt(s2);
-
-        if(s1 < 0 || s2 < 0) return alert("Sem negativos.");
-        if(s1 > 30 || s2 > 30) { if(!confirm(`Placar alto (${s1}x${s2}). Confirma?`)) return; }
-        
-        if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) {
-             if(!confirm("Jogo parece não ter acabado. Salvar?")) return;
-        }
-        
-        m.s1 = s1;
-        m.s2 = s2;
-        m.saved = true;
-        recalc();
-        save();
-    }
-
-    // EDIT HISTORY BUTTON
-    window.editScore = (mid) => {
-        const m = appState.matches.find(x=>x.mid===mid);
-        if(m && confirm("Editar resultado deste jogo?")) {
-            const newS1 = prompt("Placar Time 1:", m.s1);
-            const newS2 = prompt("Placar Time 2:", m.s2);
-            if(newS1 !== null && newS2 !== null) {
-                m.s1 = parseInt(newS1);
-                m.s2 = parseInt(newS2);
-                recalc();
-                save();
-            }
-        }
-    }
-
-    window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
-    window.updateCourt = (mid, val) => { const m = appState.matches.find(x=>x.mid===mid); if(m){ m.court = val; save(); } }
-    function recalc() { appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); appState.matches.forEach(m=>{ if(m.saved) { const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } } }); }
-    
+    // RENDER APP
     function renderApp() {
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
@@ -734,7 +659,7 @@
         poolPs.forEach(p => { const d = document.createElement('div'); d.className=`std-card ${selectedPid===p.id?'selected':''}`; d.style.padding='10px'; d.style.aspectRatio='auto'; d.onclick=(e)=>window.toggleSel(p.id,e); 
             d.innerHTML = `<span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer;">${p.name} ✎</span> <b style="color:red; float:right;" class="admin-only" onclick="delPlayer('${p.id}');event.stopPropagation()">✕</b>`; pl.appendChild(d); });
         
-        // RENDER LIVE COURTS (WITH UNIQUE IDS 'live-s1-...')
+        // RENDER LIVE COURTS
         const cc = document.getElementById('courts-container'); cc.innerHTML = '';
         const totalCourts = appState.courtCount || 1;
         const matches = appState.matches || [];
@@ -756,10 +681,8 @@
                         <div class="live-team">${s1}</div>
                         <div class="live-vs">X</div>
                         <div class="live-team">${s2}</div>
-                        <div class="admin-only live-inputs">
-                            <input type="tel" id="live-s1-${activeMatch.mid}" value="${activeMatch.s1}" class="live-input">
-                            <input type="tel" id="live-s2-${activeMatch.mid}" value="${activeMatch.s2}" class="live-input">
-                            <button class="btn-std btn-green" style="width:auto; margin:0;" onclick="saveS('${activeMatch.mid}')">OK</button>
+                        <div class="live-inputs">
+                            <span style="font-weight:900; font-size:1.5em; color:#666;">JOGO EM ANDAMENTO</span>
                         </div>
                     </div>
                 `;
@@ -783,7 +706,6 @@
                     historyHTML += `
                         <div class="history-item">
                             <span>${s1} <b>${m.s1}</b> x <b>${m.s2}</b> ${s2}</span>
-                            <span class="admin-only" style="color:#007bff; cursor:pointer;" onclick="editScore('${m.mid}')">✎</span>
                         </div>`;
                 });
             }
@@ -808,7 +730,7 @@
             cc.appendChild(card);
         }
 
-        // RENDER FULL TABLE (WITH UNIQUE IDS 'tbl-s1-...')
+        // RENDER FULL TABLE
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
@@ -834,7 +756,7 @@
                         </div>
                         <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;"><span>${p1n}</span><span class="match-score">${m.s1||'-'}</span></div>
                         <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;"><span>${p2n}</span><span class="match-score">${m.s2||'-'}</span></div>
-                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}
+                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}
                     </div>`;
                 });
                 h += `</div>`;
@@ -848,7 +770,7 @@
                         const t2 = appState.mode==='fixed' ? n(m.p3) : `${n(m.p3)}<br><small>/${n(m.p4)}</small>`;
                         let courtOpts = ''; const totalCourts = appState.courtCount || 1;
                         for(let c=1; c<=totalCourts; c++) { courtOpts += `<option value="${c}" ${m.court==c?'selected':''}>Q${c}</option>`; }
-                        h += `<tr><td style="text-align:right">${t1}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left">${t2}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right">${t1}</td><td style="padding:0; width:50px;"><select class="court-select" onchange="updateCourt('${m.mid}', this.value)">${courtOpts}</select></td><td style="padding:0"><input type="tel" id="s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0"><input type="tel" id="s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left">${t2}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">${g.name} (Vazio) <span class="admin-only" style="float:right; cursor:pointer;" onclick="delGroup('${g.id}'); event.stopPropagation()">✕</span></div>`; }
