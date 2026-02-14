@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V112 (Final Fix)</title>
+    <title>BT Manager - V113 (Score Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -188,6 +188,7 @@
         <div style="display:flex; align-items:center; gap:5px;">
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
             <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
+            <button onclick="openQueue()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">list_alt</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
         </div>
     </div>
@@ -646,7 +647,6 @@
     window.openQueue = () => { // NOT USED ANYMORE AS MAIN VIEW, BUT KEPT FOR HISTORY
         const list = document.getElementById('queue-list'); list.innerHTML = '';
         // ...
-        document.getElementById('modal-queue').style.display = 'flex';
     }
 
     window.toggleHistory = (court) => {
@@ -742,7 +742,7 @@
         save(); 
     }
     
-    // FIX SAVE SCORE WITH ID SEPARATION + UPDATE
+    // FIX SAVE SCORE WITH ID SEPARATION + UPDATE + VALUE CHECK
     window.saveS = (mid) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -758,16 +758,21 @@
             return;
         }
 
-        // SAVE MODE
-        let s1_el = document.getElementById(`live-s1-${mid}`);
-        let s2_el = document.getElementById(`live-s2-${mid}`);
-        if(!s1_el) { s1_el = document.getElementById(`tbl-s1-${mid}`); s2_el = document.getElementById(`tbl-s2-${mid}`); }
+        // SAVE MODE - Check both possible inputs
+        let val1 = document.getElementById(`live-s1-${mid}`)?.value || document.getElementById(`tbl-s1-${mid}`)?.value;
+        let val2 = document.getElementById(`live-s2-${mid}`)?.value || document.getElementById(`tbl-s2-${mid}`)?.value;
+        
+        // If undefined/null, treat as empty
+        if (val1 === undefined || val1 === null) val1 = '';
+        if (val2 === undefined || val2 === null) val2 = '';
 
-        if(!s1_el || !s2_el) { alert("Erro de visualização. Tente recarregar."); return; }
-
-        let s1 = s1_el.value; let s2 = s2_el.value;
-        if(s1 === '' || s2 === '') { alert("Preencha o placar."); return; }
-        s1 = parseInt(s1); s2 = parseInt(s2);
+        if(val1 === '' || val2 === '') { 
+            alert("Preencha o placar."); 
+            return; 
+        }
+        
+        let s1 = parseInt(val1); 
+        let s2 = parseInt(val2);
 
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
@@ -918,3 +923,5 @@
 </script>
 </body>
 </html>
+
+
