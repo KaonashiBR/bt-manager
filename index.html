@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V113 (Score Fix)</title>
+    <title>BT Manager - V115 (Knockout Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -110,7 +110,6 @@
         .player-link { cursor: pointer; border-bottom: 1px dashed #999; transition:0.2s; }
         .player-link:hover { color: var(--primary); border-bottom-color: var(--primary); font-weight:bold; }
         .player-link.empty { color: #999; font-style: italic; }
-        /* VIEWER FIX */
         .viewer-mode .player-link { cursor: default; border-bottom: none; pointer-events: none; }
 
         .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 5px; font-size: 0.6em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
@@ -128,7 +127,7 @@
         .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
         .bracket-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 0; }
         .match-card { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 150px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.8em; display:flex; flex-direction:column; justify-content:center; }
-        .match-team { padding: 2px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+        .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
         .match-score { font-weight: 900; color: #333; }
         
@@ -607,6 +606,11 @@
         selectingMatch = mid;
         selectingSlot = slot;
         
+        const m = appState.matches.find(x => x.mid === mid);
+        if(!m) return;
+        
+        const isKO = m.gid.includes('ko');
+
         const list = document.getElementById('select-list-container');
         list.innerHTML = '';
         
@@ -616,9 +620,15 @@
         noneItem.onclick = () => confirmPlayerSelect('');
         list.appendChild(noneItem);
 
-        const sortedPlayers = [...appState.players].sort((a,b) => a.name.localeCompare(b.name));
+        // FILTER LOGIC
+        let candidates = [];
+        if(isKO) {
+            candidates = appState.players; // Allow all for knockout
+        } else {
+            candidates = appState.players.filter(p => p.groupId === m.gid);
+        }
 
-        sortedPlayers.forEach(p => {
+        candidates.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
             const item = document.createElement('div');
             item.className = 'select-item';
             item.innerText = p.name;
@@ -878,15 +888,23 @@
             if(g.id.includes('ko-')) { 
                 h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="bracket-scroll">`;
                 ms.forEach((m, idx) => {
-                    const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'Selecionar...');
+                    const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]'); // HINT HERE
                     const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
+                    
+                    // KNOCKOUT BRACKET RENDER (DOUBLE VS DOUBLE)
                     h += `<div class="match-card"><div style="font-size:0.7em; color:#777; margin-bottom:5px; display:flex; justify-content:space-between;"><span>#${idx+1}</span></div>
                         <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;">
-                             <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
+                             <span style="display:flex; flex-direction:column; text-align:left;">
+                                <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
+                                <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.9em; color:#555;">${n(m.p2)}</span>
+                             </span>
                              <span class="match-score">${m.s1||'-'}</span>
                         </div>
-                        <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between;">
-                             <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
+                        <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between; margin-top:5px; border-top:1px dashed #eee; padding-top:5px;">
+                             <span style="display:flex; flex-direction:column; text-align:left;">
+                                <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
+                                <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.9em; color:#555;">${n(m.p4)}</span>
+                             </span>
                              <span class="match-score">${m.s2||'-'}</span>
                         </div>
                         ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}</div>`;
@@ -918,10 +936,10 @@
             }
             col.innerHTML = h; gc.appendChild(col);
         });
+
+        // RESTORE FOCUS
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
 </script>
 </body>
 </html>
-
-
