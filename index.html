@@ -5,21 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V116 (Knockout Fix & Bracket)</title>
+    <title>BT Manager - V117 (Fixed Bracket)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN SÓLIDO (V116 BASE - 10% Font Increase) */
+        /* DESIGN SÓLIDO (V117 - Bracket Engine) */
         :root { 
             --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; 
             --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; 
-            --font-base: 1.1em; /* Increased by 10% */
+            --font-base: 1.1em; 
         }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
+        /* NAVBAR */
         .navbar { background: white; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         .nav-logo { font-weight: 800; font-size: 1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
@@ -124,21 +125,28 @@
         .modal-box { background: white; width: 100%; max-width: 440px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
         .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .btn-google { background: #db4437; } .btn-logout { background: #555; }
-        .rank-table { width: 100%; border-collapse: collapse; background: white; }
-        .rank-table th { background: #333; color: white; padding: 6px; font-size: 0.8em; }
-        .rank-table td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.9em; }
-        .rank-pos { width: 26px; height: 26px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 1em; }
-        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
         
-        /* BRACKET STYLES (Horizontal) */
-        .bracket-container { display: flex; overflow-x: auto; padding: 20px; }
-        .bracket-round { display: flex; flex-direction: column; justify-content: space-around; margin-right: 20px; }
-        .bracket-match { background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; min-width: 170px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.9em; display:flex; flex-direction:column; justify-content:center; margin-bottom: 10px; position: relative; }
-        .bracket-match::after { content: ''; position: absolute; top: 50%; right: -10px; width: 10px; height: 2px; background: #ccc; }
-        .bracket-round:last-child .bracket-match::after { display: none; }
+        /* BRACKET ENGINE STYLES (NEW V117) */
+        .bracket-scroll-container { display: flex; overflow-x: auto; padding: 10px; gap: 30px; }
+        .bracket-round-col { display: flex; flex-direction: column; justify-content: space-around; min-width: 200px; position: relative; }
+        
+        /* Match Card within Bracket */
+        .bracket-match-card {
+            background: white; border: 1px solid #ccc; border-radius: 6px; padding: 5px; 
+            margin-bottom: 20px; /* Spacing between matches in same round */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            font-size: 0.9em; display:flex; flex-direction:column; justify-content:center;
+            position: relative;
+        }
+        
+        /* Connecting Lines (Simple visual trick) */
+        .bracket-round-col:not(:last-child) .bracket-match-card::after {
+            content: ""; position: absolute; top: 50%; right: -30px; width: 30px; height: 2px; background: #ccc;
+        }
+        
         .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
-        .match-score { font-weight: 900; color: #333; }
+        .match-score { font-weight: 900; color: #333; margin-left:5px; }
         
         .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
@@ -888,40 +896,66 @@
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='group-box'; 
-            let h = ``;
+            
+            // SPECIAL RENDER FOR KNOCKOUT GROUP
             if(g.id.includes('ko-')) { 
-                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="bracket-scroll">`;
-                ms.forEach((m, idx) => {
-                    const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]'); // HINT HERE
-                    const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
-                    
-                    // KNOCKOUT BRACKET RENDER (DOUBLE VS DOUBLE)
-                    h += `<div class="match-card"><div style="font-size:0.7em; color:#777; margin-bottom:5px; display:flex; justify-content:space-between;"><span>#${idx+1}</span></div>
-                        <div class="match-team ${w1?'winner':''}" style="display:flex; justify-content:space-between;">
-                             <span style="display:flex; flex-direction:column; text-align:left;">
-                                <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
-                                <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.9em; color:#555;">${n(m.p2)}</span>
-                             </span>
-                             <span class="match-score">${m.s1||'-'}</span>
-                        </div>
-                        <div class="match-team ${w2?'winner':''}" style="display:flex; justify-content:space-between; margin-top:5px; border-top:1px dashed #eee; padding-top:5px;">
-                             <span style="display:flex; flex-direction:column; text-align:left;">
-                                <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
-                                <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.9em; color:#555;">${n(m.p4)}</span>
-                             </span>
-                             <span class="match-score">${m.s2||'-'}</span>
-                        </div>
-                        ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}</div>`;
+                col.style.gridColumn = '1 / -1'; // Take full width
+                let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
+                
+                h += `<div class="bracket-scroll-container">`; // NEW SCROLL CONTAINER
+                
+                // Logic to separate matches into columns (Rounds)
+                const totalMatches = ms.length;
+                let rounds = [];
+                // Simple heuristic: 15 matches -> 8 + 4 + 2 + 1
+                if(totalMatches === 1) rounds = [1];
+                else if(totalMatches <= 3) rounds = [2, 1]; // Semis + Final
+                else if(totalMatches <= 7) rounds = [4, 2, 1]; // Quarters + Semis + Final
+                else rounds = [8, 4, 2, 1]; // R16 + Q + S + F
+
+                let matchIndex = 0;
+                rounds.forEach((count, roundIdx) => {
+                    h += `<div class="bracket-round-col">`; // COLUMN START
+                    for(let k=0; k<count; k++) {
+                        if(matchIndex >= ms.length) break;
+                        const m = ms[matchIndex];
+                        matchIndex++;
+                        
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
+                        const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
+                        
+                        h += `<div class="bracket-match-card">
+                            <div class="match-team ${w1?'winner':''}">
+                                 <span style="display:flex; flex-direction:column; text-align:left;">
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.8em; color:#555;">${n(m.p2)}</span>
+                                 </span>
+                                 <span class="match-score">${m.s1||'-'}</span>
+                            </div>
+                            <div class="match-team ${w2?'winner':''}" style="margin-top:2px;">
+                                 <span style="display:flex; flex-direction:column; text-align:left;">
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.8em; color:#555;">${n(m.p4)}</span>
+                                 </span>
+                                 <span class="match-score">${m.s2||'-'}</span>
+                            </div>
+                            ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px; justify-content:center;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px; height:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px; height:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}
+                        </div>`;
+                    }
+                    h += `</div>`; // COLUMN END
                 });
-                h += `</div>`;
+                
+                h += `</div>`; // SCROLL CONTAINER END
+                col.innerHTML = h;
+                
             } else {
-                h += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                // NORMAL GROUP RENDER
+                let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
                 
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
                     ms.forEach(m => {
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || (id===''?'<span style="color:var(--primary); font-style:italic;">Selecionar...</span>':'?');
-                        
                         const p1Block = `<span class="player-link ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>`;
                         const p2Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p2===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p2')">${n(m.p2)}</span>`;
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
@@ -937,14 +971,13 @@
                     ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
+                col.innerHTML = h;
             }
-            col.innerHTML = h; gc.appendChild(col);
+            gc.appendChild(col);
         });
 
-        // RESTORE FOCUS
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
 </script>
 </body>
 </html>
-
