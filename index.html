@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V122 (Add Group Fix)</title>
+    <title>BT Manager - V123 (Group Logic Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN SÓLIDO (V122) */
+        /* DESIGN SÓLIDO (V123) */
         :root { 
             --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; 
             --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; 
@@ -65,17 +65,29 @@
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 1px; width: 50px; text-align: center; color: #333; }
+        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
 
-        .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
+        /* COMPACT POOL CARD */
+        .pool-card {
+            background: white; border-radius: 4px; border: 1px solid #ddd;
+            padding: 8px 10px; font-size: 0.9em; font-weight: 600;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: 0.1s; margin-bottom: 4px;
+        }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
 
-        .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
+        /* GROUP BOX */
+        .group-box {
+            background: white; border: 2px solid #e2e8f0; border-radius: 8px;
+            padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px;
+        }
         .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
+        /* LAYOUT BOARD */
         .board { display: flex; flex-direction: column; gap: 15px; }
         #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; }
         @media(min-width: 1100px) { 
@@ -84,6 +96,7 @@
             .group-box { flex: 1 0 19%; min-width: 240px; } 
         }
 
+        /* JOGOS LIST */
         .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 8px; padding: 12px; display: flex; flex-direction: column; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .match-info { display: flex; justify-content: space-between; align-items: center; width: 100%; font-weight: 700; font-size: 1em;}
         .match-vs { color: #888; font-size: 0.9em; margin: 0 5px; }
@@ -97,6 +110,7 @@
 
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
+        
         .player-link { cursor: pointer; border-bottom: 1px dashed #999; transition:0.2s; }
         .player-link:hover { color: var(--primary); border-bottom-color: var(--primary); font-weight:bold; }
         .player-link.empty { color: #999; font-style: italic; }
@@ -105,35 +119,62 @@
         .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 8px; font-size: 0.8em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
         .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
 
+        /* MODALS */
         #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-player-select { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: white; width: 100%; max-width: 440px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
         .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .btn-google { background: #db4437; } .btn-logout { background: #555; }
+        .rank-table { width: 100%; border-collapse: collapse; background: white; }
+        .rank-table th { background: #333; color: white; padding: 6px; font-size: 0.8em; }
+        .rank-table td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.9em; }
+        .rank-pos { width: 26px; height: 26px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 1em; }
+        .rank-1 .rank-pos { background: #FFD700; color: #000; } 
+        .rank-2 .rank-pos { background: #C0C0C0; color: #000; } 
+        .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
         
+        /* BRACKET ENGINE (TREE LINES) */
         .bracket-stage { display: flex; justify-content: center; align-items: flex-start; padding: 20px 0; overflow-x: auto; gap: 20px; }
         .bracket-side-container { display: flex; gap: 20px; }
         .bracket-side-container.right { flex-direction: row-reverse; }
         .bracket-final-container { display: flex; flex-direction: column; justify-content: center; margin: 0 30px; }
         .bracket-round-col { display: flex; flex-direction: column; justify-content: space-around; min-width: 190px; position: relative; }
         
-        .bracket-match-card { background: white; border: 1px solid #999; border-radius: 6px; padding: 8px; margin: 10px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.95em; display:flex; flex-direction:column; justify-content:center; position: relative; z-index: 2; min-height: 70px; }
+        .bracket-match-card {
+            background: white; border: 1px solid #999; border-radius: 6px; padding: 8px; 
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            font-size: 0.95em; display:flex; flex-direction:column; justify-content:center;
+            position: relative; z-index: 2;
+            min-height: 70px;
+        }
+
+        /* CONNECTORS */
+        .bracket-left .bracket-round-col:not(:last-child) .bracket-match-card::after {
+            content: ""; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: #333;
+        }
+        .bracket-right .bracket-round-col:not(:last-child) .bracket-match-card::after {
+            content: ""; position: absolute; top: 50%; left: -20px; width: 20px; height: 2px; background: #333;
+        }
         
-        .bracket-left .bracket-round-col:not(:last-child) .bracket-match-card::after { content: ""; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: #333; }
-        .bracket-right .bracket-round-col:not(:last-child) .bracket-match-card::after { content: ""; position: absolute; top: 50%; left: -20px; width: 20px; height: 2px; background: #333; }
         .bracket-left .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
         .bracket-left .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; right: -20px; width: 2px; background: #333; }
         .bracket-left .bracket-pair::after { content: ""; position: absolute; top: 50%; right: -40px; width: 20px; height: 2px; background: #333; }
+        
         .bracket-right .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
         .bracket-right .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; left: -20px; width: 2px; background: #333; }
         .bracket-right .bracket-pair::after { content: ""; position: absolute; top: 50%; left: -40px; width: 20px; height: 2px; background: #333; }
-        .bracket-final-card { border: 2px solid var(--primary); transform: scale(1.1); }
         
+        .bracket-final-card { border: 2px solid var(--primary); transform: scale(1.1); }
         .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
         .match-score { font-weight: 900; color: #333; margin-left:5px; font-size:1.1em; }
+        
         .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
+        
+        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
+        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
     </style>
 </head>
 <body class="viewer-mode">
@@ -143,8 +184,14 @@
 </div>
 
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
-    <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
+    <div class="nav-logo" onclick="window.goHome()">
+        <span>🎾</span>
+        <div>BT Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div>
+    </div>
+    <div class="nav-user" onclick="openLoginModal()">
+        <span id="nav-username" class="user-name">Visitante</span>
+        <img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
+    </div>
 </div>
 
 <div id="screen-arenas" class="screen active">
@@ -178,6 +225,7 @@
         <div style="display:flex; align-items:center; gap:5px;">
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
             <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
+            <button onclick="openQueue()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">list_alt</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
         </div>
     </div>
@@ -207,7 +255,9 @@
         <div class="app-tab" onclick="switchAppView('table')">TABELA</div>
     </div>
 
-    <div id="view-games" class="view-section active"><div id="games-container"></div></div>
+    <div id="view-games" class="view-section active">
+        <div id="games-container"></div>
+    </div>
 
     <div id="view-table" class="view-section">
         <div class="board">
@@ -484,18 +534,20 @@
         }
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
+        
+        // CORREÇÃO CRÍTICA (V123): HIGIENIZAÇÃO DE ARRAYS E OBJETOS DO FIREBASE
         onValue(appRef, (snap) => {
             document.getElementById('loading').style.display = 'none'; const d = snap.val();
-            if(d) { appState = d; ['players','groups','matches'].forEach(k => {if(!appState[k]) appState[k]=[]}); }
-            else { appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; }
-            
-            // GARANTE QUE AS LISTAS EXISTAM
-            if(!appState.groups) appState.groups = [];
-            if(!appState.players) appState.players = [];
-            if(!appState.matches) appState.matches = [];
-
-            if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
-                appState.groupCount = appState.groups ? appState.groups.length : 0;
+            if(d) { 
+                appState = d; 
+                // Força conversão de objeto para array se o Firebase bagunçar os índices
+                ['players','groups','matches'].forEach(k => {
+                    if(!appState[k]) appState[k]=[];
+                    else if(!Array.isArray(appState[k])) appState[k] = Object.values(appState[k]);
+                });
+            }
+            else { 
+                appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
             }
             
             recalc(); 
@@ -678,13 +730,14 @@
         document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); 
     }
     
-    // FIX: ROBUST ADD GROUP
+    // FIX: ROBUST ADD GROUP (V123)
     window.addGroup = () => {
-        if(!appState.groups) appState.groups = [];
-        if(typeof appState.groupCount !== 'number') appState.groupCount = appState.groups.length;
+        if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = [];
         
-        appState.groupCount++;
-        const groupName = "GRUPO " + String.fromCharCode(64 + appState.groupCount); 
+        // Use array length + 1 for simple increment
+        const nextNum = appState.groups.length + 1;
+        const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); 
+        
         appState.groups.push({
             id: 'g' + Date.now(),
             name: groupName
@@ -757,7 +810,8 @@
         save(); 
     }
     
-    window.saveS = async (mid) => { 
+    // FIX SAVE SCORE WITH ID SEPARATION + UPDATE + VALUE CHECK
+    window.saveS = (mid) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
@@ -766,7 +820,7 @@
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
                 m.saved = false;
                 recalc();
-                await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
+                update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
             }
             return;
         }
@@ -777,10 +831,7 @@
         if (val1 === undefined || val1 === null) val1 = '';
         if (val2 === undefined || val2 === null) val2 = '';
 
-        if(val1 === '' || val2 === '' || isNaN(val1) || isNaN(val2)) { 
-            alert("Preencha o placar com números válidos."); 
-            return; 
-        }
+        if(val1 === '' || val2 === '') { alert("Preencha o placar."); return; }
         
         let s1 = parseInt(val1); let s2 = parseInt(val2);
 
@@ -789,21 +840,19 @@
         m.s1 = s1; m.s2 = s2; m.saved = true;
         recalc();
 
+        // ** AUTO ADVANCE WINNER FOR KNOCKOUT **
         if(m.gid.includes('ko')) {
             advanceWinner(mid, m, s1, s2);
         }
         
-        try {
-            await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-            if(m.gid.includes('ko')) {
-                await update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
-            }
-        } catch(e) {
-            console.error("Erro ao salvar:", e);
-            alert("Erro de conexão ao salvar.");
+        update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
+        
+        if(m.gid.includes('ko')) {
+            update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
         }
     }
 
+    // --- AUTO ADVANCE LOGIC ---
     function advanceWinner(mid, currentMatch, s1, s2) {
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         const myIndexInGroup = koMatches.findIndex(m => m.mid === mid);
@@ -850,6 +899,7 @@
         }
     }
 
+    // EDIT HISTORY BUTTON
     window.editScore = (mid) => {
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -877,6 +927,9 @@
                 run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); 
                 if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } 
             }
+            if(m.isBye) {
+                 // BYE Logic (Optional points)
+            }
         }); 
     }
     
@@ -886,6 +939,7 @@
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
         
+        // POOL RENDER (COMPACT)
         poolPs.forEach(p => { 
             const d = document.createElement('div'); 
             d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
@@ -894,6 +948,7 @@
             pl.appendChild(d); 
         });
         
+        // RENDER MATCHES LIST (VIEW 1) - ONLY UNSAVED
         const gc1 = document.getElementById('games-container'); gc1.innerHTML='';
         const pendingMatches = appState.matches.filter(m => !m.saved && !m.isBye);
         
@@ -930,26 +985,34 @@
             });
         }
 
+        // RENDER TABLE (VIEW 2)
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='group-box'; 
             
+            // SPECIAL RENDER FOR KNOCKOUT GROUP
             if(g.id.includes('ko-')) { 
-                col.style.gridColumn = '1 / -1'; 
+                col.style.gridColumn = '1 / -1'; // Take full width
                 let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
-                h += `<div class="bracket-stage">`;
+                
+                h += `<div class="bracket-stage">`; // MAIN FLEX CONTAINER
                 
                 const totalMatches = ms.length;
                 let rounds = [];
+                // Simple heuristic: 15 matches -> 8 + 4 + 2 + 1
                 if(totalMatches === 1) rounds = [1];
                 else if(totalMatches <= 3) rounds = [2, 1]; 
                 else if(totalMatches <= 7) rounds = [4, 2, 1]; 
                 else rounds = [8, 4, 2, 1]; 
 
+                // CONTAINER FOR LEFT SIDE
                 h += `<div class="bracket-side-container left">`;
+                
+                // RENDER LEFT SIDE
                 let matchIndex = 0;
+                // Exclude Final Round from loop
                 for(let r=0; r<rounds.length-1; r++) {
                     const count = rounds[r];
                     const leftCount = count / 2;
@@ -957,6 +1020,7 @@
                     for(let k=0; k<leftCount; k++) {
                         if(matchIndex >= ms.length) break;
                         const m = ms[matchIndex]; matchIndex++;
+                        
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
                         const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
                         
@@ -985,8 +1049,9 @@
                     }
                     h += `</div>`;
                 }
-                h += `</div>`; 
+                h += `</div>`; // End Left Container
 
+                // RENDER FINAL (CENTER)
                 const finalMatch = ms[ms.length-1];
                 if(finalMatch) {
                     const nf = (id) => appState.players.find(x=>x.id===id)?.name || '[+ Parceiro]';
@@ -1012,13 +1077,20 @@
                     </div></div>`;
                 }
 
+                // CONTAINER FOR RIGHT SIDE
                 h += `<div class="bracket-side-container right">`;
+                
+                // RENDER RIGHT SIDE (REVERSE LOOP? NO, JUST CONTINUE INDEX)
+                // We need to pick up where Left Side left off for each round
+                // Global Match Index is tricky. We need to jump.
+                // Round 1 (8 matches): 0-3 Left, 4-7 Right
+                
                 let rightMatchIndexBase = 0;
                 for(let r=0; r<rounds.length-1; r++) {
                     const count = rounds[r];
                     const leftCount = count / 2;
                     const rightCount = count / 2;
-                    let currentRightIndex = rightMatchIndexBase + leftCount; 
+                    let currentRightIndex = rightMatchIndexBase + leftCount; // Skip left matches
                     
                     h += `<div class="bracket-round-col bracket-right">`;
                     for(let k=0; k<rightCount; k++) {
@@ -1051,14 +1123,18 @@
                         if(!isEvenChild && r < rounds.length-2) { h += `</div>`; }
                     }
                     h += `</div>`;
-                    rightMatchIndexBase += count;
+                    rightMatchIndexBase += count; // Move to next round block
                 }
-                h += `</div>`;
-                h += `</div>`;
+                h += `</div>`; // End Right Container
+
+                h += `</div>`; // END MAIN FLEX
+                
                 col.innerHTML = h;
                 
             } else {
+                // NORMAL GROUP RENDER
                 let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
                     ms.forEach(m => {
