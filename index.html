@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V123 (Final Bracket)</title>
+    <title>BT Manager - V124 (Group Fix & Visual)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* VARIÁVEIS E RESET */
+        /* DESIGN SÓLIDO (V124) */
         :root { 
             --primary: #ff6b00; 
             --secondary: #0f172a; 
@@ -24,19 +24,9 @@
             --font-base: 17px; 
         }
         
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-body); 
-            color: var(--text-dark); 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            font-size: var(--font-base); 
-        }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
-        /* NAVBAR */
-        .navbar { background: white; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
+        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
@@ -44,15 +34,14 @@
         .user-name { font-size: 0.9em; font-weight: 600; color: #555; display: none; }
         @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.3em; } }
 
-        /* SCREENS */
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; width: 100%; }
         
-        /* CARDS */
         .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
         .std-card:active { transform: scale(0.97); }
         .std-card.selected { border: 3px solid var(--primary); transform: scale(0.95); background: #fff3e0; }
+
         .card-img { width: 100%; height: 100%; object-fit: cover; }
         .card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 10px 10px; color: white; }
         .card-title { font-weight: 700; font-size: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
@@ -66,17 +55,16 @@
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
         .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
 
-        /* UI ELEMENTS */
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
         .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 1em; margin-bottom: 15px;}
         .status-bar { background: #333; color: white; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9em; font-weight: bold; }
+        
         button.btn-std { border: none; border-radius: 4px; padding: 12px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.95em; width: 100%; margin-bottom: 5px; }
         .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; }
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
 
-        /* TABLES & LISTS */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
@@ -84,11 +72,11 @@
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
+
         .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
 
-        /* GROUP BOX */
         .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
         .group-header:hover { opacity: 0.9; }
@@ -103,7 +91,6 @@
             .group-box { flex: 1 0 19%; min-width: 240px; } 
         }
 
-        /* JOGOS LIST */
         .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 8px; padding: 12px; display: flex; flex-direction: column; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .match-info { display: flex; justify-content: space-between; align-items: center; width: 100%; font-weight: 700; font-size: 1em;}
         .match-vs { color: #888; font-size: 0.9em; margin: 0 5px; }
@@ -160,7 +147,6 @@
             content: ""; position: absolute; top: 50%; left: -30px; width: 30px; height: 2px; background: #333;
         }
         
-        /* Vertical Connectors (Pairs) */
         .bracket-left .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
         .bracket-left .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; right: -30px; width: 2px; background: #333; }
         .bracket-left .bracket-pair::after { content: ""; position: absolute; top: 50%; right: -50px; width: 20px; height: 2px; background: #333; }
@@ -186,14 +172,8 @@
 </div>
 
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()">
-        <span>🎾</span>
-        <div>BT Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div>
-    </div>
-    <div class="nav-user" onclick="openLoginModal()">
-        <span id="nav-username" class="user-name">Visitante</span>
-        <img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png">
-    </div>
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
 </div>
 
 <div id="screen-arenas" class="screen active">
@@ -257,9 +237,7 @@
         <div class="app-tab" onclick="switchAppView('table')">TABELA</div>
     </div>
 
-    <div id="view-games" class="view-section active">
-        <div id="games-container"></div>
-    </div>
+    <div id="view-games" class="view-section active"><div id="games-container"></div></div>
 
     <div id="view-table" class="view-section">
         <div class="board">
@@ -537,12 +515,10 @@
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
         
-        // CORREÇÃO CRÍTICA (V123): HIGIENIZAÇÃO DE ARRAYS E OBJETOS DO FIREBASE
         onValue(appRef, (snap) => {
             document.getElementById('loading').style.display = 'none'; const d = snap.val();
             if(d) { 
                 appState = d; 
-                // Força conversão de objeto para array se o Firebase bagunçar os índices
                 ['players','groups','matches'].forEach(k => {
                     if(!appState[k]) appState[k]=[];
                     else if(!Array.isArray(appState[k])) appState[k] = Object.values(appState[k]);
@@ -551,7 +527,6 @@
             else { 
                 appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
             }
-            
             recalc(); 
             renderApp();
         });
@@ -692,7 +667,6 @@
         if(m) {
             m[selectingSlot] = pid;
             save();
-            // No need to manually render, onValue/save loop handles it or we call render
             renderApp();
         }
         document.getElementById('modal-player-select').style.display = 'none';
@@ -721,17 +695,8 @@
     }
 
     window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
-    function save() { if (appRef) {
-        set(appRef, appState).catch(e => {
-            console.error('Erro ao salvar:', e);
-            alert('Erro ao salvar no Firebase: ' + e.message);
-        });
-    } else {
-        console.warn('Tentando salvar sem referência do Firebase ativa');
-    }
-}
+    function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
-    
     window.addPlayer = () => { 
         const n=document.getElementById('pName').value.trim(); if(!n)return; 
         if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!");
@@ -740,17 +705,28 @@
         document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); 
     }
     
-    // FIX: ROBUST ADD GROUP (V123)
-   window.addGroup = () => {
-    if (!appState.groups) appState.groups = [];
-    if (typeof appState.groupCount !== 'number') appState.groupCount = appState.groups.length;
-    appState.groupCount++;
-    const groupName = 'GRUPO ' + String.fromCharCode(64 + appState.groupCount);
-    appState.groups.push({ id: 'g' + Date.now(), name: groupName });
-    renderApp(); // ADICIONA ESTA LINHA ANTES DO SAVE
-    save();
-};
-
+    // FIX: ROBUST ADD GROUP
+    window.addGroup = () => {
+        try {
+            // FORÇA A SER UM ARRAY, MESMO SE ESTIVER VAZIO OU UNDEFINED
+            if(!appState.groups || !Array.isArray(appState.groups)) {
+                appState.groups = [];
+            }
+            
+            const nextNum = appState.groups.length + 1;
+            const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); 
+            
+            appState.groups.push({
+                id: 'g' + Date.now(),
+                name: groupName
+            });
+            
+            save(); // Salva no Firebase
+            renderApp(); // Atualiza a tela imediatamente
+        } catch(e) {
+            alert("Erro ao criar grupo: " + e.message);
+        }
+    }
 
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
     window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); } }
@@ -766,7 +742,7 @@
         if(existing.length > 0) return alert("Os jogos automáticos já foram gerados. Para adicionar mais, use o modo Manual (Mãozinha).");
 
         const ps=appState.players.filter(p=>p.groupId===gid); 
-        if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); 
+        if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
         
         let roundMatches = [];
         
@@ -788,6 +764,7 @@
         else { 
             let pairs=[]; 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
+            
             pairs.sort(()=>Math.random()-0.5); 
             while(pairs.length) { 
                 let pA=pairs[0], found=false; 
@@ -815,8 +792,7 @@
         save(); 
     }
     
-    // FIX SAVE SCORE WITH ID SEPARATION + UPDATE + VALUE CHECK
-    window.saveS = (mid) => { 
+    window.saveS = async (mid) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
@@ -825,7 +801,7 @@
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
                 m.saved = false;
                 recalc();
-                update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
+                await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
             }
             return;
         }
@@ -904,6 +880,7 @@
         }
     }
 
+    // EDIT HISTORY BUTTON
     window.editScore = (mid) => {
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -931,9 +908,6 @@
                 run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); 
                 if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } 
             }
-            if(m.isBye) {
-                 // BYE Logic (Optional points)
-            }
         }); 
     }
     
@@ -943,6 +917,7 @@
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
         
+        // POOL RENDER (COMPACT)
         poolPs.forEach(p => { 
             const d = document.createElement('div'); 
             d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
@@ -951,6 +926,7 @@
             pl.appendChild(d); 
         });
         
+        // RENDER MATCHES LIST (VIEW 1) - ONLY UNSAVED
         const gc1 = document.getElementById('games-container'); gc1.innerHTML='';
         const pendingMatches = appState.matches.filter(m => !m.saved && !m.isBye);
         
@@ -987,26 +963,34 @@
             });
         }
 
+        // RENDER TABLE (VIEW 2)
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='group-box'; 
             
+            // SPECIAL RENDER FOR KNOCKOUT GROUP
             if(g.id.includes('ko-')) { 
-                col.style.gridColumn = '1 / -1'; 
+                col.style.gridColumn = '1 / -1'; // Take full width
                 let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
-                h += `<div class="bracket-stage">`;
+                
+                h += `<div class="bracket-stage">`; // MAIN FLEX CONTAINER
                 
                 const totalMatches = ms.length;
                 let rounds = [];
+                // Simple heuristic: 15 matches -> 8 + 4 + 2 + 1
                 if(totalMatches === 1) rounds = [1];
                 else if(totalMatches <= 3) rounds = [2, 1]; 
                 else if(totalMatches <= 7) rounds = [4, 2, 1]; 
                 else rounds = [8, 4, 2, 1]; 
 
+                // CONTAINER FOR LEFT SIDE
                 h += `<div class="bracket-side-container left">`;
+                
+                // RENDER LEFT SIDE
                 let matchIndex = 0;
+                // Exclude Final Round from loop
                 for(let r=0; r<rounds.length-1; r++) {
                     const count = rounds[r];
                     const leftCount = count / 2;
@@ -1014,6 +998,7 @@
                     for(let k=0; k<leftCount; k++) {
                         if(matchIndex >= ms.length) break;
                         const m = ms[matchIndex]; matchIndex++;
+                        
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
                         const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
                         
@@ -1042,8 +1027,9 @@
                     }
                     h += `</div>`;
                 }
-                h += `</div>`; 
+                h += `</div>`; // End Left Container
 
+                // RENDER FINAL (CENTER)
                 const finalMatch = ms[ms.length-1];
                 if(finalMatch) {
                     const nf = (id) => appState.players.find(x=>x.id===id)?.name || '[+ Parceiro]';
@@ -1069,13 +1055,20 @@
                     </div></div>`;
                 }
 
+                // CONTAINER FOR RIGHT SIDE
                 h += `<div class="bracket-side-container right">`;
+                
+                // RENDER RIGHT SIDE (REVERSE LOOP? NO, JUST CONTINUE INDEX)
+                // We need to pick up where Left Side left off for each round
+                // Global Match Index is tricky. We need to jump.
+                // Round 1 (8 matches): 0-3 Left, 4-7 Right
+                
                 let rightMatchIndexBase = 0;
                 for(let r=0; r<rounds.length-1; r++) {
                     const count = rounds[r];
                     const leftCount = count / 2;
                     const rightCount = count / 2;
-                    let currentRightIndex = rightMatchIndexBase + leftCount; 
+                    let currentRightIndex = rightMatchIndexBase + leftCount; // Skip left matches
                     
                     h += `<div class="bracket-round-col bracket-right">`;
                     for(let k=0; k<rightCount; k++) {
@@ -1115,6 +1108,7 @@
                 col.innerHTML = h;
                 
             } else {
+                // NORMAL GROUP RENDER
                 let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
                 
                 if(ms.length) {
@@ -1145,4 +1139,3 @@
 </script>
 </body>
 </html>
-
