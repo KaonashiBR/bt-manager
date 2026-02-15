@@ -5,22 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V125 (Scope Fix)</title>
+    <title>BT Manager - V129 (Smart Queue)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN SÓLIDO (V125) */
+        /* DESIGN SÓLIDO (V129) */
         :root { 
-            --primary: #ff6b00; 
-            --secondary: #0f172a; 
-            --bg-body: #f4f6f8; 
-            --text-dark: #333; 
-            --blue-masc: #2196F3; 
-            --pink-fem: #E91E63; 
-            --fav-color: #ff3b30; 
+            --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; 
+            --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; 
             --font-base: 17px; 
         }
         
@@ -63,7 +58,7 @@
         .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 1em; margin-bottom: 15px;}
         .status-bar { background: #333; color: white; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9em; font-weight: bold; }
         button.btn-std { border: none; border-radius: 4px; padding: 12px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.95em; width: 100%; margin-bottom: 5px; }
-        .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; }
+        .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; } .btn-dark { background: #444; }
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
 
@@ -75,7 +70,7 @@
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
-        
+
         .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
@@ -87,19 +82,34 @@
         .group-header.target { border: 2px dashed #fff; }
 
         /* LAYOUT BOARD */
-        .board { display: flex; flex-direction: column; gap: 15px; }
-        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; }
+        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
+        #groups-container { display: flex; flex-direction: column; gap: 15px; }
         @media(min-width: 1100px) { 
-            .board { flex-direction: row; flex-wrap: wrap; align-items: flex-start; } 
-            #col-pool { flex: 0 0 180px; position: sticky; top: 75px; max-height: 85vh; overflow-y: auto; }
-            .group-box { flex: 1 0 19%; min-width: 240px; } 
+            .board { grid-template-columns: 200px 1fr; align-items: start; } 
+            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
+            #groups-container { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; }
+            .group-box { flex: 0 0 24%; min-width: 280px; }
         }
 
-        /* JOGOS LIST */
-        .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 8px; padding: 12px; display: flex; flex-direction: column; gap: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .match-info { display: flex; justify-content: space-between; align-items: center; width: 100%; font-weight: 700; font-size: 1em;}
-        .match-vs { color: #888; font-size: 0.9em; margin: 0 5px; }
-        .match-actions { display: flex; gap: 10px; margin-top: 5px; justify-content: center; }
+        /* JOGOS LIST (SMART QUEUE STYLE) */
+        .match-list-item { 
+            background: white; border: 1px solid #ddd; 
+            border-left: 5px solid var(--secondary); 
+            border-radius: 6px; margin-bottom: 10px; padding: 10px; 
+            display: grid; grid-template-columns: 40px 1fr 50px; 
+            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        }
+        .match-order-badge {
+            background: #333; color: white; font-weight: 900; 
+            width: 30px; height: 30px; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; font-size: 0.9em;
+        }
+        .match-main-content { padding: 0 10px; }
+        .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
+        .match-actions { display: flex; flex-direction: column; gap: 5px; }
+        
         .match-group-tag { font-size: 0.8em; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555; }
 
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
@@ -117,7 +127,6 @@
         .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 8px; font-size: 0.8em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
         .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
 
-        /* MODALS */
         #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-player-select { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: white; width: 100%; max-width: 440px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
         .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -221,8 +230,7 @@
     
     <div class="admin-only" style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;">
         <div style="display:flex; gap:5px; margin-bottom:5px;">
-            <input type="text" id="pName" list="player-suggestions" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
-            <datalist id="player-suggestions"></datalist>
+            <input type="text" id="pName" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
             <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
             <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
         </div>
@@ -232,6 +240,9 @@
             <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Mata-Mata</button>
             <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
             <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
+            <button onclick="exportData()" class="btn-std btn-dark" style="width:auto;">💾 Backup</button>
+            <button onclick="document.getElementById('import-file').click()" class="btn-std btn-dark" style="width:auto;">📂 Restaurar</button>
+            <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(this)">
         </div>
         <div style="margin-top:5px; font-size:0.8em; color:#666; text-align:center;">
             <span class="material-icons" style="font-size:1.1em; vertical-align:middle;">touch_app</span> Clique no jogador da reserva, depois no Grupo.
@@ -240,12 +251,15 @@
 
     <div class="app-tabs">
         <div class="app-tab active" onclick="switchAppView('games')">JOGOS</div>
-        <div class="app-tab" onclick="switchAppView('table')">TABELA</div>
+        <div class="app-tab" onclick="switchAppView('groups')">GRUPOS</div>
+        <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-games" class="view-section active"><div id="games-container"></div></div>
+    <div id="view-games" class="view-section active">
+        <div id="games-container"></div>
+    </div>
 
-    <div id="view-table" class="view-section">
+    <div id="view-groups" class="view-section">
         <div class="board">
             <div class="column" id="col-pool">
                 <div style="background:var(--secondary); color:white; padding:8px; font-weight:bold; display:flex; justify-content:space-between; font-size:0.9em; border-radius: 8px 8px 0 0;">
@@ -254,8 +268,12 @@
                 </div>
                 <div id="pool-list" style="padding:5px; display:flex; flex-direction:column; gap:2px;"></div>
             </div>
-            <div id="groups-container" style="display:contents;"></div>
+            <div id="groups-container"></div>
         </div>
+    </div>
+    
+    <div id="view-bracket" class="view-section">
+        <div id="bracket-container" style="width:100%; overflow-x:auto;"></div>
     </div>
 </div>
 
@@ -384,7 +402,6 @@
             document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : "Usuário";
             document.getElementById('btn-add-arena').style.display = 'flex'; 
             document.getElementById('msg-login').style.display = 'none';
-            if(curArenaId) loadArenaPlayers(curArenaId);
             onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
                 favorites = snap.val() || {};
                 if(document.getElementById('screen-arenas').classList.contains('active')) loadArenas();
@@ -412,10 +429,7 @@
     }
 
     function loadArenaPlayers(arenaId) {
-        onValue(ref(db, `arena_players/${arenaId}`), (snap) => {
-            const dl = document.getElementById('player-suggestions'); dl.innerHTML = '';
-            if(snap.exists()) { Object.keys(snap.val()).forEach(name => { const opt = document.createElement('option'); opt.value = name; dl.appendChild(opt); }); }
-        });
+        // Removed as requested
     }
 
     function fixDriveLink(url) { if (url && url.includes('drive.google.com') && url.includes('/file/d/')) { const id = url.match(/\/d\/(.*?)\//)[1]; return `https://drive.google.com/uc?export=view&id=${id}`; } return url; }
@@ -472,12 +486,18 @@
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        
         if(view === 'games') {
             document.querySelectorAll('.app-tab')[0].classList.add('active');
             document.getElementById('view-games').classList.add('active');
-        } else {
+        } 
+        else if(view === 'groups') {
             document.querySelectorAll('.app-tab')[1].classList.add('active');
-            document.getElementById('view-table').classList.add('active');
+            document.getElementById('view-groups').classList.add('active');
+        }
+        else if(view === 'bracket') {
+            document.querySelectorAll('.app-tab')[2].classList.add('active');
+            document.getElementById('view-bracket').classList.add('active');
         }
     }
 
@@ -534,7 +554,6 @@
             else { 
                 appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
             }
-            
             recalc(); 
             renderApp();
         });
@@ -592,6 +611,8 @@
         document.getElementById('modal-knockout').style.display = 'none';
         save();
         alert("Chave Gerada!");
+        // AUTO SWITCH TO BRACKET VIEW
+        switchAppView('bracket');
     }
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { 
@@ -733,6 +754,37 @@
         } catch(e) {
             alert("Erro ao criar grupo: " + e.message);
         }
+    }
+
+    // BACKUP & RESTORE FUNCTIONS
+    window.exportData = () => {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "bt_manager_backup.json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    window.importData = (input) => {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                if (confirm("Isso substituirá os dados atuais desta etapa. Confirmar?")) {
+                    appState = json;
+                    save();
+                    renderApp();
+                    alert("Dados restaurados com sucesso!");
+                }
+            } catch(err) {
+                alert("Erro ao ler arquivo: " + err.message);
+            }
+        };
+        reader.readAsText(file);
     }
 
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
@@ -916,6 +968,46 @@
             }
         }); 
     }
+
+    // --- HELPER PARA FILA INTELIGENTE (SMART QUEUE) ---
+    function getSmartSortedMatches(allMatches) {
+        // Filtrar apenas jogos pendentes (não salvos e não BYE)
+        const pending = allMatches.filter(m => !m.saved && !m.isBye);
+        
+        // Separar jogos de Mata-Mata (Prioridade)
+        const koMatches = pending.filter(m => m.gid.includes('ko'));
+        const groupMatches = pending.filter(m => !m.gid.includes('ko'));
+        
+        // Organizar jogos de grupo por GrupoID
+        const groupsMap = {};
+        const groupOrder = []; // Para manter a ordem de criação dos grupos
+        
+        groupMatches.forEach(m => {
+            if (!groupsMap[m.gid]) {
+                groupsMap[m.gid] = [];
+                groupOrder.push(m.gid);
+            }
+            groupsMap[m.gid].push(m);
+        });
+
+        // Intercalar: 1 de cada grupo, rodada por rodada
+        const interleaved = [];
+        let maxLen = 0;
+        Object.values(groupsMap).forEach(arr => {
+            if(arr.length > maxLen) maxLen = arr.length;
+        });
+
+        for (let i = 0; i < maxLen; i++) {
+            groupOrder.forEach(gid => {
+                if (groupsMap[gid][i]) {
+                    interleaved.push(groupsMap[gid][i]);
+                }
+            });
+        }
+
+        // Retornar: Mata-Mata primeiro, depois os grupos intercalados
+        return [...koMatches, ...interleaved];
+    }
     
     function renderApp() {
         const focusedId = document.activeElement ? document.activeElement.id : null;
@@ -923,6 +1015,7 @@
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
         
+        // POOL RENDER (COMPACT)
         poolPs.forEach(p => { 
             const d = document.createElement('div'); 
             d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
@@ -931,13 +1024,16 @@
             pl.appendChild(d); 
         });
         
+        // RENDER MATCHES LIST (VIEW 1) - SMART QUEUE
         const gc1 = document.getElementById('games-container'); gc1.innerHTML='';
-        const pendingMatches = appState.matches.filter(m => !m.saved && !m.isBye);
         
-        if(pendingMatches.length === 0) {
+        // USANDO A NOVA LÓGICA DE FILA INTELIGENTE
+        const sortedMatches = getSmartSortedMatches(appState.matches);
+        
+        if(sortedMatches.length === 0) {
             gc1.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Nenhum jogo em aberto.</div>';
         } else {
-            pendingMatches.forEach(m => {
+            sortedMatches.forEach((m, index) => {
                 const g = appState.groups.find(gr => gr.id === m.gid);
                 const gName = g ? g.name : 'Unknown';
                 const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'Selecionar...');
@@ -949,28 +1045,30 @@
                 const d = document.createElement('div');
                 d.className = 'match-list-item';
                 d.innerHTML = `
-                    <div class="match-info">
-                        <span class="match-group-tag">${gName}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                        <div style="flex:1; text-align:right;">${t1}</div>
-                        <div class="match-vs">X</div>
-                        <div style="flex:1; text-align:left;">${t2}</div>
+                    <div class="match-order-badge">#${index + 1}</div>
+                    <div class="match-main-content">
+                        <div class="match-info">
+                            <span class="match-group-tag">${gName}</span>
+                        </div>
+                        <div class="match-vs-line">
+                            <div style="flex:1; text-align:right;">${t1}</div>
+                            <div style="margin:0 8px; font-size:0.8em; color:#999;">X</div>
+                            <div style="flex:1; text-align:left;">${t2}</div>
+                        </div>
                     </div>
                     <div class="match-actions admin-only">
-                         <input type="tel" id="live-s1-${m.mid}" class="tbl-input" placeholder="0">
-                         <input type="tel" id="live-s2-${m.mid}" class="tbl-input" placeholder="0">
-                         <button class="btn-std btn-green" style="width:auto; margin:0;" onclick="saveS('${m.mid}')">OK</button>
+                         <input type="tel" id="live-s1-${m.mid}" class="tbl-input" placeholder="0" style="width:40px; height:40px; font-size:1.2em;">
+                         <input type="tel" id="live-s2-${m.mid}" class="tbl-input" placeholder="0" style="width:40px; height:40px; font-size:1.2em;">
+                         <button class="btn-std btn-green" style="width:auto; margin:0; padding:5px 10px;" onclick="saveS('${m.mid}')">OK</button>
                     </div>
                 `;
                 gc1.appendChild(d);
             });
         }
 
+        // RENDER TABLE (VIEW 2)
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
-        
-        // DECLARAR H FORA DO LOOP PARA EVITAR ERRO DE ESCOPO
-        let h = '';
+        let h = ''; 
 
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
@@ -1120,8 +1218,8 @@
                     ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
-                col.innerHTML = h;
             }
+            col.innerHTML = h;
             gc.appendChild(col);
         });
 
