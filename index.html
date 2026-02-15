@@ -5,22 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V120 (Clean & Pro Bracket)</title>
+    <title>BT Manager - V121 (Strict Mode)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN SÓLIDO (V120 - Cleaned & Optimized) */
+        /* VARIAVEIS E RESET */
         :root { 
-            --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; 
-            --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; 
-            --font-base: 17px; /* Fonte Aumentada */
+            --primary: #ff6b00; 
+            --secondary: #0f172a; 
+            --bg-body: #f4f6f8; 
+            --text-dark: #333; 
+            --blue-masc: #2196F3; 
+            --pink-fem: #E91E63; 
+            --fav-color: #ff3b30; 
+            --font-base: 17px; 
         }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
-        /* NAVBAR */
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg-body); 
+            color: var(--text-dark); 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            font-size: var(--font-base); 
+        }
+        
+        /* COMPONENTES GERAIS */
         .navbar { background: white; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
@@ -31,8 +46,10 @@
 
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
+        
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; width: 100%; }
         
+        /* CARDS */
         .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
         .std-card:active { transform: scale(0.97); }
         .std-card.selected { border: 3px solid var(--primary); transform: scale(0.95); background: #fff3e0; }
@@ -42,11 +59,16 @@
         .card-title { font-weight: 700; font-size: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
         .card-subtitle { font-size: 0.9em; opacity: 0.8; margin-top: 2px; }
         .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4.5em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-        .bg-masc { background: var(--blue-masc); } .bg-fem { background: var(--pink-fem); } .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
+        
+        .bg-masc { background: var(--blue-masc); } 
+        .bg-fem { background: var(--pink-fem); } 
+        .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
         .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
         .bg-tourney .material-icons { font-size: 4.5em; color: white; opacity: 0.3; }
+        
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
         .btn-icon-circle { width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.9); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.3em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
+        
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
         .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
 
@@ -56,7 +78,12 @@
         .status-bar { background: #333; color: white; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9em; font-weight: bold; }
         
         button.btn-std { border: none; border-radius: 4px; padding: 12px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.95em; width: 100%; margin-bottom: 5px; }
-        .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; }
+        .btn-org { background: var(--primary); } 
+        .btn-blue { background: var(--secondary); } 
+        .btn-red { background: #d32f2f; } 
+        .btn-green { background: #2e7d32; } 
+        .btn-gold { background: #FFD700; color: black; }
+        
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
 
@@ -64,9 +91,11 @@
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
+        
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        
+        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
+
         /* COMPACT POOL CARD */
         .pool-card {
             background: white; border-radius: 4px; border: 1px solid #ddd;
@@ -106,7 +135,8 @@
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
         .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .view-section { display: none; } .view-section.active { display: block; }
+        .view-section { display: none; } 
+        .view-section.active { display: block; }
 
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
@@ -128,46 +158,17 @@
         .rank-table th { background: #333; color: white; padding: 6px; font-size: 0.8em; }
         .rank-table td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.9em; }
         .rank-pos { width: 26px; height: 26px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 1em; }
-        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
+        .rank-1 .rank-pos { background: #FFD700; color: #000; } 
+        .rank-2 .rank-pos { background: #C0C0C0; color: #000; } 
+        .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
         
-        /* === PRO CONVERGING BRACKET ENGINE === */
-        /* Main Container */
-        .bracket-stage {
-            display: flex;
-            justify-content: center;
-            align-items: center; /* Centers items vertically if needed, but flex-start usually better */
-            align-items: flex-start;
-            padding: 20px 0;
-            overflow-x: auto;
-            gap: 20px;
-        }
-
-        /* 3 Main Columns */
-        .bracket-side-container {
-            display: flex;
-            gap: 20px;
-        }
-        .bracket-side-container.right {
-            flex-direction: row-reverse; /* Mirrors the visual */
-        }
+        /* BRACKET ENGINE (TREE LINES) */
+        .bracket-stage { display: flex; justify-content: center; align-items: flex-start; padding: 20px 0; overflow-x: auto; gap: 20px; }
+        .bracket-side-container { display: flex; gap: 20px; }
+        .bracket-side-container.right { flex-direction: row-reverse; }
+        .bracket-final-container { display: flex; flex-direction: column; justify-content: center; margin: 0 30px; }
+        .bracket-round-col { display: flex; flex-direction: column; justify-content: space-around; min-width: 190px; position: relative; }
         
-        .bracket-final-container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            margin: 0 30px; /* Space around final */
-        }
-
-        /* Rounds (Vertical Columns) */
-        .bracket-round-col {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around; /* Spreads matches evenly */
-            min-width: 190px;
-            position: relative;
-        }
-
-        /* The Match Card */
         .bracket-match-card {
             background: white; border: 1px solid #999; border-radius: 6px; padding: 8px; 
             margin: 10px 0;
@@ -177,46 +178,23 @@
             min-height: 70px;
         }
 
-        /* === CONNECTORS === */
-        /* Horizontal Line going OUT from Left Side */
+        /* CONNECTORS */
         .bracket-left .bracket-round-col:not(:last-child) .bracket-match-card::after {
             content: ""; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: #333;
         }
-        
-        /* Horizontal Line going OUT from Right Side (Reversed logic) */
         .bracket-right .bracket-round-col:not(:last-child) .bracket-match-card::after {
             content: ""; position: absolute; top: 50%; left: -20px; width: 20px; height: 2px; background: #333;
         }
-
-        /* Vertical Brackets (The Forks) */
-        /* We use a container div around pairs in JS to make this easier? 
-           Or pseudo elements on the column. Let's use simple logic: 
-           Every pair of matches connects to a vertical bar. */
         
-        /* Left Side Fork */
         .bracket-left .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
-        .bracket-left .bracket-pair::before { /* Vertical line */
-            content: ""; position: absolute; top: 25%; bottom: 25%; right: -20px; width: 2px; background: #333;
-        }
-        .bracket-left .bracket-pair::after { /* Horizontal connector to next round */
-            content: ""; position: absolute; top: 50%; right: -40px; width: 20px; height: 2px; background: #333;
-        }
+        .bracket-left .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; right: -20px; width: 2px; background: #333; }
+        .bracket-left .bracket-pair::after { content: ""; position: absolute; top: 50%; right: -40px; width: 20px; height: 2px; background: #333; }
         
-        /* Right Side Fork (Mirrored) */
         .bracket-right .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
-        .bracket-right .bracket-pair::before { /* Vertical line */
-            content: ""; position: absolute; top: 25%; bottom: 25%; left: -20px; width: 2px; background: #333;
-        }
-        .bracket-right .bracket-pair::after { /* Horizontal connector to next round */
-            content: ""; position: absolute; top: 50%; left: -40px; width: 20px; height: 2px; background: #333;
-        }
+        .bracket-right .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; left: -20px; width: 2px; background: #333; }
+        .bracket-right .bracket-pair::after { content: ""; position: absolute; top: 50%; left: -40px; width: 20px; height: 2px; background: #333; }
         
-        /* Final Match Styling */
-        .bracket-final-card {
-            border: 2px solid var(--primary);
-            transform: scale(1.1);
-        }
-
+        .bracket-final-card { border: 2px solid var(--primary); transform: scale(1.1); }
         .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
         .match-score { font-weight: 900; color: #333; margin-left:5px; font-size:1.1em; }
@@ -224,9 +202,6 @@
         .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
-        
-        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
-        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
     </style>
 </head>
 <body class="viewer-mode">
@@ -507,7 +482,7 @@
     window.updatePreview = (url) => { document.getElementById('img-preview').src = fixDriveLink(url); }
     window.handleFileSelect = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d'); const scale = 500 / img.width; cvs.width = 500; cvs.height = img.height * scale; ctx.drawImage(img, 0, 0, cvs.width, cvs.height); const data = cvs.toDataURL('image/jpeg', 0.7); document.getElementById('inp-url').value = data; updatePreview(data); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
 
-    window.saveModal = () => {
+    window.saveModal = async () => {
         if(!user && !localAdmin) return;
         const type = document.getElementById('modal-type').value;
         const id = document.getElementById('modal-id').value;
@@ -518,22 +493,23 @@
         else if (type === 'category') { path = `categories/${curArenaId}`; data.type = document.getElementById('inp-cat-type').value; data.short = document.getElementById('inp-cat-short').value.toUpperCase(); data.points = { p1: parseInt(document.getElementById('pts-1').value)||0, p2: parseInt(document.getElementById('pts-2').value)||0, p3: parseInt(document.getElementById('pts-3').value)||0, part: parseInt(document.getElementById('pts-part').value)||0 }; } 
         else if (type === 'tournament') { path = `tournaments_meta/${curCatId}`; data.pwd = document.getElementById('inp-pwd').value || "1234"; data.date = Date.now(); }
 
-        if (id) { 
-            update(ref(db, `${path}/${id}`), data); 
-        } else {
-            data.createdAt = Date.now();
-            const newRef = push(ref(db, path), data);
-            if(type === 'tournament') {
-                set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user?user.uid:'local' });
+        try {
+            if (id) { 
+                await update(ref(db, `${path}/${id}`), data); 
+            } else {
+                data.createdAt = Date.now();
+                const newRef = push(ref(db, path), data);
+                if(type === 'tournament') {
+                    await set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user?user.uid:'local' });
+                }
             }
-        }
-        closeModal();
+            closeModal();
+        } catch(e) { console.error(e); alert("Erro ao salvar: " + e.message); }
     }
 
     window.switchTab = (tabName) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if(tabName === 'tournaments') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-tournaments').classList.add('active'); } else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-ranking').classList.add('active'); loadRanking(); } }
     window.showScreen = (id) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
-    // APP VIEW SWITCH
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
@@ -590,8 +566,8 @@
             if(d) { appState = d; ['players','groups','matches'].forEach(k => {if(!appState[k]) appState[k]=[]}); }
             else { appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; }
             
-            // Initial check for groupCount
-            if(appState.groupCount === undefined) {
+            // GARANTE QUE GROUPCOUNT EXISTA
+            if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
                 appState.groupCount = appState.groups ? appState.groups.length : 0;
             }
             
@@ -689,7 +665,6 @@
         }
     }
 
-    // NEW PLAYER SELECT MODAL (AUTO-OPEN)
     window.openPlayerSelect = (mid, slot) => {
         if(document.body.classList.contains('viewer-mode')) return;
         selectingMatch = mid;
@@ -709,10 +684,9 @@
         noneItem.onclick = () => confirmPlayerSelect('');
         list.appendChild(noneItem);
 
-        // FILTER LOGIC
         let candidates = [];
         if(isKO) {
-            candidates = appState.players; // Allow all for knockout
+            candidates = appState.players; 
         } else {
             candidates = appState.players.filter(p => p.groupId === m.gid);
         }
@@ -742,13 +716,17 @@
         selectingSlot = null;
     }
 
-    window.openQueue = () => { // NOT USED ANYMORE AS MAIN VIEW, BUT KEPT FOR HISTORY
+    window.openQueue = () => { 
         const list = document.getElementById('queue-list'); list.innerHTML = '';
-        // ...
-    }
-
-    window.toggleHistory = (court) => {
-        // ... unused now
+        const pending = appState.matches.filter(m => !m.saved && !m.isBye);
+        if(pending.length === 0) list.innerHTML = "Sem jogos na fila.";
+        else pending.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'queue-item';
+            div.innerText = "Jogo pendente..."; 
+            list.appendChild(div);
+        });
+        document.getElementById('modal-queue').style.display = 'flex';
     }
 
     window.tryAdmin = () => { 
@@ -762,9 +740,18 @@
         } else alert("Senha incorreta"); 
     }
 
-    window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
+    window.deleteItem = async (type, id) => { 
+        if(confirm("Apagar?")) { 
+            if(type==='arena'){ await remove(ref(db, `arenas/${id}`)); await remove(ref(db, `categories/${id}`));} 
+            else if(type==='category'){ await remove(ref(db, `categories/${curArenaId}/${id}`)); await remove(ref(db, `tournaments_meta/${id}`));} 
+            else { await remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); await remove(ref(db, `tournaments_data/${id}`));} 
+        } 
+    }
+    
     function save() { if(appRef) set(appRef, appState); }
+    
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
+    
     window.addPlayer = () => { 
         const n=document.getElementById('pName').value.trim(); if(!n)return; 
         if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!");
@@ -773,7 +760,7 @@
         document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); 
     }
     
-    // FIX: ROBUST ADD GROUP
+    // CORREÇÃO: ADICIONAR GRUPO COM SEGURANÇA
     window.addGroup = () => {
         if(!appState.groups) appState.groups = [];
         if(typeof appState.groupCount !== 'number') appState.groupCount = appState.groups.length;
@@ -785,6 +772,7 @@
             name: groupName
         });
         save();
+        renderApp(); // Força renderização imediata
     }
 
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
@@ -795,15 +783,15 @@
     window.delGroup = (gid) => { if(confirm("Excluir?")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); }}
     window.delPlayer = (pid) => { if(confirm("Excluir?")) { appState.players=appState.players.filter(p=>p.id!==pid); save(); }}
     
-    // SAFE ROUND GEN + LOCK AUTO
     window.genMatches = (gid) => { 
         const existing = appState.matches.filter(m => m.gid === gid);
-        if(existing.length > 0) return alert("Os jogos automáticos já foram gerados. Para adicionar mais, use o modo Manual (Mãozinha).");
+        if(existing.length > 0) return alert("Jogos já gerados. Use o modo manual para adicionar mais.");
 
         const ps=appState.players.filter(p=>p.groupId===gid); 
-        if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); 
+        if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
         
         let roundMatches = [];
+        let safety = 0;
         
         if(appState.mode==='fixed') { 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { 
@@ -823,8 +811,10 @@
         else { 
             let pairs=[]; 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
+            
             pairs.sort(()=>Math.random()-0.5); 
-            while(pairs.length) { 
+            while(pairs.length && safety < 5000) { 
+                safety++;
                 let pA=pairs[0], found=false; 
                 for(let k=1; k<pairs.length; k++) { 
                     let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
@@ -838,6 +828,8 @@
             } 
         } 
 
+        if(safety >= 5000) alert("Aviso: Limite de iteração atingido ao gerar jogos.");
+
         roundMatches.forEach(m => {
             addMatch(gid, m.p1, m.p2, m.p3, m.p4, false);
         });
@@ -850,8 +842,7 @@
         save(); 
     }
     
-    // FIX SAVE SCORE WITH ID SEPARATION + UPDATE + VALUE CHECK
-    window.saveS = (mid) => { 
+    window.saveS = async (mid) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
@@ -860,7 +851,7 @@
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
                 m.saved = false;
                 recalc();
-                update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
+                await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
             }
             return;
         }
@@ -871,7 +862,10 @@
         if (val1 === undefined || val1 === null) val1 = '';
         if (val2 === undefined || val2 === null) val2 = '';
 
-        if(val1 === '' || val2 === '') { alert("Preencha o placar."); return; }
+        if(val1 === '' || val2 === '' || isNaN(val1) || isNaN(val2)) { 
+            alert("Preencha o placar com números válidos."); 
+            return; 
+        }
         
         let s1 = parseInt(val1); let s2 = parseInt(val2);
 
@@ -880,19 +874,21 @@
         m.s1 = s1; m.s2 = s2; m.saved = true;
         recalc();
 
-        // ** AUTO ADVANCE WINNER FOR KNOCKOUT **
         if(m.gid.includes('ko')) {
             advanceWinner(mid, m, s1, s2);
         }
         
-        update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-        
-        if(m.gid.includes('ko')) {
-            update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
+        try {
+            await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
+            if(m.gid.includes('ko')) {
+                await update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
+            }
+        } catch(e) {
+            console.error("Erro ao salvar:", e);
+            alert("Erro de conexão ao salvar.");
         }
     }
 
-    // --- AUTO ADVANCE LOGIC ---
     function advanceWinner(mid, currentMatch, s1, s2) {
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         const myIndexInGroup = koMatches.findIndex(m => m.mid === mid);
@@ -939,7 +935,6 @@
         }
     }
 
-    // EDIT HISTORY BUTTON
     window.editScore = (mid) => {
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -949,6 +944,7 @@
             const newS1 = prompt("Placar Time 1:", m.s1);
             const newS2 = prompt("Placar Time 2:", m.s2);
             if(newS1 !== null && newS2 !== null) {
+                if(isNaN(newS1) || isNaN(newS2)) return alert("Use apenas números.");
                 m.s1 = parseInt(newS1); m.s2 = parseInt(newS2);
                 recalc();
                 if(m.gid.includes('ko')) advanceWinner(mid, m, m.s1, m.s2); 
@@ -959,6 +955,7 @@
     }
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
+    
     function recalc() { 
         appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); 
         appState.matches.forEach(m=>{ 
@@ -966,9 +963,6 @@
                 const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; 
                 run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); 
                 if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } 
-            }
-            if(m.isBye) {
-                 // BYE Logic (Optional points)
             }
         }); 
     }
@@ -979,7 +973,6 @@
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
         
-        // POOL RENDER (COMPACT)
         poolPs.forEach(p => { 
             const d = document.createElement('div'); 
             d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
@@ -988,7 +981,6 @@
             pl.appendChild(d); 
         });
         
-        // RENDER MATCHES LIST (VIEW 1) - ONLY UNSAVED
         const gc1 = document.getElementById('games-container'); gc1.innerHTML='';
         const pendingMatches = appState.matches.filter(m => !m.saved && !m.isBye);
         
@@ -1016,8 +1008,8 @@
                         <div style="flex:1; text-align:left;">${t2}</div>
                     </div>
                     <div class="match-actions admin-only">
-                         <input type="tel" id="live-s1-${m.mid}" class="tbl-input" placeholder="0" style="width:40px; height:40px; font-size:1.2em;">
-                         <input type="tel" id="live-s2-${m.mid}" class="tbl-input" placeholder="0" style="width:40px; height:40px; font-size:1.2em;">
+                         <input type="tel" id="live-s1-${m.mid}" class="tbl-input" placeholder="0">
+                         <input type="tel" id="live-s2-${m.mid}" class="tbl-input" placeholder="0">
                          <button class="btn-std btn-green" style="width:auto; margin:0;" onclick="saveS('${m.mid}')">OK</button>
                     </div>
                 `;
@@ -1025,19 +1017,16 @@
             });
         }
 
-        // RENDER TABLE (VIEW 2)
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='group-box'; 
             
-            // SPECIAL RENDER FOR KNOCKOUT GROUP
             if(g.id.includes('ko-')) { 
-                col.style.gridColumn = '1 / -1'; // Take full width
+                col.style.gridColumn = '1 / -1'; 
                 let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
-                
-                h += `<div class="bracket-stage">`; // MAIN FLEX CONTAINER
+                h += `<div class="bracket-stage">`;
                 
                 const totalMatches = ms.length;
                 let rounds = [];
@@ -1046,17 +1035,14 @@
                 else if(totalMatches <= 7) rounds = [4, 2, 1]; 
                 else rounds = [8, 4, 2, 1]; 
 
-                // CONTAINER FOR LEFT SIDE
                 h += `<div class="bracket-side-container left">`;
-                
-                // RENDER LEFT SIDE
                 let matchIndex = 0;
-                // Exclude Final Round from loop
                 for(let r=0; r<rounds.length-1; r++) {
                     const count = rounds[r];
                     const leftCount = count / 2;
                     h += `<div class="bracket-round-col bracket-left">`;
                     for(let k=0; k<leftCount; k++) {
+                        if(matchIndex >= ms.length) break;
                         const m = ms[matchIndex]; matchIndex++;
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
                         const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
@@ -1086,49 +1072,44 @@
                     }
                     h += `</div>`;
                 }
-                h += `</div>`; // End Left Container
+                h += `</div>`; 
 
-                // RENDER FINAL (CENTER)
                 const finalMatch = ms[ms.length-1];
-                const nf = (id) => appState.players.find(x=>x.id===id)?.name || '[+ Parceiro]';
-                const wf1 = finalMatch.saved && finalMatch.s1 > finalMatch.s2; const wf2 = finalMatch.saved && finalMatch.s2 > finalMatch.s1;
+                if(finalMatch) {
+                    const nf = (id) => appState.players.find(x=>x.id===id)?.name || '[+ Parceiro]';
+                    const wf1 = finalMatch.saved && finalMatch.s1 > finalMatch.s2; const wf2 = finalMatch.saved && finalMatch.s2 > finalMatch.s1;
 
-                h += `<div class="bracket-final-container"><div class="bracket-match-card bracket-final-card">
-                     <div style="text-align:center; font-weight:900; margin-bottom:5px; color:var(--primary);">FINAL</div>
-                     <div class="match-team ${wf1?'winner':''}">
-                             <span style="display:flex; flex-direction:column; text-align:left;">
-                                <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p1')">${nf(finalMatch.p1)}</span>
-                                <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p2')" style="font-size:0.8em; color:#555;">${nf(finalMatch.p2)}</span>
-                             </span>
-                             <span class="match-score">${finalMatch.s1||'-'}</span>
-                        </div>
-                        <div class="match-team ${wf2?'winner':''}" style="margin-top:2px;">
-                             <span style="display:flex; flex-direction:column; text-align:left;">
-                                <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p3')">${nf(finalMatch.p3)}</span>
-                                <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p4')" style="font-size:0.8em; color:#555;">${nf(finalMatch.p4)}</span>
-                             </span>
-                             <span class="match-score">${finalMatch.s2||'-'}</span>
-                        </div>
-                        ${!finalMatch.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px; justify-content:center;"><input type="tel" id="tbl-s1-${finalMatch.mid}" value="${finalMatch.s1}" class="tbl-input" style="width:30px; height:30px;" ${finalMatch.saved?'disabled':''}><input type="tel" id="tbl-s2-${finalMatch.mid}" value="${finalMatch.s2}" class="tbl-input" style="width:30px; height:30px;" ${finalMatch.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${finalMatch.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${finalMatch.mid}')">${finalMatch.saved?'✎':'OK'}</button></div>` : ''}
-                </div></div>`;
+                    h += `<div class="bracket-final-container"><div class="bracket-match-card bracket-final-card">
+                        <div style="text-align:center; font-weight:900; margin-bottom:5px; color:var(--primary);">FINAL</div>
+                        <div class="match-team ${wf1?'winner':''}">
+                                <span style="display:flex; flex-direction:column; text-align:left;">
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p1')">${nf(finalMatch.p1)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p2')" style="font-size:0.8em; color:#555;">${nf(finalMatch.p2)}</span>
+                                </span>
+                                <span class="match-score">${finalMatch.s1||'-'}</span>
+                            </div>
+                            <div class="match-team ${wf2?'winner':''}" style="margin-top:2px;">
+                                <span style="display:flex; flex-direction:column; text-align:left;">
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p3')">${nf(finalMatch.p3)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p4')" style="font-size:0.8em; color:#555;">${nf(finalMatch.p4)}</span>
+                                </span>
+                                <span class="match-score">${finalMatch.s2||'-'}</span>
+                            </div>
+                            ${!finalMatch.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px; justify-content:center;"><input type="tel" id="tbl-s1-${finalMatch.mid}" value="${finalMatch.s1}" class="tbl-input" style="width:30px; height:30px;" ${finalMatch.saved?'disabled':''}><input type="tel" id="tbl-s2-${finalMatch.mid}" value="${finalMatch.s2}" class="tbl-input" style="width:30px; height:30px;" ${finalMatch.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${finalMatch.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${finalMatch.mid}')">${finalMatch.saved?'✎':'OK'}</button></div>` : ''}
+                    </div></div>`;
+                }
 
-                // CONTAINER FOR RIGHT SIDE
                 h += `<div class="bracket-side-container right">`;
-                
-                // RENDER RIGHT SIDE (REVERSE LOOP? NO, JUST CONTINUE INDEX)
-                // We need to pick up where Left Side left off for each round
-                // Global Match Index is tricky. We need to jump.
-                // Round 1 (8 matches): 0-3 Left, 4-7 Right
-                
                 let rightMatchIndexBase = 0;
                 for(let r=0; r<rounds.length-1; r++) {
                     const count = rounds[r];
                     const leftCount = count / 2;
                     const rightCount = count / 2;
-                    let currentRightIndex = rightMatchIndexBase + leftCount; // Skip left matches
+                    let currentRightIndex = rightMatchIndexBase + leftCount; 
                     
                     h += `<div class="bracket-round-col bracket-right">`;
                     for(let k=0; k<rightCount; k++) {
+                        if(currentRightIndex + k >= ms.length) break;
                         const m = ms[currentRightIndex + k];
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
                         const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
@@ -1157,20 +1138,20 @@
                         if(!isEvenChild && r < rounds.length-2) { h += `</div>`; }
                     }
                     h += `</div>`;
-                    rightMatchIndexBase += count; // Move to next round block
+                    rightMatchIndexBase += count;
                 }
-                h += `</div>`; // End Right Container
-
-                h += `</div>`; // END MAIN FLEX
-                
+                h += `</div>`;
+                h += `</div>`;
                 col.innerHTML = h;
                 
             } else {
                 let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
                     ms.forEach(m => {
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || (id===''?'<span style="color:var(--primary); font-style:italic;">Selecionar...</span>':'?');
+                        
                         const p1Block = `<span class="player-link ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>`;
                         const p2Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p2===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p2')">${n(m.p2)}</span>`;
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
