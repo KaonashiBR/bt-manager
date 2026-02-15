@@ -5,23 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V118 (Auto Advance)</title>
+    <title>BT Manager - V120 (Clean & Pro Bracket)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN SÓLIDO (V118 - +10% Fonts) */
+        /* DESIGN SÓLIDO (V120 - Cleaned & Optimized) */
         :root { 
             --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; 
             --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; 
-            --font-base: 17px; /* Aumentado */
+            --font-base: 17px; /* Fonte Aumentada */
         }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
         /* NAVBAR */
-        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
+        .navbar { background: white; padding: 8px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
@@ -66,8 +66,7 @@
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
-
+        
         /* COMPACT POOL CARD */
         .pool-card {
             background: white; border-radius: 4px; border: 1px solid #ddd;
@@ -125,45 +124,98 @@
         .modal-box { background: white; width: 100%; max-width: 440px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
         .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .btn-google { background: #db4437; } .btn-logout { background: #555; }
+        .rank-table { width: 100%; border-collapse: collapse; background: white; }
+        .rank-table th { background: #333; color: white; padding: 6px; font-size: 0.8em; }
+        .rank-table td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.9em; }
+        .rank-pos { width: 26px; height: 26px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 1em; }
+        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
         
-        /* BRACKET ENGINE (TREE LINES) */
-        .bracket-scroll-container { display: flex; overflow-x: auto; padding: 20px 10px; gap: 40px; } /* Increased gap for lines */
-        .bracket-round-col { display: flex; flex-direction: column; justify-content: space-around; min-width: 190px; position: relative; }
+        /* === PRO CONVERGING BRACKET ENGINE === */
+        /* Main Container */
+        .bracket-stage {
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Centers items vertically if needed, but flex-start usually better */
+            align-items: flex-start;
+            padding: 20px 0;
+            overflow-x: auto;
+            gap: 20px;
+        }
+
+        /* 3 Main Columns */
+        .bracket-side-container {
+            display: flex;
+            gap: 20px;
+        }
+        .bracket-side-container.right {
+            flex-direction: row-reverse; /* Mirrors the visual */
+        }
         
+        .bracket-final-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0 30px; /* Space around final */
+        }
+
+        /* Rounds (Vertical Columns) */
+        .bracket-round-col {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around; /* Spreads matches evenly */
+            min-width: 190px;
+            position: relative;
+        }
+
+        /* The Match Card */
         .bracket-match-card {
             background: white; border: 1px solid #999; border-radius: 6px; padding: 8px; 
-            margin-bottom: 20px; 
+            margin: 10px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
             font-size: 0.95em; display:flex; flex-direction:column; justify-content:center;
             position: relative; z-index: 2;
-        }
-        
-        /* HORIZONTAL CONNECTORS */
-        .bracket-round-col:not(:last-child) .bracket-match-card::after {
-            content: ""; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: #333; z-index: 1;
-        }
-        
-        /* VERTICAL CONNECTORS (The Branch) */
-        /* Even children (Top part of branch) */
-        .bracket-round-col:not(:last-child) .bracket-match-card:nth-child(odd)::before {
-            content: ""; position: absolute; top: 50%; right: -20px; width: 2px; height: 100%; background: #333; 
-            transform: translateY(50%); /* Go down */
-            height: calc(50% + 20px); /* Extend to meet sibling, rough calc */
-            display: none; /* JS will toggle for cleaner look later, or CSS refined */
+            min-height: 70px;
         }
 
-        /* Simplified visual lines for pairs */
-        .bracket-pair { display: flex; flex-direction: column; justify-content: center; position: relative; margin-bottom: 20px; }
-        .bracket-pair::after { /* The Vertical Bar connecting pairs */
-            content:""; position: absolute; right: -20px; top: 25%; bottom: 25%; width: 2px; background: #333;
+        /* === CONNECTORS === */
+        /* Horizontal Line going OUT from Left Side */
+        .bracket-left .bracket-round-col:not(:last-child) .bracket-match-card::after {
+            content: ""; position: absolute; top: 50%; right: -20px; width: 20px; height: 2px; background: #333;
         }
-        .bracket-pair::before { /* The Horizontal Bar to next round */
-            content:""; position: absolute; right: -40px; top: 50%; width: 20px; height: 2px; background: #333;
+        
+        /* Horizontal Line going OUT from Right Side (Reversed logic) */
+        .bracket-right .bracket-round-col:not(:last-child) .bracket-match-card::after {
+            content: ""; position: absolute; top: 50%; left: -20px; width: 20px; height: 2px; background: #333;
         }
-        /* Last column needs no connectors */
-        .bracket-round-col:last-child .bracket-pair::after, 
-        .bracket-round-col:last-child .bracket-pair::before { display: none; }
 
+        /* Vertical Brackets (The Forks) */
+        /* We use a container div around pairs in JS to make this easier? 
+           Or pseudo elements on the column. Let's use simple logic: 
+           Every pair of matches connects to a vertical bar. */
+        
+        /* Left Side Fork */
+        .bracket-left .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .bracket-left .bracket-pair::before { /* Vertical line */
+            content: ""; position: absolute; top: 25%; bottom: 25%; right: -20px; width: 2px; background: #333;
+        }
+        .bracket-left .bracket-pair::after { /* Horizontal connector to next round */
+            content: ""; position: absolute; top: 50%; right: -40px; width: 20px; height: 2px; background: #333;
+        }
+        
+        /* Right Side Fork (Mirrored) */
+        .bracket-right .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .bracket-right .bracket-pair::before { /* Vertical line */
+            content: ""; position: absolute; top: 25%; bottom: 25%; left: -20px; width: 2px; background: #333;
+        }
+        .bracket-right .bracket-pair::after { /* Horizontal connector to next round */
+            content: ""; position: absolute; top: 50%; left: -40px; width: 20px; height: 2px; background: #333;
+        }
+        
+        /* Final Match Styling */
+        .bracket-final-card {
+            border: 2px solid var(--primary);
+            transform: scale(1.1);
+        }
 
         .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
@@ -538,7 +590,11 @@
             if(d) { appState = d; ['players','groups','matches'].forEach(k => {if(!appState[k]) appState[k]=[]}); }
             else { appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; }
             
-            // AUTO RECALC POINTS ON LOAD
+            // Initial check for groupCount
+            if(appState.groupCount === undefined) {
+                appState.groupCount = appState.groups ? appState.groups.length : 0;
+            }
+            
             recalc(); 
             renderApp();
         });
@@ -679,7 +735,6 @@
         if(m) {
             m[selectingSlot] = pid;
             save();
-            // No need to manually render, onValue/save loop handles it or we call render
             renderApp();
         }
         document.getElementById('modal-player-select').style.display = 'none';
@@ -717,7 +772,21 @@
         if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } 
         document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); 
     }
-    window.addGroup = () => { appState.groupCount++; appState.groups.push({id:'g'+Date.now(), name: "GRUPO "+String.fromCharCode(64+appState.groupCount)}); save(); }
+    
+    // FIX: ROBUST ADD GROUP
+    window.addGroup = () => {
+        if(!appState.groups) appState.groups = [];
+        if(typeof appState.groupCount !== 'number') appState.groupCount = appState.groups.length;
+        
+        appState.groupCount++;
+        const groupName = "GRUPO " + String.fromCharCode(64 + appState.groupCount); 
+        appState.groups.push({
+            id: 'g' + Date.now(),
+            name: groupName
+        });
+        save();
+    }
+
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
     window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); } }
     window.toggleSel = (pid,e) => { if(document.body.classList.contains('viewer-mode'))return; e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
@@ -735,7 +804,6 @@
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4"); 
         
         let roundMatches = [];
-        // No court limit prompts
         
         if(appState.mode==='fixed') { 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { 
@@ -743,10 +811,9 @@
             } 
         } 
         else if(ps.length===4) {
-            // FIXED 4 PLAYERS = 3 MATCHES (NO REPEAT)
-            roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); // 0+1 vs 2+3
-            roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); // 0+2 vs 1+3
-            roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); // 0+3 vs 1+2
+            roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); 
+            roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); 
+            roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); 
         }
         else if(ps.length===5) { 
              [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{
@@ -756,7 +823,6 @@
         else { 
             let pairs=[]; 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
-            
             pairs.sort(()=>Math.random()-0.5); 
             while(pairs.length) { 
                 let pA=pairs[0], found=false; 
@@ -780,7 +846,6 @@
     }
     
     window.addManual = (gid) => { 
-        // Creates empty match
         addMatch(gid, '', '', '', '', false); 
         save(); 
     }
@@ -791,7 +856,6 @@
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
 
-        // UNLOCK MODE
         if(m.saved) {
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
                 m.saved = false;
@@ -801,7 +865,6 @@
             return;
         }
 
-        // SAVE MODE - Check both possible inputs
         let val1 = document.getElementById(`live-s1-${mid}`)?.value || document.getElementById(`tbl-s1-${mid}`)?.value;
         let val2 = document.getElementById(`live-s2-${mid}`)?.value || document.getElementById(`tbl-s2-${mid}`)?.value;
         
@@ -814,7 +877,6 @@
 
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
-        // UPDATE LOCAL
         m.s1 = s1; m.s2 = s2; m.saved = true;
         recalc();
 
@@ -823,10 +885,8 @@
             advanceWinner(mid, m, s1, s2);
         }
         
-        // UPDATE REMOTE (ATOMIC)
         update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
         
-        // If we advanced, we need to save the whole match array or the specific next match, simpler to save all
         if(m.gid.includes('ko')) {
             update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
         }
@@ -834,47 +894,14 @@
 
     // --- AUTO ADVANCE LOGIC ---
     function advanceWinner(mid, currentMatch, s1, s2) {
-        // Find current match INDEX in the KO group
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         const myIndexInGroup = koMatches.findIndex(m => m.mid === mid);
         
         if(myIndexInGroup === -1) return;
 
-        // Calculate Next Match Index
-        // Logic: Matches 0,1 feed 8. Matches 2,3 feed 9.
-        // Winner of Match N goes to Match: TotalMatches + floor(N/2)
-        // This only works if matches are generated in order (which they are)
-        
-        // Determine total initial matches (e.g., 8 for Round of 16)
         let total = koMatches.length;
-        // This is tricky because the array has all rounds.
-        // Visual Structure:
-        // Round 1 (8 matches): 0-7
-        // Round 2 (4 matches): 8-11
-        // Round 3 (2 matches): 12-13
-        // Round 4 (1 match): 14
-        
-        // We can infer the "Next Match" by:
-        // If I am match 0, I go to match 8, slot 1.
-        // If I am match 1, I go to match 8, slot 2.
-        
-        // We need to know how many matches are in MY round.
-        // Let's assume binary tree structure.
-        // Recursive finding? No, easier:
-        // The array is already sorted by round.
-        // Next match index = (CurrentIndex - FirstIndexInRound) / 2 + FirstIndexInNextRound
-        
-        // SIMPLER:
-        // If total matches is 15 (16 players).
-        // Matches 0-7 feed matches 8-11.
-        // Match 0 -> Match 8 (p1)
-        // Match 1 -> Match 8 (p3)
-        // Match 2 -> Match 9 (p1)
-        // Match 3 -> Match 9 (p3)
-        
-        // Find start of rounds
         let roundSizes = [];
-        let k = (total + 1) / 2; // e.g. 8
+        let k = (total + 1) / 2; 
         while(k >= 1) { roundSizes.push(k); k /= 2; }
         
         let currentRoundStart = 0;
@@ -891,7 +918,7 @@
             currentRoundStart += size;
         }
         
-        if(myRoundSize === 1) return; // Final match, nowhere to go
+        if(myRoundSize === 1) return; 
         
         const relativeIndex = myIndexInGroup - currentRoundStart;
         const nextRelativeIndex = Math.floor(relativeIndex / 2);
@@ -900,22 +927,17 @@
         if(nextMatchGlobalIndex < koMatches.length) {
             const nextMatch = koMatches[nextMatchGlobalIndex];
             
-            // Identify Winners
             let w1, w2;
             if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; }
             else { w1 = currentMatch.p3; w2 = currentMatch.p4; }
             
-            // Assign to Slot
             if(relativeIndex % 2 === 0) {
-                // Top feed (p1/p2)
                 nextMatch.p1 = w1; nextMatch.p2 = w2;
             } else {
-                // Bottom feed (p3/p4)
                 nextMatch.p3 = w1; nextMatch.p4 = w2;
             }
         }
     }
-
 
     // EDIT HISTORY BUTTON
     window.editScore = (mid) => {
@@ -929,7 +951,7 @@
             if(newS1 !== null && newS2 !== null) {
                 m.s1 = parseInt(newS1); m.s2 = parseInt(newS2);
                 recalc();
-                if(m.gid.includes('ko')) advanceWinner(mid, m, m.s1, m.s2); // Update tree
+                if(m.gid.includes('ko')) advanceWinner(mid, m, m.s1, m.s2); 
                 update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: m.s1, s2: m.s2 });
                 if(m.gid.includes('ko')) update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
             }
@@ -1015,65 +1037,136 @@
                 col.style.gridColumn = '1 / -1'; // Take full width
                 let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
                 
-                h += `<div class="bracket-scroll-container">`; // NEW SCROLL CONTAINER
+                h += `<div class="bracket-stage">`; // MAIN FLEX CONTAINER
                 
-                // Logic to separate matches into columns (Rounds)
                 const totalMatches = ms.length;
                 let rounds = [];
-                // Simple heuristic: 15 matches -> 8 + 4 + 2 + 1
                 if(totalMatches === 1) rounds = [1];
-                else if(totalMatches <= 3) rounds = [2, 1]; // Semis + Final
-                else if(totalMatches <= 7) rounds = [4, 2, 1]; // Quarters + Semis + Final
-                else rounds = [8, 4, 2, 1]; // R16 + Q + S + F
+                else if(totalMatches <= 3) rounds = [2, 1]; 
+                else if(totalMatches <= 7) rounds = [4, 2, 1]; 
+                else rounds = [8, 4, 2, 1]; 
 
+                // CONTAINER FOR LEFT SIDE
+                h += `<div class="bracket-side-container left">`;
+                
+                // RENDER LEFT SIDE
                 let matchIndex = 0;
-                rounds.forEach((count, roundIdx) => {
-                    h += `<div class="bracket-round-col">`; // COLUMN START
-                    for(let k=0; k<count; k++) {
-                        if(matchIndex >= ms.length) break;
-                        const m = ms[matchIndex];
-                        matchIndex++;
-                        
+                // Exclude Final Round from loop
+                for(let r=0; r<rounds.length-1; r++) {
+                    const count = rounds[r];
+                    const leftCount = count / 2;
+                    h += `<div class="bracket-round-col bracket-left">`;
+                    for(let k=0; k<leftCount; k++) {
+                        const m = ms[matchIndex]; matchIndex++;
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
                         const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
                         
-                        // CONNECTING LINE LOGIC FOR PAIRS
                         const isEvenChild = (k % 2 === 0);
-                        const hasConnector = roundIdx < rounds.length - 1;
-                        const pairClass = (hasConnector && isEvenChild) ? 'bracket-pair' : '';
-
-                        if(isEvenChild && hasConnector) { h += `<div class="bracket-pair">`; }
+                        if(isEvenChild && r < rounds.length-2) { h += `<div class="bracket-pair">`; }
 
                         h += `<div class="bracket-match-card">
                             <div class="match-team ${w1?'winner':''}">
                                  <span style="display:flex; flex-direction:column; text-align:left;">
                                     <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.9em; color:#555;">${n(m.p2)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.8em; color:#555;">${n(m.p2)}</span>
                                  </span>
                                  <span class="match-score">${m.s1||'-'}</span>
                             </div>
                             <div class="match-team ${w2?'winner':''}" style="margin-top:2px;">
                                  <span style="display:flex; flex-direction:column; text-align:left;">
                                     <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.9em; color:#555;">${n(m.p4)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.8em; color:#555;">${n(m.p4)}</span>
                                  </span>
                                  <span class="match-score">${m.s2||'-'}</span>
                             </div>
                             ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px; justify-content:center;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px; height:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px; height:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}
                         </div>`;
 
-                        if(!isEvenChild && hasConnector) { h += `</div>`; } // Close bracket-pair div
+                        if(!isEvenChild && r < rounds.length-2) { h += `</div>`; }
                     }
-                    h += `</div>`; // COLUMN END
-                });
+                    h += `</div>`;
+                }
+                h += `</div>`; // End Left Container
+
+                // RENDER FINAL (CENTER)
+                const finalMatch = ms[ms.length-1];
+                const nf = (id) => appState.players.find(x=>x.id===id)?.name || '[+ Parceiro]';
+                const wf1 = finalMatch.saved && finalMatch.s1 > finalMatch.s2; const wf2 = finalMatch.saved && finalMatch.s2 > finalMatch.s1;
+
+                h += `<div class="bracket-final-container"><div class="bracket-match-card bracket-final-card">
+                     <div style="text-align:center; font-weight:900; margin-bottom:5px; color:var(--primary);">FINAL</div>
+                     <div class="match-team ${wf1?'winner':''}">
+                             <span style="display:flex; flex-direction:column; text-align:left;">
+                                <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p1')">${nf(finalMatch.p1)}</span>
+                                <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p2')" style="font-size:0.8em; color:#555;">${nf(finalMatch.p2)}</span>
+                             </span>
+                             <span class="match-score">${finalMatch.s1||'-'}</span>
+                        </div>
+                        <div class="match-team ${wf2?'winner':''}" style="margin-top:2px;">
+                             <span style="display:flex; flex-direction:column; text-align:left;">
+                                <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p3')">${nf(finalMatch.p3)}</span>
+                                <span class="player-link admin-only" onclick="openPlayerSelect('${finalMatch.mid}', 'p4')" style="font-size:0.8em; color:#555;">${nf(finalMatch.p4)}</span>
+                             </span>
+                             <span class="match-score">${finalMatch.s2||'-'}</span>
+                        </div>
+                        ${!finalMatch.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px; justify-content:center;"><input type="tel" id="tbl-s1-${finalMatch.mid}" value="${finalMatch.s1}" class="tbl-input" style="width:30px; height:30px;" ${finalMatch.saved?'disabled':''}><input type="tel" id="tbl-s2-${finalMatch.mid}" value="${finalMatch.s2}" class="tbl-input" style="width:30px; height:30px;" ${finalMatch.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${finalMatch.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${finalMatch.mid}')">${finalMatch.saved?'✎':'OK'}</button></div>` : ''}
+                </div></div>`;
+
+                // CONTAINER FOR RIGHT SIDE
+                h += `<div class="bracket-side-container right">`;
                 
-                h += `</div>`; // SCROLL CONTAINER END
+                // RENDER RIGHT SIDE (REVERSE LOOP? NO, JUST CONTINUE INDEX)
+                // We need to pick up where Left Side left off for each round
+                // Global Match Index is tricky. We need to jump.
+                // Round 1 (8 matches): 0-3 Left, 4-7 Right
+                
+                let rightMatchIndexBase = 0;
+                for(let r=0; r<rounds.length-1; r++) {
+                    const count = rounds[r];
+                    const leftCount = count / 2;
+                    const rightCount = count / 2;
+                    let currentRightIndex = rightMatchIndexBase + leftCount; // Skip left matches
+                    
+                    h += `<div class="bracket-round-col bracket-right">`;
+                    for(let k=0; k<rightCount; k++) {
+                        const m = ms[currentRightIndex + k];
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
+                        const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
+                        
+                        const isEvenChild = (k % 2 === 0);
+                        if(isEvenChild && r < rounds.length-2) { h += `<div class="bracket-pair">`; }
+
+                        h += `<div class="bracket-match-card">
+                           <div class="match-team ${w1?'winner':''}">
+                                 <span style="display:flex; flex-direction:column; text-align:left;">
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.8em; color:#555;">${n(m.p2)}</span>
+                                 </span>
+                                 <span class="match-score">${m.s1||'-'}</span>
+                            </div>
+                            <div class="match-team ${w2?'winner':''}" style="margin-top:2px;">
+                                 <span style="display:flex; flex-direction:column; text-align:left;">
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.8em; color:#555;">${n(m.p4)}</span>
+                                 </span>
+                                 <span class="match-score">${m.s2||'-'}</span>
+                            </div>
+                           ${!m.isBye ? `<div class="admin-only" style="margin-top:5px; display:flex; gap:5px; justify-content:center;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input" style="width:30px; height:30px;" ${m.saved?'disabled':''}><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input" style="width:30px; height:30px;" ${m.saved?'disabled':''}><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button></div>` : ''}
+                        </div>`;
+
+                        if(!isEvenChild && r < rounds.length-2) { h += `</div>`; }
+                    }
+                    h += `</div>`;
+                    rightMatchIndexBase += count; // Move to next round block
+                }
+                h += `</div>`; // End Right Container
+
+                h += `</div>`; // END MAIN FLEX
+                
                 col.innerHTML = h;
                 
             } else {
-                // NORMAL GROUP RENDER
                 let h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
-                
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
                     ms.forEach(m => {
