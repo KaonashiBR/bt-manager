@@ -721,7 +721,15 @@
     }
 
     window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
-    function save() { if(appRef) set(appRef, appState); }
+    function save() { if (appRef) {
+        set(appRef, appState).catch(e => {
+            console.error('Erro ao salvar:', e);
+            alert('Erro ao salvar no Firebase: ' + e.message);
+        });
+    } else {
+        console.warn('Tentando salvar sem referência do Firebase ativa');
+    }
+}
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
     
     window.addPlayer = () => { 
@@ -733,20 +741,16 @@
     }
     
     // FIX: ROBUST ADD GROUP (V123)
-    window.addGroup = () => {
-        if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = [];
-        
-        // Use array length + 1 for simple increment
-        const nextNum = appState.groups.length + 1;
-        const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); 
-        
-        appState.groups.push({
-            id: 'g' + Date.now(),
-            name: groupName
-        });
-        save();
-        renderApp();
-    }
+   window.addGroup = () => {
+    if (!appState.groups) appState.groups = [];
+    if (typeof appState.groupCount !== 'number') appState.groupCount = appState.groups.length;
+    appState.groupCount++;
+    const groupName = 'GRUPO ' + String.fromCharCode(64 + appState.groupCount);
+    appState.groups.push({ id: 'g' + Date.now(), name: groupName });
+    renderApp(); // ADICIONA ESTA LINHA ANTES DO SAVE
+    save();
+};
+
 
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
     window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); } }
@@ -1141,3 +1145,4 @@
 </script>
 </body>
 </html>
+
