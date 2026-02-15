@@ -5,17 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V129 (Smart Queue)</title>
+    <title>BT Manager - V130 (Fixed Layout & Bracket)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* DESIGN SÓLIDO (V129) */
+        /* DESIGN SÓLIDO (V130) */
         :root { 
-            --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; 
-            --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; 
+            --primary: #ff6b00; 
+            --secondary: #0f172a; 
+            --bg-body: #f4f6f8; 
+            --text-dark: #333; 
+            --blue-masc: #2196F3; 
+            --pink-fem: #E91E63; 
+            --fav-color: #ff3b30; 
             --font-base: 17px; 
         }
         
@@ -69,8 +74,7 @@
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
-
+        
         .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
@@ -81,35 +85,55 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD */
-        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
-        #groups-container { display: flex; flex-direction: column; gap: 15px; }
-        @media(min-width: 1100px) { 
-            .board { grid-template-columns: 200px 1fr; align-items: start; } 
-            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
-            #groups-container { display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; }
-            .group-box { flex: 0 0 24%; min-width: 280px; }
+        /* LAYOUT BOARD - FIXED V130 (4 GROUPS PER ROW) */
+        .board { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 15px; 
+        }
+        
+        #col-pool { 
+            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
+            width: 100%; 
+            max-height: 300px; overflow-y: auto; 
+        }
+        
+        #groups-container {
+            display: flex; flex-direction: column; gap: 15px;
         }
 
-        /* JOGOS LIST (SMART QUEUE STYLE) */
-        .match-list-item { 
-            background: white; border: 1px solid #ddd; 
-            border-left: 5px solid var(--secondary); 
-            border-radius: 6px; margin-bottom: 10px; padding: 10px; 
-            display: grid; grid-template-columns: 40px 1fr 50px; 
-            align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
+        @media(min-width: 1100px) { 
+            .board { 
+                grid-template-columns: 200px 1fr; 
+                align-items: start;
+            } 
+            #col-pool { 
+                position: sticky; top: 75px; 
+                max-height: 85vh; 
+            }
+            
+            #groups-container {
+                display: flex; 
+                flex-wrap: wrap; 
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .group-box {
+                /* FORCE 4 ITEMS PER ROW */
+                flex: 0 0 calc(25% - 15px); /* 25% minus gap */
+                min-width: 250px;
+                max-width: 25%; /* Ensure it doesn't stretch */
+            }
         }
-        .match-order-badge {
-            background: #333; color: white; font-weight: 900; 
-            width: 30px; height: 30px; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; font-size: 0.9em;
-        }
+
+        /* JOGOS LIST */
+        .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
         .match-main-content { padding: 0 10px; }
         .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
         .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         .match-actions { display: flex; flex-direction: column; gap: 5px; }
-        
         .match-group-tag { font-size: 0.8em; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555; }
 
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
@@ -137,40 +161,40 @@
         .rank-pos { width: 26px; height: 26px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 1em; }
         .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
         
-        /* BRACKET ENGINE - VISUAL */
-        .bracket-stage { display: flex; justify-content: center; align-items: flex-start; padding: 20px 0; overflow-x: auto; gap: 30px; }
-        .bracket-side-container { display: flex; gap: 30px; }
+        /* BRACKET ENGINE - SYMMETRIC TREE */
+        .bracket-stage { display: flex; justify-content: center; align-items: flex-start; padding: 20px 0; overflow-x: auto; gap: 40px; }
+        .bracket-side-container { display: flex; gap: 40px; }
         .bracket-side-container.right { flex-direction: row-reverse; }
         .bracket-final-container { display: flex; flex-direction: column; justify-content: center; margin: 0 20px; }
-        .bracket-round-col { display: flex; flex-direction: column; justify-content: space-around; min-width: 190px; position: relative; }
+        .bracket-round-col { display: flex; flex-direction: column; justify-content: space-around; min-width: 180px; position: relative; }
         
         .bracket-match-card {
             background: white; border: 1px solid #999; border-radius: 6px; padding: 8px; 
-            margin: 15px 0;
+            margin: 20px 0;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
             font-size: 0.95em; display:flex; flex-direction:column; justify-content:center;
             position: relative; z-index: 2;
             min-height: 80px;
         }
 
-        /* CONNECTORS */
+        /* Lines */
         .bracket-left .bracket-round-col:not(:last-child) .bracket-match-card::after {
-            content: ""; position: absolute; top: 50%; right: -30px; width: 30px; height: 2px; background: #333;
+            content: ""; position: absolute; top: 50%; right: -40px; width: 40px; height: 2px; background: #333;
         }
         .bracket-right .bracket-round-col:not(:last-child) .bracket-match-card::after {
-            content: ""; position: absolute; top: 50%; left: -30px; width: 30px; height: 2px; background: #333;
+            content: ""; position: absolute; top: 50%; left: -40px; width: 40px; height: 2px; background: #333;
         }
         
-        /* Vertical Connectors (Pairs) */
+        /* Vertical Connectors */
         .bracket-left .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
-        .bracket-left .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; right: -30px; width: 2px; background: #333; }
-        .bracket-left .bracket-pair::after { content: ""; position: absolute; top: 50%; right: -50px; width: 20px; height: 2px; background: #333; }
+        .bracket-left .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; right: -40px; width: 2px; background: #333; }
+        .bracket-left .bracket-pair::after { content: ""; position: absolute; top: 50%; right: -60px; width: 20px; height: 2px; background: #333; }
         
         .bracket-right .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
-        .bracket-right .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; left: -30px; width: 2px; background: #333; }
-        .bracket-right .bracket-pair::after { content: ""; position: absolute; top: 50%; left: -50px; width: 20px; height: 2px; background: #333; }
+        .bracket-right .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; left: -40px; width: 2px; background: #333; }
+        .bracket-right .bracket-pair::after { content: ""; position: absolute; top: 50%; left: -60px; width: 20px; height: 2px; background: #333; }
         
-        .bracket-final-card { border: 2px solid var(--primary); transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .bracket-final-card { border: 3px solid var(--primary); transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
         .match-score { font-weight: 900; color: #333; margin-left:5px; font-size:1.1em; }
@@ -429,7 +453,7 @@
     }
 
     function loadArenaPlayers(arenaId) {
-        // Removed as requested
+        // AUTOCOMPLETE REMOVED AS REQUESTED
     }
 
     function fixDriveLink(url) { if (url && url.includes('drive.google.com') && url.includes('/file/d/')) { const id = url.match(/\/d\/(.*?)\//)[1]; return `https://drive.google.com/uc?export=view&id=${id}`; } return url; }
@@ -734,7 +758,7 @@
         document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); 
     }
     
-    // FIX: ROBUST ADD GROUP
+    // FIX: ROBUST ADD GROUP (V124)
     window.addGroup = () => {
         try {
             if(!appState.groups || !Array.isArray(appState.groups)) {
@@ -1068,7 +1092,9 @@
 
         // RENDER TABLE (VIEW 2)
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
-        let h = ''; 
+        
+        // DECLARAR H FORA DO LOOP
+        let h = '';
 
         appState.groups.forEach((g,i) => {
             const ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
@@ -1194,7 +1220,10 @@
                 }
                 h += `</div>`;
                 h += `</div>`;
-                col.innerHTML = h;
+                
+                // RENDER BRACKET TO SEPARATE VIEW
+                document.getElementById('bracket-container').innerHTML = h;
+                // DO NOT ADD TO groups-container
                 
             } else {
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
@@ -1218,9 +1247,10 @@
                     ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
+                
+                col.innerHTML = h;
+                gc.appendChild(col);
             }
-            col.innerHTML = h;
-            gc.appendChild(col);
         });
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
