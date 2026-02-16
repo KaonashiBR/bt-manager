@@ -5,35 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V136 (Auto BYE 6x0)</title>
+    <title>BT Manager - V137 (Score Logic Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* VARIÁVEIS E RESET */
-        :root { 
-            --primary: #ff6b00; 
-            --secondary: #0f172a; 
-            --bg-body: #f4f6f8; 
-            --text-dark: #333; 
-            --blue-masc: #2196F3; 
-            --pink-fem: #E91E63; 
-            --fav-color: #ff3b30; 
-            --font-base: 17px; 
-        }
-        
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-body); 
-            color: var(--text-dark); 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            font-size: var(--font-base); 
-        }
+        /* BASE & VARS */
+        :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
         /* NAVBAR */
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
@@ -66,7 +47,7 @@
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
         .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
 
-        /* UI ELEMENTS */
+        /* UI */
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
         .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 1em; margin-bottom: 15px;}
@@ -75,8 +56,6 @@
         .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; } .btn-dark { background: #444; }
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
-
-        /* TABLES & LISTS */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
@@ -84,61 +63,28 @@
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
         .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
-
         .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
 
-        /* GROUP BOX */
+        /* GROUP BOX & LAYOUT */
         .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
-
-        /* LAYOUT BOARD - FIXED V135 (4 COLS GRID) */
-        .board { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-        }
         
-        #col-pool { 
-            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
-            width: 100%; 
-            max-height: 300px; overflow-y: auto; 
-        }
+        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
+        #groups-container { display: flex; flex-direction: column; gap: 15px; }
         
-        /* Mobile: Groups stack vertically */
-        #groups-container {
-            display: flex; flex-direction: column; gap: 15px;
-        }
-
         @media(min-width: 1100px) { 
-            .board { 
-                grid-template-columns: 200px 1fr; 
-                align-items: start;
-            } 
-            #col-pool { 
-                position: sticky; top: 75px; 
-                max-height: 85vh; 
-            }
-            
-            /* DESKTOP FIXED GRID (4 COLS) */
-            #groups-container {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr); /* FORÇA 4 POR LINHA */
-                gap: 15px;
-                align-items: start;
-            }
-            
-            .group-box {
-                flex: unset;
-                min-width: 0;
-                width: 100%;
-            }
+            .board { grid-template-columns: 200px 1fr; align-items: start; } 
+            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
+            #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
+            .group-box { flex: unset; width: 100%; }
         }
 
-        /* JOGOS LIST */
+        /* JOGOS LIST & TAB */
         .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
         .match-main-content { padding: 0 10px; }
@@ -146,12 +92,11 @@
         .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         .match-actions { display: flex; flex-direction: column; gap: 5px; }
         .match-group-tag { font-size: 0.8em; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555; }
-
+        
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
         .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .view-section { display: none; } .view-section.active { display: block; }
-
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
         .player-link { cursor: pointer; border-bottom: 1px dashed #999; transition:0.2s; }
@@ -581,7 +526,7 @@
         
         appState.matches.push(...koMatches);
 
-        // 8. AUTO PROCESS BYES (NEW V136)
+        // 8. AUTO PROCESS BYES (V136)
         koMatches.forEach(m => {
             if (m.isBye) {
                 if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
@@ -850,13 +795,26 @@
             return;
         }
 
-        let val1 = document.getElementById(`live-s1-${mid}`)?.value || document.getElementById(`tbl-s1-${mid}`)?.value;
-        let val2 = document.getElementById(`live-s2-${mid}`)?.value || document.getElementById(`tbl-s2-${mid}`)?.value;
-        
-        if (val1 === undefined || val1 === null) val1 = '';
-        if (val2 === undefined || val2 === null) val2 = '';
+        // CORREÇÃO DA LEITURA DE PLACAR (V137)
+        // Procura o valor em todos os lugares possíveis
+        const elLive1 = document.getElementById(`live-s1-${mid}`);
+        const elLive2 = document.getElementById(`live-s2-${mid}`);
+        const elTbl1 = document.getElementById(`tbl-s1-${mid}`);
+        const elTbl2 = document.getElementById(`tbl-s2-${mid}`);
 
-        if(val1 === '' || val2 === '') { alert("Preencha o placar."); return; }
+        let val1 = '';
+        let val2 = '';
+
+        if (elLive1 && elLive1.value !== '') val1 = elLive1.value;
+        else if (elTbl1 && elTbl1.value !== '') val1 = elTbl1.value;
+
+        if (elLive2 && elLive2.value !== '') val2 = elLive2.value;
+        else if (elTbl2 && elTbl2.value !== '') val2 = elTbl2.value;
+
+        if(val1 === '' || val2 === '') { 
+            alert(`Placar não encontrado ou vazio. \nLido: [${val1}] x [${val2}]\nVerifique se digitou no campo correto.`); 
+            return; 
+        }
         
         let s1 = parseInt(val1); let s2 = parseInt(val2);
 
@@ -1124,9 +1082,10 @@
                     ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
+                
+                col.innerHTML = h;
+                gc.appendChild(col);
             }
-            col.innerHTML = h;
-            gc.appendChild(col);
         });
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
