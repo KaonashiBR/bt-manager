@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V141 (Final KO Fix)</title>
+    <title>BT Manager - V142 (Final KO Logic)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,7 +74,7 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD - FIXED V141 (4 COLS GRID) */
+        /* LAYOUT BOARD - FIXED V142 */
         .board { 
             display: grid; 
             grid-template-columns: 1fr; 
@@ -239,9 +239,7 @@
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-games" class="view-section active">
-        <div id="games-container"></div>
-    </div>
+    <div id="view-games" class="view-section active"><div id="games-container"></div></div>
 
     <div id="view-groups" class="view-section">
         <div class="board">
@@ -845,16 +843,26 @@
             return;
         }
 
-        // CORREÇÃO CRÍTICA V141: PROCURA INPUT EM TODO DOCUMENTO
-        // Busca qualquer input que termine com o ID do match e tenha o prefixo correto
-        let el1 = document.querySelector(`input[id$="-s1-${mid}"]`);
-        let el2 = document.querySelector(`input[id$="-s2-${mid}"]`);
+        // CORREÇÃO CRÍTICA V141: LEITURA ROBUSTA DOS IDs DE INPUT
+        let val1 = '';
+        let val2 = '';
 
-        let val1 = el1 ? el1.value : '';
-        let val2 = el2 ? el2.value : '';
+        // TENTA LER DO MATA-MATA (ID: ko-s1-...)
+        let elKo1 = document.getElementById(`ko-s1-${mid}`);
+        let elKo2 = document.getElementById(`ko-s2-${mid}`);
+        if(elKo1 && elKo1.value) val1 = elKo1.value;
+        if(elKo2 && elKo2.value) val2 = elKo2.value;
+
+        // SE NÃO ACHOU, TENTA LER DO JOGOS (ID: live-s1-...)
+        if(val1 === '') val1 = document.getElementById(`live-s1-${mid}`)?.value || '';
+        if(val2 === '') val2 = document.getElementById(`live-s2-${mid}`)?.value || '';
+
+        // SE NÃO ACHOU, TENTA LER DA TABELA DE GRUPOS (ID: tbl-s1-...)
+        if(val1 === '') val1 = document.getElementById(`tbl-s1-${mid}`)?.value || '';
+        if(val2 === '') val2 = document.getElementById(`tbl-s2-${mid}`)?.value || '';
 
         if(val1 === '' || val2 === '') { 
-            alert(`Preencha o placar.`); 
+            alert(`Preencha o placar.\n(Nada encontrado nos campos)`); 
             return; 
         }
         
@@ -862,19 +870,23 @@
 
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
+        // 1. ATUALIZA ESTADO LOCAL
         m.s1 = s1; m.s2 = s2; m.saved = true;
         recalc();
 
-        // ** ADVANCE WINNER FOR KNOCKOUT **
+        // 2. CALCULA AVANÇO SE FOR MATA-MATA
         if(m.gid.includes('ko')) {
             advanceWinner(mid, m, s1, s2);
         }
         
-        // SAVE ALL TO BE SAFE
-        await update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
+        // 3. SALVA NO BANCO (LISTA INTEIRA PARA GARANTIR O AVANÇO)
+        if(m.gid.includes('ko')) {
+            await update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
+        } else {
+            await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
+        }
         
         renderApp(); // FORCE UPDATE
-        if(m.gid.includes('ko')) alert("Vencedor avançou para a próxima fase!");
     }
 
     // --- AUTO ADVANCE LOGIC (MATHEMATICAL V141) ---
