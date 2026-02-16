@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V135 (Score Input Fix)</title>
+    <title>BT Manager - V136 (Auto BYE 6x0)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -580,6 +580,19 @@
         }
         
         appState.matches.push(...koMatches);
+
+        // 8. AUTO PROCESS BYES (NEW V136)
+        koMatches.forEach(m => {
+            if (m.isBye) {
+                if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
+                    m.s1 = 6; m.s2 = 0; m.saved = true;
+                    advanceWinner(m.mid, m, 6, 0);
+                } else if (m.p1 === 'BYE' && m.p3 !== 'BYE') {
+                    m.s1 = 0; m.s2 = 6; m.saved = true;
+                    advanceWinner(m.mid, m, 0, 6);
+                }
+            }
+        });
         
         document.getElementById('modal-knockout').style.display = 'none';
         save();
@@ -1111,9 +1124,9 @@
                     ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
-                col.innerHTML = h;
-                gc.appendChild(col);
             }
+            col.innerHTML = h;
+            gc.appendChild(col);
         });
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
