@@ -5,35 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V138 (Delete Bracket Button)</title>
+    <title>BT Manager - V139 (Score Save Fixed)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* VARIÁVEIS E RESET */
-        :root { 
-            --primary: #ff6b00; 
-            --secondary: #0f172a; 
-            --bg-body: #f4f6f8; 
-            --text-dark: #333; 
-            --blue-masc: #2196F3; 
-            --pink-fem: #E91E63; 
-            --fav-color: #ff3b30; 
-            --font-base: 17px; 
-        }
-        
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-body); 
-            color: var(--text-dark); 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            font-size: var(--font-base); 
-        }
+        /* BASE & VARS */
+        :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
         /* NAVBAR */
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
@@ -241,7 +222,6 @@
             <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std" style="width:auto;">Fixas</button>
             <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Mata-Mata</button>
             <button onclick="resetKnockout()" class="btn-std btn-red" style="width:auto;">❌ Excluir Mata-Mata</button>
-            
             <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
             <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
             <button onclick="exportData()" class="btn-std btn-dark" style="width:auto;">💾 Backup</button>
@@ -513,16 +493,13 @@
     window.resetKnockout = () => {
         if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
         
-        // Remove groups with 'ko' in ID
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-        
-        // Remove matches linked to 'ko' groups
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
         
         save();
         renderApp();
         alert("Mata-Mata excluído!");
-        switchAppView('groups'); // Go back to groups view
+        switchAppView('groups');
     }
 
     // === EXECUÇÃO MATA-MATA (GLOBAL SEEDING) ===
@@ -596,7 +573,7 @@
         
         appState.matches.push(...koMatches);
 
-        // 8. AUTO PROCESS BYES (V136)
+        // AUTO PROCESS BYES
         koMatches.forEach(m => {
             if (m.isBye) {
                 if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
@@ -865,19 +842,18 @@
             return;
         }
 
-        // CORREÇÃO CRÍTICA V137: PROCURA INPUT EM TODO DOCUMENTO
-        let val1 = document.getElementById(`live-s1-${mid}`)?.value;
-        let val2 = document.getElementById(`live-s2-${mid}`)?.value;
-        
-        // Se não achou na tela Live (Jogos), procura na tabela (Grupos/MataMata)
-        if (val1 === undefined) val1 = document.getElementById(`tbl-s1-${mid}`)?.value;
-        if (val2 === undefined) val2 = document.getElementById(`tbl-s2-${mid}`)?.value;
+        // CORREÇÃO CRÍTICA V139: LEITURA ROBUSTA
+        let v1Live = document.getElementById(`live-s1-${mid}`)?.value;
+        let v1Tbl = document.getElementById(`tbl-s1-${mid}`)?.value;
+        let v2Live = document.getElementById(`live-s2-${mid}`)?.value;
+        let v2Tbl = document.getElementById(`tbl-s2-${mid}`)?.value;
 
-        if (!val1) val1 = '';
-        if (!val2) val2 = '';
+        // Se o valor existe e não é vazio, usa. Se não, tenta o outro.
+        let val1 = (v1Live && v1Live.trim() !== '') ? v1Live : (v1Tbl || '');
+        let val2 = (v2Live && v2Live.trim() !== '') ? v2Live : (v2Tbl || '');
 
         if(val1 === '' || val2 === '') { 
-            alert("Preencha o placar."); 
+            alert(`Preencha o placar.\n(Valor lido: [${val1}] x [${val2}])`); 
             return; 
         }
         
@@ -898,6 +874,8 @@
         if(m.gid.includes('ko')) {
             update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
         }
+        
+        renderApp(); // FORCE UPDATE TO SHOW NEW ROUND
     }
 
     // --- AUTO ADVANCE LOGIC ---
@@ -922,29 +900,28 @@
             if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; }
             else { w1 = currentMatch.p3; w2 = currentMatch.p4; }
             
-            if(myIndex % 2 === 0) {
-                targetMatch.p1 = w1; targetMatch.p2 = w2;
-            } else {
-                targetMatch.p3 = w1; targetMatch.p4 = w2;
+            // ATUALIZAR O OBJETO GLOBAL
+            const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
+            if(globalTargetIndex > -1) {
+                if(myIndex % 2 === 0) {
+                    appState.matches[globalTargetIndex].p1 = w1; 
+                    appState.matches[globalTargetIndex].p2 = w2;
+                } else {
+                    appState.matches[globalTargetIndex].p3 = w1; 
+                    appState.matches[globalTargetIndex].p4 = w2;
+                }
             }
         }
     }
 
-    window.editScore = (mid) => {
-        const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
-        if(matchIndex === -1) return;
-        const m = appState.matches[matchIndex];
-
-        if(confirm("Editar resultado deste jogo?")) {
-            const newS1 = prompt("Placar Time 1:", m.s1);
-            const newS2 = prompt("Placar Time 2:", m.s2);
-            if(newS1 !== null && newS2 !== null) {
-                m.s1 = parseInt(newS1); m.s2 = parseInt(newS2);
-                recalc();
-                if(m.gid.includes('ko')) advanceWinner(mid, m, m.s1, m.s2); 
-                update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: m.s1, s2: m.s2 });
-                if(m.gid.includes('ko')) update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
-            }
+    // EDIT SCORE FUNCTION
+    window.editS = async (mid) => {
+        if(!confirm("Editar placar?")) return;
+        const mIdx = appState.matches.findIndex(x => x.mid === mid);
+        if(mIdx > -1) {
+            appState.matches[mIdx].saved = false;
+            renderApp(); 
+            await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false});
         }
     }
 
@@ -1070,7 +1047,7 @@
                 col.style.gridColumn = '1 / -1'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
                 
-                // RENDER AS SIMPLE LIST WITH INPUTS (V135 FIX)
+                // RENDER AS SIMPLE LIST WITH INPUTS (V139 FIX)
                 h += `<div class="ko-list">`;
                 
                 const rounds = {};
@@ -1097,7 +1074,6 @@
                         const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
                         const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
                         
-                        // LOGIC FOR INPUTS VS DISPLAY
                         const isEditing = !m.saved && !m.isBye;
                         
                         h += `<div class="ko-match-item">
@@ -1117,7 +1093,11 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
-                            ${isEditing ? `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}')">✓</button>` : ''}
+                            ${isEditing ? 
+                                `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}')">✓</button>` 
+                                : 
+                                `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>`
+                            }
                         </div>`;
                     });
                 });
