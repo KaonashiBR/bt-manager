@@ -5,35 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V131 (Grid Layout Fix)</title>
+    <title>BT Manager - V132 (Grid & Logic Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* VARIÁVEIS E RESET */
+        /* BASE & VARS */
         :root { 
-            --primary: #ff6b00; 
-            --secondary: #0f172a; 
-            --bg-body: #f4f6f8; 
-            --text-dark: #333; 
-            --blue-masc: #2196F3; 
-            --pink-fem: #E91E63; 
-            --fav-color: #ff3b30; 
+            --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; 
+            --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; 
             --font-base: 17px; 
         }
-        
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-body); 
-            color: var(--text-dark); 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            font-size: var(--font-base); 
-        }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
         /* NAVBAR */
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
@@ -66,7 +51,7 @@
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
         .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
 
-        /* UI ELEMENTS */
+        /* HEADER & UTILS */
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
         .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 1em; margin-bottom: 15px;}
@@ -76,15 +61,14 @@
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
 
-        /* TABLES & LISTS */
+        /* TABLE */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
-
+        
         .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
@@ -92,51 +76,27 @@
         /* GROUP BOX */
         .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
-        .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD - FIXED V131 (4 COLS GRID) */
-        .board { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-        }
+        /* === LAYOUT V132: STRICT GRID === */
+        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
         
-        #col-pool { 
-            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
-            width: 100%; 
-            max-height: 300px; overflow-y: auto; 
-        }
-        
-        /* Mobile: Groups stack vertically */
-        #groups-container {
-            display: flex; flex-direction: column; gap: 15px;
-        }
+        /* Mobile: 1 Column */
+        #groups-container { display: grid; grid-template-columns: 1fr; gap: 15px; }
 
         @media(min-width: 1100px) { 
-            .board { 
-                grid-template-columns: 200px 1fr; 
-                align-items: start;
-            } 
-            #col-pool { 
-                position: sticky; top: 75px; 
-                max-height: 85vh; 
-            }
+            .board { grid-template-columns: 200px 1fr; align-items: start; } 
+            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
             
-            /* DESKTOP FIXED GRID (4 COLS) */
-            #groups-container {
+            /* Desktop: 4 Columns Strict */
+            #groups-container { 
                 display: grid;
-                grid-template-columns: repeat(4, 1fr); /* FORÇA 4 POR LINHA */
+                grid-template-columns: repeat(4, 1fr); 
                 gap: 15px;
                 align-items: start;
             }
-            
-            .group-box {
-                /* Reset flex properties for grid child */
-                flex: unset;
-                min-width: 0; /* Prevents overflow in grid */
-                width: 100%;
-            }
+            /* If only 1 group, it stays 1/4 width */
         }
 
         /* JOGOS LIST */
@@ -179,33 +139,15 @@
         .bracket-side-container.right { flex-direction: row-reverse; }
         .bracket-final-container { display: flex; flex-direction: column; justify-content: center; margin: 0 20px; }
         .bracket-round-col { display: flex; flex-direction: column; justify-content: space-around; min-width: 180px; position: relative; }
-        
-        .bracket-match-card {
-            background: white; border: 1px solid #999; border-radius: 6px; padding: 8px; 
-            margin: 20px 0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
-            font-size: 0.95em; display:flex; flex-direction:column; justify-content:center;
-            position: relative; z-index: 2;
-            min-height: 80px;
-        }
-
-        /* Lines */
-        .bracket-left .bracket-round-col:not(:last-child) .bracket-match-card::after {
-            content: ""; position: absolute; top: 50%; right: -40px; width: 40px; height: 2px; background: #333;
-        }
-        .bracket-right .bracket-round-col:not(:last-child) .bracket-match-card::after {
-            content: ""; position: absolute; top: 50%; left: -40px; width: 40px; height: 2px; background: #333;
-        }
-        
-        /* Vertical Connectors */
+        .bracket-match-card { background: white; border: 1px solid #999; border-radius: 6px; padding: 8px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 0.95em; display:flex; flex-direction:column; justify-content:center; position: relative; z-index: 2; min-height: 80px; }
+        .bracket-left .bracket-round-col:not(:last-child) .bracket-match-card::after { content: ""; position: absolute; top: 50%; right: -40px; width: 40px; height: 2px; background: #333; }
+        .bracket-right .bracket-round-col:not(:last-child) .bracket-match-card::after { content: ""; position: absolute; top: 50%; left: -40px; width: 40px; height: 2px; background: #333; }
         .bracket-left .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
         .bracket-left .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; right: -40px; width: 2px; background: #333; }
         .bracket-left .bracket-pair::after { content: ""; position: absolute; top: 50%; right: -60px; width: 20px; height: 2px; background: #333; }
-        
         .bracket-right .bracket-pair { position: relative; display: flex; flex-direction: column; justify-content: center; height: 100%; }
         .bracket-right .bracket-pair::before { content: ""; position: absolute; top: 25%; bottom: 25%; left: -40px; width: 2px; background: #333; }
         .bracket-right .bracket-pair::after { content: ""; position: absolute; top: 50%; left: -60px; width: 20px; height: 2px; background: #333; }
-        
         .bracket-final-card { border: 3px solid var(--primary); transform: scale(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .match-team { padding: 4px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .match-team.winner { font-weight: bold; background: #e0ffe0; color: #006400; }
@@ -291,9 +233,7 @@
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-games" class="view-section active">
-        <div id="games-container"></div>
-    </div>
+    <div id="view-games" class="view-section active"><div id="games-container"></div></div>
 
     <div id="view-groups" class="view-section">
         <div class="board">
@@ -438,7 +378,6 @@
             document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : "Usuário";
             document.getElementById('btn-add-arena').style.display = 'flex'; 
             document.getElementById('msg-login').style.display = 'none';
-            if(curArenaId) loadArenaPlayers(curArenaId);
             onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
                 favorites = snap.val() || {};
                 if(document.getElementById('screen-arenas').classList.contains('active')) loadArenas();
@@ -612,6 +551,7 @@
         document.getElementById('modal-knockout').style.display = 'flex';
     }
 
+    // FIXED: RESET KNOCKOUT GROUP TO AVOID DUPLICATES
     window.execKnockout = () => {
         let qualified = [];
         appState.groups.forEach(g => {
@@ -624,8 +564,11 @@
         });
 
         if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
-        
         qualified.sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
+
+        // REMOVE OLD KNOCKOUT GROUPS TO AVOID DUPLICATES
+        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
+        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
 
         let size = 2;
         while(size < qualified.length) size *= 2;
@@ -633,22 +576,49 @@
         const gid = `g-ko-${Date.now()}`;
         appState.groups.push({ id: gid, name: `MATA-MATA (Chave de ${size})` });
 
+        // GENERATE MATCHES FOR ROUND 1
+        const totalMatches = size - 1; // e.g. 16 players = 15 matches total
+        let koMatches = [];
+        
+        // ROUND 1: Match 0 to (size/2 - 1)
         for(let i=0; i<size/2; i++) {
             const high = qualified[i];
             const lowIndex = size - 1 - i;
             const low = qualified[lowIndex];
             
-            if(!low) {
-                addMatch(gid, high.id, high.id, 'BYE', 'BYE', true); 
-            } else {
-                addMatch(gid, high.id, high.id, low.id, low.id, false);
-            }
+            let m = {
+                mid: 'm' + Date.now() + Math.random().toString().substr(2, 3), 
+                gid: gid, 
+                p1: high ? high.id : 'BYE', 
+                p2: high ? high.id : 'BYE', 
+                p3: low ? low.id : 'BYE', 
+                p4: low ? low.id : 'BYE',
+                s1:'', s2:'', saved: false, isBye: false
+            };
+
+            if (!low) m.isBye = true; // Handle auto bye
+            koMatches.push(m);
         }
+
+        // GENERATE EMPTY SLOTS FOR NEXT ROUNDS
+        // If size=8 (4 matches R1), we need 2 Semis, 1 Final.
+        // Total slots needed = size - 1. We have size/2 matches.
+        // Remaining matches = (size-1) - (size/2) = size/2 - 1.
+        
+        for(let i=0; i < (size/2 - 1); i++) {
+             koMatches.push({
+                mid: 'm' + Date.now() + Math.random().toString().substr(2, 3) + i, 
+                gid: gid, 
+                p1: '', p2: '', p3: '', p4: '',
+                s1:'', s2:'', saved: false, isBye: false
+            });
+        }
+        
+        appState.matches.push(...koMatches);
         
         document.getElementById('modal-knockout').style.display = 'none';
         save();
         alert("Chave Gerada!");
-        // AUTO SWITCH TO BRACKET VIEW
         switchAppView('bracket');
     }
 
@@ -1133,8 +1103,24 @@
                     for(let k=0; k<leftCount; k++) {
                         if(matchIndex >= ms.length) break;
                         const m = ms[matchIndex]; matchIndex++;
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
-                        const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
+                        
+                        // PLACEHOLDER LOGIC FIXED
+                        let n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        let labelP1 = n(m.p1) || (m.isBye ? 'BYE' : `Venc. Jogo #${matchIndex}`); // Show Placeholder
+                        if(m.p1 === 'BYE') labelP1 = 'BYE';
+                        
+                        // Check if it's round 1 (seeded)
+                        if(r === 0 && !m.p1) labelP1 = '[+ Jogador]';
+                        
+                        // Simple check if name exists
+                        if(m.p1 && m.p1 !== 'BYE') labelP1 = n(m.p1);
+
+                        // REPEAT LOGIC FOR P2/P3/P4
+                        // SIMPLIFIED RENDER:
+                        const p1Name = m.p1 && m.p1 !== 'BYE' ? n(m.p1) : (m.isBye ? 'BYE' : (r===0 ? '[+ Jogador]' : 'Aguardando...'));
+                        const p2Name = m.p2 && m.p2 !== 'BYE' ? n(m.p2) : (m.isBye ? 'BYE' : (r===0 ? '[+ Jogador]' : 'Aguardando...'));
+
+                        const w1 = m.saved && m.s1 > m.s2; 
                         
                         const isEvenChild = (k % 2 === 0);
                         if(isEvenChild && r < rounds.length-2) { h += `<div class="bracket-pair">`; }
@@ -1142,15 +1128,15 @@
                         h += `<div class="bracket-match-card">
                             <div class="match-team ${w1?'winner':''}">
                                  <span style="display:flex; flex-direction:column; text-align:left;">
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.8em; color:#555;">${n(m.p2)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${p1Name}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.8em; color:#555;">${p2Name}</span>
                                  </span>
                                  <span class="match-score">${m.s1||'-'}</span>
                             </div>
-                            <div class="match-team ${w2?'winner':''}" style="margin-top:2px;">
+                            <div class="match-team ${m.saved && m.s2 > m.s1?'winner':''}" style="margin-top:2px;">
                                  <span style="display:flex; flex-direction:column; text-align:left;">
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.8em; color:#555;">${n(m.p4)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${m.p3 && m.p3 !== 'BYE' ? n(m.p3) : (m.isBye ? 'BYE' : (r===0 ? '[+ Jogador]' : 'Aguardando...'))}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.8em; color:#555;">${m.p4 && m.p4 !== 'BYE' ? n(m.p4) : (m.isBye ? 'BYE' : (r===0 ? '[+ Jogador]' : 'Aguardando...'))}</span>
                                  </span>
                                  <span class="match-score">${m.s2||'-'}</span>
                             </div>
@@ -1163,9 +1149,10 @@
                 }
                 h += `</div>`; 
 
+                // FINAL MATCH (CENTER)
                 const finalMatch = ms[ms.length-1];
                 if(finalMatch) {
-                    const nf = (id) => appState.players.find(x=>x.id===id)?.name || '[+ Parceiro]';
+                    const nf = (id) => appState.players.find(x=>x.id===id)?.name || 'Aguardando...';
                     const wf1 = finalMatch.saved && finalMatch.s1 > finalMatch.s2; const wf2 = finalMatch.saved && finalMatch.s2 > finalMatch.s1;
 
                     h += `<div class="bracket-final-container"><div class="bracket-match-card bracket-final-card">
@@ -1200,7 +1187,13 @@
                     for(let k=0; k<rightCount; k++) {
                         if(currentRightIndex + k >= ms.length) break;
                         const m = ms[currentRightIndex + k];
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'[+ Parceiro]');
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name; // Helper
+                        
+                        const p1Name = m.p1 && m.p1 !== 'BYE' ? n(m.p1) : (m.isBye ? 'BYE' : (r===0 ? '[+ Jogador]' : 'Aguardando...'));
+                        const p2Name = m.p2 && m.p2 !== 'BYE' ? n(m.p2) : (m.isBye ? 'BYE' : (r===0 ? '[+ Jogador]' : 'Aguardando...'));
+                        const p3Name = m.p3 && m.p3 !== 'BYE' ? n(m.p3) : (m.isBye ? 'BYE' : (r===0 ? '[+ Jogador]' : 'Aguardando...'));
+                        const p4Name = m.p4 && m.p4 !== 'BYE' ? n(m.p4) : (m.isBye ? 'BYE' : (r===0 ? '[+ Jogador]' : 'Aguardando...'));
+
                         const w1 = m.saved && m.s1 > m.s2; const w2 = m.saved && m.s2 > m.s1;
                         
                         const isEvenChild = (k % 2 === 0);
@@ -1209,15 +1202,15 @@
                         h += `<div class="bracket-match-card">
                            <div class="match-team ${w1?'winner':''}">
                                  <span style="display:flex; flex-direction:column; text-align:left;">
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.8em; color:#555;">${n(m.p2)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${p1Name}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p2')" style="font-size:0.8em; color:#555;">${p2Name}</span>
                                  </span>
                                  <span class="match-score">${m.s1||'-'}</span>
                             </div>
                             <div class="match-team ${w2?'winner':''}" style="margin-top:2px;">
                                  <span style="display:flex; flex-direction:column; text-align:left;">
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>
-                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.8em; color:#555;">${n(m.p4)}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${p3Name}</span>
+                                    <span class="player-link admin-only" onclick="openPlayerSelect('${m.mid}', 'p4')" style="font-size:0.8em; color:#555;">${p4Name}</span>
                                  </span>
                                  <span class="match-score">${m.s2||'-'}</span>
                             </div>
@@ -1232,9 +1225,7 @@
                 h += `</div>`;
                 h += `</div>`;
                 
-                // RENDER BRACKET TO SEPARATE VIEW
                 document.getElementById('bracket-container').innerHTML = h;
-                // DO NOT ADD TO groups-container
                 
             } else {
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
