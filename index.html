@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V134 (Simple & Stable)</title>
+    <title>BT Manager - V135 (Score Input Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -83,7 +83,8 @@
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        
+        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
+
         .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
@@ -94,25 +95,47 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD */
-        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
+        /* LAYOUT BOARD - FIXED V135 (4 COLS GRID) */
+        .board { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 15px; 
+        }
         
-        /* Mobile: Groups stack */
-        #groups-container { display: flex; flex-direction: column; gap: 15px; }
+        #col-pool { 
+            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
+            width: 100%; 
+            max-height: 300px; overflow-y: auto; 
+        }
+        
+        /* Mobile: Groups stack vertically */
+        #groups-container {
+            display: flex; flex-direction: column; gap: 15px;
+        }
 
         @media(min-width: 1100px) { 
-            .board { grid-template-columns: 200px 1fr; align-items: start; } 
-            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
+            .board { 
+                grid-template-columns: 200px 1fr; 
+                align-items: start;
+            } 
+            #col-pool { 
+                position: sticky; top: 75px; 
+                max-height: 85vh; 
+            }
             
-            /* Desktop: 4 Colunas FIXAS */
-            #groups-container { 
+            /* DESKTOP FIXED GRID (4 COLS) */
+            #groups-container {
                 display: grid;
-                grid-template-columns: repeat(4, 1fr); 
+                grid-template-columns: repeat(4, 1fr); /* FORÇA 4 POR LINHA */
                 gap: 15px;
                 align-items: start;
             }
-            .group-box { flex: unset; width: 100%; }
+            
+            .group-box {
+                flex: unset;
+                min-width: 0;
+                width: 100%;
+            }
         }
 
         /* JOGOS LIST */
@@ -152,15 +175,10 @@
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
 
-        /* SIMPLIFIED KNOCKOUT LIST VIEW */
-        .ko-round-header {
-            background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center;
-        }
+        /* KNOCKOUT LIST VIEW */
+        .ko-round-header { background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; }
         .ko-list { background: white; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
-        .ko-match-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 10px 0; border-bottom: 1px solid #eee; 
-        }
+        .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
         .ko-match-item:last-child { border-bottom: none; }
         .ko-player { flex: 1; text-align: center; font-weight: 600; cursor: pointer; }
         .ko-vs { font-size: 0.8em; color: #999; margin: 0 10px; }
@@ -467,6 +485,10 @@
             else { 
                 appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
             }
+            // Garantir que groupCount existe
+            if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
+                appState.groupCount = appState.groups ? appState.groups.length : 0;
+            }
             recalc(); 
             renderApp();
         });
@@ -488,11 +510,9 @@
         document.getElementById('modal-knockout').style.display = 'flex';
     }
 
-    // === EXECUÇÃO MATA-MATA (GLOBAL SEEDING SIMPLIFICADO) ===
+    // === EXECUÇÃO MATA-MATA (GLOBAL SEEDING) ===
     window.execKnockout = () => {
         let qualified = [];
-        
-        // 1. COLETAR TODOS OS CLASSIFICADOS
         appState.groups.forEach(g => {
             if(g.id.includes('ko')) return;
             const n = parseInt(document.getElementById(`ko-n-${g.id}`).value) || 0;
@@ -504,34 +524,29 @@
 
         if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
 
-        // 2. ORDENAR GERAL
         qualified.sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
 
-        // 3. LIMPAR
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
 
-        // 4. CALCULAR TAMANHO (2, 4, 8, 16...)
         let size = 2;
         while(size < qualified.length) size *= 2;
         
         const gid = `g-ko-${Date.now()}`;
         appState.groups.push({ id: gid, name: `MATA-MATA (Chave de ${size})` });
 
-        // 5. GERAR MATCHUPS (LISTA PLANA DE JOGOS)
         let seeds = new Array(size).fill(null);
         for(let i=0; i<qualified.length; i++) seeds[i] = qualified[i];
 
         let pairingOrder = [];
         if(size === 2) pairingOrder = [0, 1];
-        else if(size === 4) pairingOrder = [0, 3, 1, 2]; // 1v4, 2v3
-        else if(size === 8) pairingOrder = [0, 7, 3, 4, 2, 5, 1, 6]; // 1v8, 4v5, 3v6, 2v7
+        else if(size === 4) pairingOrder = [0, 3, 1, 2]; 
+        else if(size === 8) pairingOrder = [0, 7, 3, 4, 2, 5, 1, 6]; 
         else if(size === 16) pairingOrder = [0, 15, 7, 8, 4, 11, 3, 12, 2, 13, 5, 10, 6, 9, 1, 14];
 
         let koMatches = [];
-        let totalRounds = Math.log2(size); // 16 -> 4 rounds (Oitavas, Quartas, Semi, Final)
+        let totalRounds = Math.log2(size);
         
-        // --- RODADA 1 (TODOS OS JOGOS) ---
         for(let i=0; i<pairingOrder.length; i+=2) {
             const seedA = seeds[pairingOrder[i]];
             const seedB = seeds[pairingOrder[i+1]];
@@ -541,18 +556,15 @@
                 gid: gid, 
                 round: 1,
                 p1: seedA ? seedA.id : 'BYE', 
-                p2: seedA ? seedA.id : 'BYE', // Duplicado para fixas? No, this is ID. Name render resolves it.
+                p2: seedA ? seedA.id : 'BYE',
                 p3: seedB ? seedB.id : 'BYE', 
                 p4: seedB ? seedB.id : 'BYE',
                 s1:'', s2:'', saved: false, isBye: false
             };
-
-            if (!seedA || !seedB) m.isBye = true; // Auto advance if BYE
+            if (!seedA || !seedB) m.isBye = true;
             koMatches.push(m);
         }
 
-        // --- RODADAS SEGUINTES (SLOTS VAZIOS) ---
-        // Ex: 8 jogos na R1 -> 4 na R2 -> 2 na R3 -> 1 na R4
         let matchesInRound = size / 2;
         for(let r=2; r<=totalRounds; r++) {
             matchesInRound /= 2;
@@ -852,24 +864,17 @@
         }
     }
 
-    // --- AUTO ADVANCE LOGIC (SIMPLER LIST BASED) ---
+    // --- AUTO ADVANCE LOGIC ---
     function advanceWinner(mid, currentMatch, s1, s2) {
-        // Find current match in the sorted KO list
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         
-        // Match must have a 'round' property now
-        if(!currentMatch.round) return; // Legacy safety
-        
-        // Find target match in next round
-        // Logic: Match I in Round R feeds Match floor(I/2) in Round R+1
-        // We need to know index relative to the round
+        if(!currentMatch.round) return; 
         
         const currentRoundMatches = koMatches.filter(m => m.round === currentMatch.round);
         const nextRoundMatches = koMatches.filter(m => m.round === currentMatch.round + 1);
         
-        if(nextRoundMatches.length === 0) return; // Final won
+        if(nextRoundMatches.length === 0) return; 
         
-        // Find index of current match within its round
         const myIndex = currentRoundMatches.findIndex(m => m.mid === mid);
         if(myIndex === -1) return;
         
@@ -877,12 +882,10 @@
         const targetMatch = nextRoundMatches[targetIndex];
         
         if(targetMatch) {
-            // Determine winner ID
             let w1, w2;
             if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; }
             else { w1 = currentMatch.p3; w2 = currentMatch.p4; }
             
-            // Slot 1 (Top) or Slot 2 (Bottom)
             if(myIndex % 2 === 0) {
                 targetMatch.p1 = w1; targetMatch.p2 = w2;
             } else {
@@ -932,7 +935,7 @@
         
         // Organizar jogos de grupo por GrupoID
         const groupsMap = {};
-        const groupOrder = []; 
+        const groupOrder = []; // Para manter a ordem de criação dos grupos
         
         groupMatches.forEach(m => {
             if (!groupsMap[m.gid]) {
@@ -942,7 +945,7 @@
             groupsMap[m.gid].push(m);
         });
 
-        // Intercalar
+        // Intercalar: 1 de cada grupo, rodada por rodada
         const interleaved = [];
         let maxLen = 0;
         Object.values(groupsMap).forEach(arr => {
@@ -957,6 +960,7 @@
             });
         }
 
+        // Retornar: Mata-Mata primeiro, depois os grupos intercalados
         return [...koMatches, ...interleaved];
     }
     
@@ -966,7 +970,7 @@
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
         const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
         
-        // POOL RENDER
+        // POOL RENDER (COMPACT)
         poolPs.forEach(p => { 
             const d = document.createElement('div'); 
             d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
@@ -975,8 +979,10 @@
             pl.appendChild(d); 
         });
         
-        // JOGOS LIST
+        // RENDER MATCHES LIST (VIEW 1) - SMART QUEUE
         const gc1 = document.getElementById('games-container'); gc1.innerHTML='';
+        
+        // USANDO A NOVA LÓGICA DE FILA INTELIGENTE
         const sortedMatches = getSmartSortedMatches(appState.matches);
         
         if(sortedMatches.length === 0) {
@@ -1015,7 +1021,7 @@
             });
         }
 
-        // RENDER GROUPS
+        // RENDER TABLE (VIEW 2)
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         let h = ''; 
 
@@ -1028,10 +1034,9 @@
                 col.style.gridColumn = '1 / -1'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
                 
-                // RENDER AS SIMPLE LIST (V134 STABLE)
+                // RENDER AS SIMPLE LIST WITH INPUTS (V135 FIX)
                 h += `<div class="ko-list">`;
                 
-                // Group by Rounds
                 const rounds = {};
                 ms.forEach(m => {
                     if(!rounds[m.round]) rounds[m.round] = [];
@@ -1056,24 +1061,32 @@
                         const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
                         const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
                         
+                        // LOGIC FOR INPUTS VS DISPLAY
+                        const isEditing = !m.saved && !m.isBye;
+                        
                         h += `<div class="ko-match-item">
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
-                            <div class="ko-score">${m.s1||'-'}</div>
-                            <div class="ko-vs">X</div>
-                            <div class="ko-score">${m.s2||'-'}</div>
+                            ${isEditing ? 
+                                `<input type="tel" id="tbl-s1-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                 <span class="ko-vs">X</span>
+                                 <input type="tel" id="tbl-s2-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                : 
+                                `<div class="ko-score">${m.s1||'-'}</div>
+                                 <div class="ko-vs">X</div>
+                                 <div class="ko-score">${m.s2||'-'}</div>`
+                            }
                             
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
-                            ${!m.saved && !m.isBye ? `<button class="btn-icon-circle admin-only" style="width:25px;height:25px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}')">ok</button>` : ''}
+                            ${isEditing ? `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}')">✓</button>` : ''}
                         </div>`;
                     });
                 });
                 
                 h += `</div>`;
-                
                 document.getElementById('bracket-container').innerHTML = h;
                 
             } else {
@@ -1098,7 +1111,6 @@
                     ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
-                
                 col.innerHTML = h;
                 gc.appendChild(col);
             }
