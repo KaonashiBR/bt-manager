@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V141 (Bulletproof)</title>
+    <title>BT Manager - V141 (Final KO Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* VARIÁVEIS E RESET */
+        /* BASE & VARS */
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
@@ -845,7 +845,7 @@
             return;
         }
 
-        // CORREÇÃO CRÍTICA V141: QUERYSELECTOR ALL PARA ACHAR O INPUT EM QUALQUER LUGAR
+        // CORREÇÃO CRÍTICA V141: PROCURA INPUT EM TODO DOCUMENTO
         // Busca qualquer input que termine com o ID do match e tenha o prefixo correto
         let el1 = document.querySelector(`input[id$="-s1-${mid}"]`);
         let el2 = document.querySelector(`input[id$="-s2-${mid}"]`);
