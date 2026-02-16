@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V142 (Final KO Logic)</title>
+    <title>BT Manager - V143 (Waterfall Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,47 +74,16 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD - FIXED V142 */
-        .board { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-        }
+        /* LAYOUT BOARD */
+        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
+        #groups-container { display: flex; flex-direction: column; gap: 15px; }
         
-        #col-pool { 
-            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
-            width: 100%; 
-            max-height: 300px; overflow-y: auto; 
-        }
-        
-        /* Mobile: Groups stack vertically */
-        #groups-container {
-            display: flex; flex-direction: column; gap: 15px;
-        }
-
         @media(min-width: 1100px) { 
-            .board { 
-                grid-template-columns: 200px 1fr; 
-                align-items: start;
-            } 
-            #col-pool { 
-                position: sticky; top: 75px; 
-                max-height: 85vh; 
-            }
-            
-            /* DESKTOP FIXED GRID (4 COLS) */
-            #groups-container {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr); /* FORÇA 4 POR LINHA */
-                gap: 15px;
-                align-items: start;
-            }
-            
-            .group-box {
-                flex: unset;
-                min-width: 0;
-                width: 100%;
-            }
+            .board { grid-template-columns: 200px 1fr; align-items: start; } 
+            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
+            #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
+            .group-box { flex: unset; width: 100%; }
         }
 
         /* JOGOS LIST */
@@ -239,7 +208,9 @@
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-games" class="view-section active"><div id="games-container"></div></div>
+    <div id="view-games" class="view-section active">
+        <div id="games-container"></div>
+    </div>
 
     <div id="view-groups" class="view-section">
         <div class="board">
@@ -887,6 +858,7 @@
         }
         
         renderApp(); // FORCE UPDATE
+        if(m.gid.includes('ko')) alert("Vencedor avançou para a próxima fase!");
     }
 
     // --- AUTO ADVANCE LOGIC (MATHEMATICAL V141) ---
