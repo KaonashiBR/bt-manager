@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V140 (Final Fix)</title>
+    <title>BT Manager - V141 (Bulletproof)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* BASE & VARS */
+        /* VARIÁVEIS E RESET */
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
@@ -74,15 +74,47 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD */
-        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
-        #groups-container { display: flex; flex-direction: column; gap: 15px; }
+        /* LAYOUT BOARD - FIXED V141 (4 COLS GRID) */
+        .board { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 15px; 
+        }
+        
+        #col-pool { 
+            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
+            width: 100%; 
+            max-height: 300px; overflow-y: auto; 
+        }
+        
+        /* Mobile: Groups stack vertically */
+        #groups-container {
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
         @media(min-width: 1100px) { 
-            .board { grid-template-columns: 200px 1fr; align-items: start; } 
-            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
-            #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
-            .group-box { flex: unset; width: 100%; }
+            .board { 
+                grid-template-columns: 200px 1fr; 
+                align-items: start;
+            } 
+            #col-pool { 
+                position: sticky; top: 75px; 
+                max-height: 85vh; 
+            }
+            
+            /* DESKTOP FIXED GRID (4 COLS) */
+            #groups-container {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr); /* FORÇA 4 POR LINHA */
+                gap: 15px;
+                align-items: start;
+            }
+            
+            .group-box {
+                flex: unset;
+                min-width: 0;
+                width: 100%;
+            }
         }
 
         /* JOGOS LIST */
@@ -515,6 +547,8 @@
                 mid: 'm' + Date.now() + Math.random().toString().substr(2, 3) + i, 
                 gid: gid, 
                 round: 1,
+                // POS (POSITION) FIELD ADDED FOR MATH CALCULATION
+                pos: i/2, 
                 p1: seedA ? seedA.id : 'BYE', 
                 p2: seedA ? seedA.id : 'BYE',
                 p3: seedB ? seedB.id : 'BYE', 
@@ -533,6 +567,7 @@
                     mid: 'm-r' + r + '-' + i + '-' + Date.now(), 
                     gid: gid, 
                     round: r,
+                    pos: i,
                     p1: '', p2: '', p3: '', p4: '',
                     s1:'', s2:'', saved: false, isBye: false
                 });
@@ -810,26 +845,16 @@
             return;
         }
 
-        // CORREÇÃO CRÍTICA V139: LEITURA ROBUSTA DOS IDs DE INPUT
-        let val1 = '';
-        let val2 = '';
+        // CORREÇÃO CRÍTICA V141: QUERYSELECTOR ALL PARA ACHAR O INPUT EM QUALQUER LUGAR
+        // Busca qualquer input que termine com o ID do match e tenha o prefixo correto
+        let el1 = document.querySelector(`input[id$="-s1-${mid}"]`);
+        let el2 = document.querySelector(`input[id$="-s2-${mid}"]`);
 
-        // TENTA LER DO MATA-MATA (ID: ko-s1-...)
-        let elKo1 = document.getElementById(`ko-s1-${mid}`);
-        let elKo2 = document.getElementById(`ko-s2-${mid}`);
-        if(elKo1 && elKo1.value) val1 = elKo1.value;
-        if(elKo2 && elKo2.value) val2 = elKo2.value;
-
-        // SE NÃO ACHOU, TENTA LER DO JOGOS (ID: live-s1-...)
-        if(val1 === '') val1 = document.getElementById(`live-s1-${mid}`)?.value || '';
-        if(val2 === '') val2 = document.getElementById(`live-s2-${mid}`)?.value || '';
-
-        // SE NÃO ACHOU, TENTA LER DA TABELA DE GRUPOS (ID: tbl-s1-...)
-        if(val1 === '') val1 = document.getElementById(`tbl-s1-${mid}`)?.value || '';
-        if(val2 === '') val2 = document.getElementById(`tbl-s2-${mid}`)?.value || '';
+        let val1 = el1 ? el1.value : '';
+        let val2 = el2 ? el2.value : '';
 
         if(val1 === '' || val2 === '') { 
-            alert(`Preencha o placar.\n(Nada encontrado nos campos)`); 
+            alert(`Preencha o placar.`); 
             return; 
         }
         
@@ -837,54 +862,52 @@
 
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
-        // 1. ATUALIZA ESTADO LOCAL
         m.s1 = s1; m.s2 = s2; m.saved = true;
         recalc();
 
-        // 2. CALCULA AVANÇO SE FOR MATA-MATA
+        // ** ADVANCE WINNER FOR KNOCKOUT **
         if(m.gid.includes('ko')) {
             advanceWinner(mid, m, s1, s2);
         }
         
-        // 3. SALVA NO BANCO (LISTA INTEIRA PARA GARANTIR O AVANÇO)
-        if(m.gid.includes('ko')) {
-            await update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
-        } else {
-            await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-        }
+        // SAVE ALL TO BE SAFE
+        await update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
         
         renderApp(); // FORCE UPDATE
+        if(m.gid.includes('ko')) alert("Vencedor avançou para a próxima fase!");
     }
 
-    // --- AUTO ADVANCE LOGIC ---
+    // --- AUTO ADVANCE LOGIC (MATHEMATICAL V141) ---
     function advanceWinner(mid, currentMatch, s1, s2) {
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         
         if(!currentMatch.round) return; 
         
-        const currentRoundMatches = koMatches.filter(m => m.round === currentMatch.round);
-        const nextRoundMatches = koMatches.filter(m => m.round === currentMatch.round + 1);
+        // DETERMINE WINNER ID
+        let w1, w2;
+        if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; }
+        else { w1 = currentMatch.p3; w2 = currentMatch.p4; }
         
-        if(nextRoundMatches.length === 0) return; 
+        // MATH CALCULATION FOR NEXT SLOT
+        const currentRound = currentMatch.round;
+        const currentPos = currentMatch.pos; // Position in the round (0, 1, 2, 3...)
         
-        const myIndex = currentRoundMatches.findIndex(m => m.mid === mid);
-        if(myIndex === -1) return;
+        const nextRound = currentRound + 1;
+        const nextPos = Math.floor(currentPos / 2);
         
-        const targetIndex = Math.floor(myIndex / 2);
-        const targetMatch = nextRoundMatches[targetIndex];
+        // Find the specific match target
+        const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos);
         
         if(targetMatch) {
-            let w1, w2;
-            if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; }
-            else { w1 = currentMatch.p3; w2 = currentMatch.p4; }
-            
             // ATUALIZAR O OBJETO GLOBAL
             const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
             if(globalTargetIndex > -1) {
-                if(myIndex % 2 === 0) {
+                if(currentPos % 2 === 0) {
+                    // Even position feeds top slot (p1/p2)
                     appState.matches[globalTargetIndex].p1 = w1; 
                     appState.matches[globalTargetIndex].p2 = w2;
                 } else {
+                    // Odd position feeds bottom slot (p3/p4)
                     appState.matches[globalTargetIndex].p3 = w1; 
                     appState.matches[globalTargetIndex].p4 = w2;
                 }
@@ -1025,7 +1048,7 @@
                 col.style.gridColumn = '1 / -1'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
                 
-                // RENDER AS SIMPLE LIST WITH INPUTS (V139 FIX)
+                // RENDER AS SIMPLE LIST WITH INPUTS (V141 FIX)
                 h += `<div class="ko-list">`;
                 
                 const rounds = {};
