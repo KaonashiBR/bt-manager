@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V143 (Waterfall Fix)</title>
+    <title>BT Manager - V144 (Priority Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,16 +74,47 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD */
-        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
-        #groups-container { display: flex; flex-direction: column; gap: 15px; }
+        /* LAYOUT BOARD - FIXED 4 COLS GRID */
+        .board { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 15px; 
+        }
         
+        #col-pool { 
+            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
+            width: 100%; 
+            max-height: 300px; overflow-y: auto; 
+        }
+        
+        /* Mobile: Groups stack vertically */
+        #groups-container {
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
         @media(min-width: 1100px) { 
-            .board { grid-template-columns: 200px 1fr; align-items: start; } 
-            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
-            #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
-            .group-box { flex: unset; width: 100%; }
+            .board { 
+                grid-template-columns: 200px 1fr; 
+                align-items: start;
+            } 
+            #col-pool { 
+                position: sticky; top: 75px; 
+                max-height: 85vh; 
+            }
+            
+            /* DESKTOP FIXED GRID (4 COLS) */
+            #groups-container {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr); 
+                gap: 15px;
+                align-items: start;
+            }
+            
+            .group-box {
+                flex: unset;
+                min-width: 0;
+                width: 100%;
+            }
         }
 
         /* JOGOS LIST */
@@ -814,23 +845,23 @@
             return;
         }
 
-        // CORREÇÃO CRÍTICA V141: LEITURA ROBUSTA DOS IDs DE INPUT
+        // CORREÇÃO CRÍTICA V144: LEITURA ROBUSTA CORRIGIDA (Prioridade: KO -> Live -> Tbl)
         let val1 = '';
         let val2 = '';
 
-        // TENTA LER DO MATA-MATA (ID: ko-s1-...)
+        // 1. TENTA LER DO MATA-MATA (ID: ko-s1-...)
         let elKo1 = document.getElementById(`ko-s1-${mid}`);
         let elKo2 = document.getElementById(`ko-s2-${mid}`);
-        if(elKo1 && elKo1.value) val1 = elKo1.value;
-        if(elKo2 && elKo2.value) val2 = elKo2.value;
+        if(elKo1) val1 = elKo1.value;
+        if(elKo2) val2 = elKo2.value;
 
-        // SE NÃO ACHOU, TENTA LER DO JOGOS (ID: live-s1-...)
-        if(val1 === '') val1 = document.getElementById(`live-s1-${mid}`)?.value || '';
-        if(val2 === '') val2 = document.getElementById(`live-s2-${mid}`)?.value || '';
+        // 2. SE NÃO ACHOU (E AINDA VAZIO), TENTA LER DO JOGOS (ID: live-s1-...)
+        if(!val1 || val1 === '') val1 = document.getElementById(`live-s1-${mid}`)?.value || '';
+        if(!val2 || val2 === '') val2 = document.getElementById(`live-s2-${mid}`)?.value || '';
 
-        // SE NÃO ACHOU, TENTA LER DA TABELA DE GRUPOS (ID: tbl-s1-...)
-        if(val1 === '') val1 = document.getElementById(`tbl-s1-${mid}`)?.value || '';
-        if(val2 === '') val2 = document.getElementById(`tbl-s2-${mid}`)?.value || '';
+        // 3. SE NÃO ACHOU, TENTA LER DA TABELA DE GRUPOS (ID: tbl-s1-...)
+        if(!val1 || val1 === '') val1 = document.getElementById(`tbl-s1-${mid}`)?.value || '';
+        if(!val2 || val2 === '') val2 = document.getElementById(`tbl-s2-${mid}`)?.value || '';
 
         if(val1 === '' || val2 === '') { 
             alert(`Preencha o placar.\n(Nada encontrado nos campos)`); 
@@ -858,7 +889,6 @@
         }
         
         renderApp(); // FORCE UPDATE
-        if(m.gid.includes('ko')) alert("Vencedor avançou para a próxima fase!");
     }
 
     // --- AUTO ADVANCE LOGIC (MATHEMATICAL V141) ---
@@ -1032,7 +1062,7 @@
                 col.style.gridColumn = '1 / -1'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
                 
-                // RENDER AS SIMPLE LIST WITH INPUTS (V141 FIX)
+                // RENDER AS SIMPLE LIST WITH INPUTS (V144 FIX)
                 h += `<div class="ko-list">`;
                 
                 const rounds = {};
@@ -1060,12 +1090,13 @@
                         const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
                         
                         const isEditing = !m.saved && !m.isBye;
+                        const hasPlayers = (m.p1 && m.p1!=='BYE') && (m.p3 && m.p3!=='BYE');
                         
                         h += `<div class="ko-match-item">
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
-                            ${isEditing ? 
+                            ${isEditing && hasPlayers ? 
                                 `<input type="tel" id="ko-s1-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
                                  <input type="tel" id="ko-s2-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
@@ -1078,10 +1109,10 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
-                            ${isEditing ? 
+                            ${isEditing && hasPlayers ? 
                                 `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}')">✓</button>` 
                                 : 
-                                `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>`
+                                (m.saved ? `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
                         </div>`;
                     });
