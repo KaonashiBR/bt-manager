@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V139 (Score Save Fixed)</title>
+    <title>BT Manager - V140 (Final Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,47 +74,15 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD - FIXED V138 (4 COLS GRID) */
-        .board { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-        }
-        
-        #col-pool { 
-            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
-            width: 100%; 
-            max-height: 300px; overflow-y: auto; 
-        }
-        
-        /* Mobile: Groups stack vertically */
-        #groups-container {
-            display: flex; flex-direction: column; gap: 15px;
-        }
-
+        /* LAYOUT BOARD */
+        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
+        #groups-container { display: flex; flex-direction: column; gap: 15px; }
         @media(min-width: 1100px) { 
-            .board { 
-                grid-template-columns: 200px 1fr; 
-                align-items: start;
-            } 
-            #col-pool { 
-                position: sticky; top: 75px; 
-                max-height: 85vh; 
-            }
-            
-            /* DESKTOP FIXED GRID (4 COLS) */
-            #groups-container {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr); /* FORÇA 4 POR LINHA */
-                gap: 15px;
-                align-items: start;
-            }
-            
-            .group-box {
-                flex: unset;
-                min-width: 0;
-                width: 100%;
-            }
+            .board { grid-template-columns: 200px 1fr; align-items: start; } 
+            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
+            #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
+            .group-box { flex: unset; width: 100%; }
         }
 
         /* JOGOS LIST */
@@ -842,18 +810,26 @@
             return;
         }
 
-        // CORREÇÃO CRÍTICA V139: LEITURA ROBUSTA
-        let v1Live = document.getElementById(`live-s1-${mid}`)?.value;
-        let v1Tbl = document.getElementById(`tbl-s1-${mid}`)?.value;
-        let v2Live = document.getElementById(`live-s2-${mid}`)?.value;
-        let v2Tbl = document.getElementById(`tbl-s2-${mid}`)?.value;
+        // CORREÇÃO CRÍTICA V139: LEITURA ROBUSTA DOS IDs DE INPUT
+        let val1 = '';
+        let val2 = '';
 
-        // Se o valor existe e não é vazio, usa. Se não, tenta o outro.
-        let val1 = (v1Live && v1Live.trim() !== '') ? v1Live : (v1Tbl || '');
-        let val2 = (v2Live && v2Live.trim() !== '') ? v2Live : (v2Tbl || '');
+        // TENTA LER DO MATA-MATA (ID: ko-s1-...)
+        let elKo1 = document.getElementById(`ko-s1-${mid}`);
+        let elKo2 = document.getElementById(`ko-s2-${mid}`);
+        if(elKo1 && elKo1.value) val1 = elKo1.value;
+        if(elKo2 && elKo2.value) val2 = elKo2.value;
+
+        // SE NÃO ACHOU, TENTA LER DO JOGOS (ID: live-s1-...)
+        if(val1 === '') val1 = document.getElementById(`live-s1-${mid}`)?.value || '';
+        if(val2 === '') val2 = document.getElementById(`live-s2-${mid}`)?.value || '';
+
+        // SE NÃO ACHOU, TENTA LER DA TABELA DE GRUPOS (ID: tbl-s1-...)
+        if(val1 === '') val1 = document.getElementById(`tbl-s1-${mid}`)?.value || '';
+        if(val2 === '') val2 = document.getElementById(`tbl-s2-${mid}`)?.value || '';
 
         if(val1 === '' || val2 === '') { 
-            alert(`Preencha o placar.\n(Valor lido: [${val1}] x [${val2}])`); 
+            alert(`Preencha o placar.\n(Nada encontrado nos campos)`); 
             return; 
         }
         
@@ -861,21 +837,23 @@
 
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
+        // 1. ATUALIZA ESTADO LOCAL
         m.s1 = s1; m.s2 = s2; m.saved = true;
         recalc();
 
-        // ** AUTO ADVANCE WINNER FOR KNOCKOUT **
+        // 2. CALCULA AVANÇO SE FOR MATA-MATA
         if(m.gid.includes('ko')) {
             advanceWinner(mid, m, s1, s2);
         }
         
-        update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-        
+        // 3. SALVA NO BANCO (LISTA INTEIRA PARA GARANTIR O AVANÇO)
         if(m.gid.includes('ko')) {
-            update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
+            await update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
+        } else {
+            await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
         }
         
-        renderApp(); // FORCE UPDATE TO SHOW NEW ROUND
+        renderApp(); // FORCE UPDATE
     }
 
     // --- AUTO ADVANCE LOGIC ---
@@ -1081,9 +1059,9 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
                             ${isEditing ? 
-                                `<input type="tel" id="tbl-s1-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" id="ko-s1-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" id="tbl-s2-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" id="ko-s2-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
                                 `<div class="ko-score">${m.s1||'-'}</div>
                                  <div class="ko-vs">X</div>
