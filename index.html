@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V148 (3rd Place Logic)</title>
+    <title>BT Manager - V147 + 3rd Place</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,16 +74,47 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD - FIXED V148 */
-        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
-        #groups-container { display: flex; flex-direction: column; gap: 15px; }
+        /* LAYOUT BOARD - FIXED V147 (4 COLS GRID) */
+        .board { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 15px; 
+        }
         
+        #col-pool { 
+            background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; 
+            width: 100%; 
+            max-height: 300px; overflow-y: auto; 
+        }
+        
+        /* Mobile: Groups stack vertically */
+        #groups-container {
+            display: flex; flex-direction: column; gap: 15px;
+        }
+
         @media(min-width: 1100px) { 
-            .board { grid-template-columns: 200px 1fr; align-items: start; } 
-            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
-            #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
-            .group-box { flex: unset; width: 100%; }
+            .board { 
+                grid-template-columns: 200px 1fr; 
+                align-items: start;
+            } 
+            #col-pool { 
+                position: sticky; top: 75px; 
+                max-height: 85vh; 
+            }
+            
+            /* DESKTOP FIXED GRID (4 COLS) */
+            #groups-container {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr); 
+                gap: 15px;
+                align-items: start;
+            }
+            
+            .group-box {
+                flex: unset;
+                min-width: 0;
+                width: 100%;
+            }
         }
 
         /* JOGOS LIST */
@@ -203,11 +234,16 @@
     </div>
 
     <div class="app-tabs">
-        <div class="app-tab active" onclick="switchAppView('groups')">GRUPOS</div>
+        <div class="app-tab active" onclick="switchAppView('games')">JOGOS</div>
+        <div class="app-tab" onclick="switchAppView('groups')">GRUPOS</div>
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-groups" class="view-section active">
+    <div id="view-games" class="view-section active">
+        <div id="games-container"></div>
+    </div>
+
+    <div id="view-groups" class="view-section">
         <div class="board">
             <div class="column" id="col-pool">
                 <div style="background:var(--secondary); color:white; padding:8px; font-weight:bold; display:flex; justify-content:space-between; font-size:0.9em; border-radius: 8px 8px 0 0;">
@@ -371,8 +407,9 @@
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        if(view === 'groups') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
-        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
+        if(view === 'games') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-games').classList.add('active'); } 
+        else if(view === 'groups') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
+        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[2].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
     }
 
     function loadArenas() {
@@ -803,7 +840,7 @@
         save(); 
     }
     
-    // --- SAVE SCORE (V146 - DOM RELATIVE) ---
+    // --- SAVE SCORE (V147 - OPTIMISTIC UPDATE) ---
     window.saveS = async (mid, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -818,8 +855,7 @@
             return;
         }
 
-        // LEITURA RELATIVA (INFALÍVEL)
-        // Pega o container pai do botão e procura inputs lá dentro
+        // LEITURA RELATIVA
         let container = btnElement.parentElement;
         if (btnElement.closest('tr')) container = btnElement.closest('tr');
         
@@ -845,18 +881,23 @@
             advanceWinner(mid, m, s1, s2);
         }
         
-        // 3. SALVA NO BANCO (LISTA INTEIRA PARA GARANTIR O AVANÇO)
-        if(m.gid.includes('ko')) {
-            await update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches);
-        } else {
-            await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-        }
+        // 3. ATUALIZA A TELA IMEDIATAMENTE (OPTIMISTIC UI)
+        renderApp(); 
         
-        renderApp(); // FORCE UPDATE
-        if(m.gid.includes('ko')) alert("Vencedor avançou para a próxima fase!");
+        // 4. SALVA NO BANCO EM BACKGROUND
+        const savePromise = m.gid.includes('ko') 
+            ? update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches)
+            : update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
+            
+        savePromise.then(() => {
+            console.log("Salvo com sucesso no banco.");
+        }).catch(err => {
+            alert("Erro de conexão ao salvar: " + err.message);
+            // Reverter em caso de erro crítico (opcional, mas seguro)
+        });
     }
 
-    // --- AUTO ADVANCE LOGIC (V148: 3rd Place) ---
+    // --- AUTO ADVANCE LOGIC ---
     function advanceWinner(mid, currentMatch, s1, s2) {
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         
@@ -923,7 +964,9 @@
         const mIdx = appState.matches.findIndex(x => x.mid === mid);
         if(mIdx > -1) {
             appState.matches[mIdx].saved = false;
+            // Optimistic update
             renderApp(); 
+            // Background update
             await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false});
         }
     }
@@ -1008,7 +1051,7 @@
                 col.style.gridColumn = '1 / -1'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
                 
-                // RENDER AS SIMPLE LIST WITH INPUTS (V145 FIX)
+                // RENDER AS SIMPLE LIST WITH INPUTS (V147 FIX)
                 h += `<div class="ko-list">`;
                 
                 const rounds = {};
