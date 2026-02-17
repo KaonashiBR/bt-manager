@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V144 (Priority Fix)</title>
+    <title>BT Manager - V145 (Clean & Stable)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,7 +74,7 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD - FIXED 4 COLS GRID */
+        /* LAYOUT BOARD - FIXED V145 (4 COLS GRID) */
         .board { 
             display: grid; 
             grid-template-columns: 1fr; 
@@ -116,15 +116,6 @@
                 width: 100%;
             }
         }
-
-        /* JOGOS LIST */
-        .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
-        .match-main-content { padding: 0 10px; }
-        .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
-        .match-actions { display: flex; flex-direction: column; gap: 5px; }
-        .match-group-tag { font-size: 0.8em; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555; }
         
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
         .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
@@ -234,16 +225,11 @@
     </div>
 
     <div class="app-tabs">
-        <div class="app-tab active" onclick="switchAppView('games')">JOGOS</div>
-        <div class="app-tab" onclick="switchAppView('groups')">GRUPOS</div>
+        <div class="app-tab active" onclick="switchAppView('groups')">GRUPOS</div>
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-games" class="view-section active">
-        <div id="games-container"></div>
-    </div>
-
-    <div id="view-groups" class="view-section">
+    <div id="view-groups" class="view-section active">
         <div class="board">
             <div class="column" id="col-pool">
                 <div style="background:var(--secondary); color:white; padding:8px; font-weight:bold; display:flex; justify-content:space-between; font-size:0.9em; border-radius: 8px 8px 0 0;">
@@ -407,9 +393,8 @@
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        if(view === 'games') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-games').classList.add('active'); } 
-        else if(view === 'groups') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
-        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[2].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
+        if(view === 'groups') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
+        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
     }
 
     function loadArenas() {
@@ -444,10 +429,10 @@
         const isOwner = localAdmin || (user && (user.uid === ownerId || ADMIN_EMAILS.includes(user.email)));
         if(isOwner) { 
             document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; 
-            switchAppView('table');
+            switchAppView('groups');
         } else { 
             document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
-            switchAppView('games');
+            switchAppView('groups');
         }
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
@@ -775,7 +760,6 @@
     window.delGroup = (gid) => { if(confirm("Excluir?")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); }}
     window.delPlayer = (pid) => { if(confirm("Excluir?")) { appState.players=appState.players.filter(p=>p.id!==pid); save(); }}
     
-    // SAFE ROUND GEN + LOCK AUTO
     window.genMatches = (gid) => { 
         const existing = appState.matches.filter(m => m.gid === gid);
         if(existing.length > 0) return alert("Os jogos automáticos já foram gerados. Para adicionar mais, use o modo Manual (Mãozinha).");
@@ -845,23 +829,22 @@
             return;
         }
 
-        // CORREÇÃO CRÍTICA V144: LEITURA ROBUSTA CORRIGIDA (Prioridade: KO -> Live -> Tbl)
-        let val1 = '';
-        let val2 = '';
+        // CORREÇÃO FINAL V145: OLHA APENAS ONDE DEVE OLHAR
+        let val1 = '', val2 = '';
 
-        // 1. TENTA LER DO MATA-MATA (ID: ko-s1-...)
-        let elKo1 = document.getElementById(`ko-s1-${mid}`);
-        let elKo2 = document.getElementById(`ko-s2-${mid}`);
-        if(elKo1) val1 = elKo1.value;
-        if(elKo2) val2 = elKo2.value;
-
-        // 2. SE NÃO ACHOU (E AINDA VAZIO), TENTA LER DO JOGOS (ID: live-s1-...)
-        if(!val1 || val1 === '') val1 = document.getElementById(`live-s1-${mid}`)?.value || '';
-        if(!val2 || val2 === '') val2 = document.getElementById(`live-s2-${mid}`)?.value || '';
-
-        // 3. SE NÃO ACHOU, TENTA LER DA TABELA DE GRUPOS (ID: tbl-s1-...)
-        if(!val1 || val1 === '') val1 = document.getElementById(`tbl-s1-${mid}`)?.value || '';
-        if(!val2 || val2 === '') val2 = document.getElementById(`tbl-s2-${mid}`)?.value || '';
+        if(m.gid.includes('ko')) {
+             // MATA MATA
+             let elKo1 = document.getElementById(`ko-s1-${mid}`);
+             let elKo2 = document.getElementById(`ko-s2-${mid}`);
+             if(elKo1) val1 = elKo1.value;
+             if(elKo2) val2 = elKo2.value;
+        } else {
+             // GRUPOS (TBL)
+             let elTbl1 = document.getElementById(`tbl-s1-${mid}`);
+             let elTbl2 = document.getElementById(`tbl-s2-${mid}`);
+             if(elTbl1) val1 = elTbl1.value;
+             if(elTbl2) val2 = elTbl2.value;
+        }
 
         if(val1 === '' || val2 === '') { 
             alert(`Preencha o placar.\n(Nada encontrado nos campos)`); 
@@ -951,46 +934,6 @@
             }
         }); 
     }
-
-    // --- HELPER PARA FILA INTELIGENTE (SMART QUEUE) ---
-    function getSmartSortedMatches(allMatches) {
-        // Filtrar apenas jogos pendentes (não salvos e não BYE)
-        const pending = allMatches.filter(m => !m.saved && !m.isBye);
-        
-        // Separar jogos de Mata-Mata (Prioridade)
-        const koMatches = pending.filter(m => m.gid.includes('ko'));
-        const groupMatches = pending.filter(m => !m.gid.includes('ko'));
-        
-        // Organizar jogos de grupo por GrupoID
-        const groupsMap = {};
-        const groupOrder = []; // Para manter a ordem de criação dos grupos
-        
-        groupMatches.forEach(m => {
-            if (!groupsMap[m.gid]) {
-                groupsMap[m.gid] = [];
-                groupOrder.push(m.gid);
-            }
-            groupsMap[m.gid].push(m);
-        });
-
-        // Intercalar: 1 de cada grupo, rodada por rodada
-        const interleaved = [];
-        let maxLen = 0;
-        Object.values(groupsMap).forEach(arr => {
-            if(arr.length > maxLen) maxLen = arr.length;
-        });
-
-        for (let i = 0; i < maxLen; i++) {
-            groupOrder.forEach(gid => {
-                if (groupsMap[gid][i]) {
-                    interleaved.push(groupsMap[gid][i]);
-                }
-            });
-        }
-
-        // Retornar: Mata-Mata primeiro, depois os grupos intercalados
-        return [...koMatches, ...interleaved];
-    }
     
     function renderApp() {
         const focusedId = document.activeElement ? document.activeElement.id : null;
@@ -1007,48 +950,6 @@
             pl.appendChild(d); 
         });
         
-        // RENDER MATCHES LIST (VIEW 1) - SMART QUEUE
-        const gc1 = document.getElementById('games-container'); gc1.innerHTML='';
-        
-        // USANDO A NOVA LÓGICA DE FILA INTELIGENTE
-        const sortedMatches = getSmartSortedMatches(appState.matches);
-        
-        if(sortedMatches.length === 0) {
-            gc1.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">Nenhum jogo em aberto.</div>';
-        } else {
-            sortedMatches.forEach((m, index) => {
-                const g = appState.groups.find(gr => gr.id === m.gid);
-                const gName = g ? g.name : 'Unknown';
-                const n = (id) => appState.players.find(x=>x.id===id)?.name || (id==='BYE'?'BYE':'Selecionar...');
-                const p1n = n(m.p1); const p2n = n(m.p2); const p3n = n(m.p3); const p4n = n(m.p4);
-                
-                const t1 = appState.mode==='fixed' ? p1n : `${p1n} / ${p2n}`;
-                const t2 = appState.mode==='fixed' ? p3n : `${p3n} / ${p4n}`;
-
-                const d = document.createElement('div');
-                d.className = 'match-list-item';
-                d.innerHTML = `
-                    <div class="match-order-badge">#${index + 1}</div>
-                    <div class="match-main-content">
-                        <div class="match-info">
-                            <span class="match-group-tag">${gName}</span>
-                        </div>
-                        <div class="match-vs-line">
-                            <div style="flex:1; text-align:right;">${t1}</div>
-                            <div style="margin:0 8px; font-size:0.8em; color:#999;">X</div>
-                            <div style="flex:1; text-align:left;">${t2}</div>
-                        </div>
-                    </div>
-                    <div class="match-actions admin-only">
-                         <input type="tel" id="live-s1-${m.mid}" class="tbl-input" placeholder="0" style="width:40px; height:40px; font-size:1.2em;">
-                         <input type="tel" id="live-s2-${m.mid}" class="tbl-input" placeholder="0" style="width:40px; height:40px; font-size:1.2em;">
-                         <button class="btn-std btn-green" style="width:auto; margin:0; padding:5px 10px;" onclick="saveS('${m.mid}')">OK</button>
-                    </div>
-                `;
-                gc1.appendChild(d);
-            });
-        }
-
         // RENDER TABLE (VIEW 2)
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         let h = ''; 
@@ -1062,7 +963,7 @@
                 col.style.gridColumn = '1 / -1'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
                 
-                // RENDER AS SIMPLE LIST WITH INPUTS (V144 FIX)
+                // RENDER AS SIMPLE LIST WITH INPUTS (V145 FIX)
                 h += `<div class="ko-list">`;
                 
                 const rounds = {};
