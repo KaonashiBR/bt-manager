@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V147 + 3rd Place</title>
+    <title>BT Manager - V147 (Instant UI)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -116,15 +116,6 @@
                 width: 100%;
             }
         }
-
-        /* JOGOS LIST */
-        .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
-        .match-main-content { padding: 0 10px; }
-        .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
-        .match-actions { display: flex; flex-direction: column; gap: 5px; }
-        .match-group-tag { font-size: 0.8em; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555; }
         
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
         .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
@@ -234,16 +225,11 @@
     </div>
 
     <div class="app-tabs">
-        <div class="app-tab active" onclick="switchAppView('games')">JOGOS</div>
-        <div class="app-tab" onclick="switchAppView('groups')">GRUPOS</div>
+        <div class="app-tab active" onclick="switchAppView('groups')">GRUPOS</div>
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-games" class="view-section active">
-        <div id="games-container"></div>
-    </div>
-
-    <div id="view-groups" class="view-section">
+    <div id="view-groups" class="view-section active">
         <div class="board">
             <div class="column" id="col-pool">
                 <div style="background:var(--secondary); color:white; padding:8px; font-weight:bold; display:flex; justify-content:space-between; font-size:0.9em; border-radius: 8px 8px 0 0;">
@@ -407,9 +393,8 @@
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        if(view === 'games') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-games').classList.add('active'); } 
-        else if(view === 'groups') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
-        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[2].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
+        if(view === 'groups') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
+        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
     }
 
     function loadArenas() {
@@ -574,16 +559,6 @@
             }
         }
         
-        // 3rd PLACE MATCH (V148)
-        koMatches.push({
-            mid: 'm-3rd-' + Date.now(),
-            gid: gid,
-            round: totalRounds, // Same index as final for display sort logic, but handled separately
-            isThirdPlace: true,
-            p1: '', p2: '', p3: '', p4: '',
-            s1:'', s2:'', saved: false, isBye: false
-        });
-
         appState.matches.push(...koMatches);
 
         // AUTO PROCESS BYES
@@ -841,7 +816,7 @@
     }
     
     // --- SAVE SCORE (V147 - OPTIMISTIC UPDATE) ---
-    window.saveS = async (mid, btnElement) => { 
+    window.saveS = (mid, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
@@ -850,7 +825,8 @@
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
                 m.saved = false;
                 recalc();
-                await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
+                update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
+                renderApp(); // Refresh to edit mode
             }
             return;
         }
@@ -903,28 +879,23 @@
         
         if(!currentMatch.round) return; 
         
-        // WINNER & LOSER IDs
-        let w1, w2, l1, l2;
-        if(s1 > s2) { 
-            w1 = currentMatch.p1; w2 = currentMatch.p2; 
-            l1 = currentMatch.p3; l2 = currentMatch.p4;
-        } else { 
-            w1 = currentMatch.p3; w2 = currentMatch.p4; 
-            l1 = currentMatch.p1; l2 = currentMatch.p2;
-        }
+        // DETERMINE WINNER ID
+        let w1, w2;
+        if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; }
+        else { w1 = currentMatch.p3; w2 = currentMatch.p4; }
         
-        // MATH CALCULATION FOR NEXT SLOT (Winner goes to Final/Semi)
+        // MATH CALCULATION FOR NEXT SLOT
         const currentRound = currentMatch.round;
-        const currentPos = currentMatch.pos; 
+        const currentPos = currentMatch.pos; // Position in the round (0, 1, 2, 3...)
         
         const nextRound = currentRound + 1;
         const nextPos = Math.floor(currentPos / 2);
         
-        // Find Target Match (Next Round)
+        // Find the specific match target
         const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos);
         
         if(targetMatch) {
-            // Update Winner Path
+            // ATUALIZAR O OBJETO GLOBAL
             const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
             if(globalTargetIndex > -1) {
                 if(currentPos % 2 === 0) {
@@ -936,30 +907,10 @@
                 }
             }
         }
-
-        // 3RD PLACE LOGIC (Check if this was a Semi-Final)
-        // If next round match is the ONLY match in that round (Final), then this was a Semi.
-        const matchesInNextRound = koMatches.filter(m => m.round === nextRound).length;
-        
-        if(matchesInNextRound === 1) {
-            // This was a Semi-Final! Send Loser to 3rd Place Match.
-            const thirdPlaceMatch = koMatches.find(m => m.isThirdPlace === true);
-            if(thirdPlaceMatch) {
-                const tIdx = appState.matches.findIndex(m => m.mid === thirdPlaceMatch.mid);
-                if(tIdx > -1) {
-                     // If pos 0 (Top Semi), loser goes to slot 1. If pos 1 (Bottom Semi), loser goes to slot 2.
-                    if(currentPos === 0) { 
-                        appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2;
-                    } else {
-                        appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2;
-                    }
-                }
-            }
-        }
     }
 
     // EDIT SCORE FUNCTION
-    window.editS = async (mid) => {
+    window.editS = (mid) => {
         if(!confirm("Editar placar?")) return;
         const mIdx = appState.matches.findIndex(x => x.mid === mid);
         if(mIdx > -1) {
@@ -967,7 +918,7 @@
             // Optimistic update
             renderApp(); 
             // Background update
-            await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false});
+            update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false});
         }
     }
 
@@ -1056,33 +1007,16 @@
                 
                 const rounds = {};
                 ms.forEach(m => {
-                    // Check for 3rd Place match (it has special flag, treat separate or group)
-                    if(m.isThirdPlace) {
-                        if(!rounds['3rd']) rounds['3rd'] = [];
-                        rounds['3rd'].push(m);
-                    } else {
-                        if(!rounds[m.round]) rounds[m.round] = [];
-                        rounds[m.round].push(m);
-                    }
+                    if(!rounds[m.round]) rounds[m.round] = [];
+                    rounds[m.round].push(m);
                 });
                 
-                // Sort rounds numerically
-                let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort();
-                
-                // Append rounds
-                roundKeys.forEach(rNum => {
+                Object.keys(rounds).sort().forEach(rNum => {
                     let rName = 'Fase ' + rNum;
                     if(ms.length === 1) rName = 'FINAL';
-                    else if(rNum == Math.log2(ms.length + 1)) rName = 'FINAL'; // Approx
-                    // Better logic: calculate max round from size
+                    else if(rNum == Math.log2(ms.length + 1)) rName = 'FINAL';
+                    else if(rNum == Math.log2(ms.length + 1) - 1) rName = 'SEMI-FINAL';
                     
-                    // Simple names based on item count
-                    const count = rounds[rNum].length;
-                    if(count === 8) rName = 'OITAVAS DE FINAL';
-                    if(count === 4) rName = 'QUARTAS DE FINAL';
-                    if(count === 2) rName = 'SEMI-FINAL';
-                    if(count === 1) rName = 'FINAL';
-
                     h += `<div class="ko-round-header">${rName}</div>`;
                     
                     rounds[rNum].forEach(m => {
@@ -1123,43 +1057,6 @@
                         </div>`;
                     });
                 });
-
-                // APPEND 3RD PLACE IF EXISTS
-                if(rounds['3rd']) {
-                    h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
-                    rounds['3rd'].forEach(m => {
-                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...';
-                        const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
-                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
-                        const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
-                        
-                        const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
-                        const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
-
-                         const isEditing = !m.saved;
-                         const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
-
-                         h += `<div class="ko-match-item">
-                            <div class="ko-player">${t1}</div>
-                            ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                 <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
-                                : 
-                                `<div class="ko-score">${m.s1||'-'}</div>
-                                 <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2||'-'}</div>`
-                            }
-                            <div class="ko-player">${t2}</div>
-                            ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}', this)">✓</button>` 
-                                : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
-                            }
-                        </div>`;
-                    });
-                }
                 
                 h += `</div>`;
                 document.getElementById('bracket-container').innerHTML = h;
