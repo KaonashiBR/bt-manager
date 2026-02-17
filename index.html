@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V145 (Clean & Stable)</title>
+    <title>BT Manager - V146 (Relative DOM Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,7 +74,7 @@
         .group-header:hover { opacity: 0.9; }
         .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD - FIXED V145 (4 COLS GRID) */
+        /* LAYOUT BOARD - FIXED V146 (4 COLS GRID) */
         .board { 
             display: grid; 
             grid-template-columns: 1fr; 
@@ -815,7 +815,8 @@
         save(); 
     }
     
-    window.saveS = async (mid) => { 
+    // --- SAVE SCORE (V146 - DOM RELATIVE) ---
+    window.saveS = async (mid, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
@@ -829,25 +830,17 @@
             return;
         }
 
-        // CORREÇÃO FINAL V145: OLHA APENAS ONDE DEVE OLHAR
-        let val1 = '', val2 = '';
-
-        if(m.gid.includes('ko')) {
-             // MATA MATA
-             let elKo1 = document.getElementById(`ko-s1-${mid}`);
-             let elKo2 = document.getElementById(`ko-s2-${mid}`);
-             if(elKo1) val1 = elKo1.value;
-             if(elKo2) val2 = elKo2.value;
-        } else {
-             // GRUPOS (TBL)
-             let elTbl1 = document.getElementById(`tbl-s1-${mid}`);
-             let elTbl2 = document.getElementById(`tbl-s2-${mid}`);
-             if(elTbl1) val1 = elTbl1.value;
-             if(elTbl2) val2 = elTbl2.value;
-        }
+        // LEITURA RELATIVA (INFALÍVEL)
+        // Pega o container pai do botão e procura inputs lá dentro
+        let container = btnElement.parentElement;
+        if (btnElement.closest('tr')) container = btnElement.closest('tr');
+        
+        let inputs = container.querySelectorAll('input[type="tel"]');
+        let val1 = inputs[0] ? inputs[0].value : '';
+        let val2 = inputs[1] ? inputs[1].value : '';
 
         if(val1 === '' || val2 === '') { 
-            alert(`Preencha o placar.\n(Nada encontrado nos campos)`); 
+            alert(`Preencha o placar.`); 
             return; 
         }
         
@@ -872,9 +865,10 @@
         }
         
         renderApp(); // FORCE UPDATE
+        if(m.gid.includes('ko')) alert("Vencedor avançou para a próxima fase!");
     }
 
-    // --- AUTO ADVANCE LOGIC (MATHEMATICAL V141) ---
+    // --- AUTO ADVANCE LOGIC ---
     function advanceWinner(mid, currentMatch, s1, s2) {
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         
@@ -934,6 +928,46 @@
             }
         }); 
     }
+
+    // --- HELPER PARA FILA INTELIGENTE (SMART QUEUE) ---
+    function getSmartSortedMatches(allMatches) {
+        // Filtrar apenas jogos pendentes (não salvos e não BYE)
+        const pending = allMatches.filter(m => !m.saved && !m.isBye);
+        
+        // Separar jogos de Mata-Mata (Prioridade)
+        const koMatches = pending.filter(m => m.gid.includes('ko'));
+        const groupMatches = pending.filter(m => !m.gid.includes('ko'));
+        
+        // Organizar jogos de grupo por GrupoID
+        const groupsMap = {};
+        const groupOrder = []; // Para manter a ordem de criação dos grupos
+        
+        groupMatches.forEach(m => {
+            if (!groupsMap[m.gid]) {
+                groupsMap[m.gid] = [];
+                groupOrder.push(m.gid);
+            }
+            groupsMap[m.gid].push(m);
+        });
+
+        // Intercalar: 1 de cada grupo, rodada por rodada
+        const interleaved = [];
+        let maxLen = 0;
+        Object.values(groupsMap).forEach(arr => {
+            if(arr.length > maxLen) maxLen = arr.length;
+        });
+
+        for (let i = 0; i < maxLen; i++) {
+            groupOrder.forEach(gid => {
+                if (groupsMap[gid][i]) {
+                    interleaved.push(groupsMap[gid][i]);
+                }
+            });
+        }
+
+        // Retornar: Mata-Mata primeiro, depois os grupos intercalados
+        return [...koMatches, ...interleaved];
+    }
     
     function renderApp() {
         const focusedId = document.activeElement ? document.activeElement.id : null;
@@ -949,7 +983,7 @@
             d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer;">✕</span></div>`; 
             pl.appendChild(d); 
         });
-        
+
         // RENDER TABLE (VIEW 2)
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         let h = ''; 
@@ -963,7 +997,7 @@
                 col.style.gridColumn = '1 / -1'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
                 
-                // RENDER AS SIMPLE LIST WITH INPUTS (V145 FIX)
+                // RENDER AS SIMPLE LIST WITH INPUTS (V146 FIX)
                 h += `<div class="ko-list">`;
                 
                 const rounds = {};
@@ -998,9 +1032,9 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" id="ko-s1-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" id="ko-s2-${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
                                 `<div class="ko-score">${m.s1||'-'}</div>
                                  <div class="ko-vs">X</div>
@@ -1011,7 +1045,7 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}')">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}', this)">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
@@ -1034,7 +1068,7 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" id="tbl-s1-${m.mid}" value="${m.s1}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" id="tbl-s2-${m.mid}" value="${m.s2}" class="tbl-input auth-input" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}', this)">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
