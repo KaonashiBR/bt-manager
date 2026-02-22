@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V153 (CBT Smart Groups & Draw)</title>
+    <title>BT Manager - V154 (Auto Groups Fix)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,6 +57,7 @@
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
         
+        /* TABLES & LISTS */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
@@ -68,10 +69,12 @@
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
 
+        /* GROUP BOX */
         .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
         .group-header:hover { opacity: 0.9; }
 
+        /* LAYOUT BOARD */
         .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
         #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
         #groups-container { display: flex; flex-direction: column; gap: 15px; }
@@ -116,6 +119,7 @@
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
 
+        /* KNOCKOUT LIST VIEW */
         .ko-round-header { background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; }
         .ko-list { background: white; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
         .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -176,7 +180,8 @@
         <div style="display:flex; gap:5px; margin-bottom:5px;">
             <input type="text" id="pName" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
             <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
-            <button class="btn-std btn-blue" style="width:auto;" onclick="promptAddGroup()">+ Grupo</button>
+            <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
+            <button class="btn-std btn-green" style="width:auto;" onclick="autoGroupsCBT()">⚡ Grupos CBT</button>
         </div>
         <div style="display:flex; gap:5px; flex-wrap:wrap;">
             <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
@@ -190,7 +195,7 @@
             <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(this)">
         </div>
         <div style="margin-top:5px; font-size:0.8em; color:#666; text-align:center;">
-            <span class="material-icons" style="font-size:1.1em; vertical-align:middle;">lightbulb</span> O botão "+ Grupo" sugere a quantidade oficial da CBT.
+            <span class="material-icons" style="font-size:1.1em; vertical-align:middle;">lightbulb</span> O botão "⚡ Grupos CBT" cria e sorteia os grupos na regra oficial.
         </div>
     </div>
 
@@ -412,6 +417,9 @@
             } else { 
                 appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
             }
+            if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
+                appState.groupCount = appState.groups ? appState.groups.length : 0;
+            }
             recalc(); 
             renderApp();
         });
@@ -422,7 +430,6 @@
     window.openFinalsModal = () => { document.getElementById('modal-finals').style.display = 'flex'; const fills = [document.getElementById('sel-win-1'), document.getElementById('sel-win-2'), document.getElementById('sel-win-3')]; fills.forEach(s => { s.innerHTML = '<option value="">Selecione...</option>'; appState.players.forEach(p => s.innerHTML += `<option value="${p.name}">${p.name}</option>`); }); }
     window.submitPoints = async () => { if(!curCatData || !curCatData.points) return alert("Erro na config da categoria."); const p1 = document.getElementById('sel-win-1').value; const p2 = document.getElementById('sel-win-2').value; const p3 = document.getElementById('sel-win-3').value; if(!p1) return alert("Selecione o campeão."); update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); const rankRef = ref(db, `rankings/${curCatId}`); const snap = await get(rankRef); let ranking = snap.val() || {}; const updatePlayer = (name, pts, isWin=false) => { const key = name.replace(/[.#$/[\]]/g, ""); if(!ranking[key]) ranking[key] = { name: name, points: 0, tournaments: 0, wins: 0 }; ranking[key].points += pts; ranking[key].tournaments += 1; if(isWin) ranking[key].wins += 1; }; if(p1) updatePlayer(p1, curCatData.points.p1, true); if(p2) updatePlayer(p2, curCatData.points.p2); if(p3) updatePlayer(p3, curCatData.points.p3); appState.players.forEach(p => { if(p.name !== p1 && p.name !== p2 && p.name !== p3) updatePlayer(p.name, curCatData.points.part); }); await set(rankRef, ranking); alert("Ranking Atualizado!"); document.getElementById('modal-finals').style.display = 'none'; }
 
-    // --- PRO KNOCKOUT CONFIG ---
     window.openConfigKnockout = () => {
         const div = document.getElementById('knockout-config-list');
         div.innerHTML = '';
@@ -440,7 +447,6 @@
         save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
     }
 
-    // NOVA FUNÇÃO DE ORDENAÇÃO CBT (V151 - Confronto Direto + Game Average)
     function sortPlayersCBT(players, matches) {
         return [...players].sort((a, b) => {
             if (b.pts !== a.pts) return b.pts - a.pts;
@@ -558,27 +564,24 @@
             koMatches.push(m);
         }
 
-        // MOTOR ANTI-CONFLITO CBT (Evitar mesmo grupo na primeira rodada)
+        // MOTOR ANTI-CONFLITO CBT
         for(let i=0; i<koMatches.length; i++) {
             let m = koMatches[i];
             if(m.round === 1 && m.p1 !== 'BYE' && m.p3 !== 'BYE') {
                 let pA = appState.players.find(x=>x.id===m.p1);
                 let pB = appState.players.find(x=>x.id===m.p3);
                 if(pA && pB && pA.groupId === pB.groupId) {
-                    // Achou conflito! Procura uma troca válida
                     for(let j=0; j<koMatches.length; j++) {
                         if(i === j) continue;
                         let m2 = koMatches[j];
-                        if(m2.round === 1) {
+                        if(m2.round === 1 && m2.p3 !== 'BYE') {
                             let pC = appState.players.find(x=>x.id===m2.p1);
                             let pD = appState.players.find(x=>x.id===m2.p3);
                             
-                            // A nova configuração pode gerar conflito?
                             let valid1 = !pD || pA.groupId !== pD.groupId;
                             let valid2 = !pC || pB.groupId !== pC.groupId;
                             
                             if(valid1 && valid2) {
-                                // Troca os oponentes (m.p3 com m2.p3)
                                 let temp1 = m.p3; let temp2 = m.p4;
                                 m.p3 = m2.p3; m.p4 = m2.p4;
                                 m2.p3 = temp1; m2.p4 = temp2;
@@ -605,7 +608,6 @@
             }
         }
         
-        // 3rd PLACE MATCH (V148 Logic)
         koMatches.push({
             mid: 'm-3rd-' + Date.now(),
             gid: gid,
@@ -617,7 +619,6 @@
 
         appState.matches.push(...koMatches);
 
-        // AUTO PROCESS BYES
         koMatches.forEach(m => {
             if (m.isBye) {
                 if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
@@ -637,7 +638,6 @@
     }
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
-
     window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } } }
     window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); } } }
     window.returnToPool = (pid) => { if(confirm("Voltar jogador para a reserva?")) { const p = appState.players.find(x => x.id === pid); if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); } } }
@@ -664,36 +664,37 @@
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
     window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); }
     
-    // === GERAÇÃO INTELIGENTE DE GRUPOS CBT (V153) ===
-    window.promptAddGroup = () => {
-        const poolCount = appState.players.filter(p => p.groupId === 'pool').length;
+    // === V154: NOVA FUNÇÃO DEDICADA PARA GERAR GRUPOS CBT ===
+    window.autoGroupsCBT = () => {
+        const pool = appState.players.filter(p => p.groupId === 'pool');
+        const N = pool.length;
         
-        // Só sugere a criação automática se não houver grupos criados e houver no mínimo 3 duplas na reserva
-        if(appState.groups.length === 0 && poolCount >= 3) {
-            let G = poolCount <= 5 ? 1 : Math.floor(poolCount / 3);
-            
-            if(confirm(`REGRAS CBT: Para ${poolCount} inscritos, o ideal é formar ${G} grupo(s).\n\nDeseja gerar e distribuir os jogadores automaticamente?`)) {
-                // Cria os grupos
-                for(let i=0; i<G; i++) {
-                    const groupName = "GRUPO " + String.fromCharCode(64 + i + 1);
-                    appState.groups.push({ id: 'g' + Date.now() + i, name: groupName });
-                }
-                
-                // Distribui os jogadores de forma equitativa (ex: 7 duplas = 1 grupo de 3 e 1 grupo de 4)
-                const pool = appState.players.filter(p=>p.groupId==='pool');
-                pool.sort(()=>Math.random()-0.5); // Embaralha para ficar justo
-                pool.forEach((p, index) => {
-                    p.groupId = appState.groups[index % G].id;
-                });
-                
-                save(); renderApp(); return;
-            }
+        if(N < 3) return alert("Mínimo de 3 jogadores na reserva para gerar grupos.");
+        
+        let G = N <= 5 ? 1 : Math.floor(N / 3);
+        
+        if(!confirm(`Regras CBT:\nPara ${N} inscritos na reserva, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
+        
+        let startIndex = appState.groups.length;
+        let newGroups = [];
+        
+        for(let i=0; i<G; i++) {
+            const groupName = "GRUPO " + String.fromCharCode(64 + startIndex + i + 1);
+            let newG = { id: 'g' + Date.now() + i, name: groupName };
+            appState.groups.push(newG);
+            newGroups.push(newG);
         }
         
-        // Caso o usuário recuse ou já existam grupos, adiciona 1 grupo manualmente (Comportamento antigo)
-        addGroup();
+        pool.sort(()=>Math.random()-0.5); 
+        pool.forEach((p, index) => {
+            p.groupId = newGroups[index % G].id;
+        });
+        
+        save(); 
+        renderApp();
     }
 
+    // O +Grupo original não tem mais prompt, só adiciona um.
     window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now(), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
 
     window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
@@ -734,36 +735,28 @@
     
     window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); }
     
-    // --- SAVE SCORE COM IDENTIFICADOR ÚNICO (V151/V153) ---
-    window.saveScore = async (mid, type) => { 
+    window.saveS = async (mid, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
 
         if(m.saved) {
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
-                m.saved = false;
-                recalc();
-                await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
-                renderApp(); 
-            }
-            return;
+                m.saved = false; recalc(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false }); renderApp(); 
+            } return;
         }
 
-        let prefix = type === 'ko' ? 'input_mata_mata' : 'input_grupo';
-        let el1 = document.getElementById(`${prefix}_s1_${mid}`);
-        let el2 = document.getElementById(`${prefix}_s2_${mid}`);
+        let container = btnElement.parentElement;
+        if (btnElement.closest('tr')) container = btnElement.closest('tr');
+        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
         
-        let val1 = el1 ? el1.value : '';
-        let val2 = el2 ? el2.value : '';
+        let inputs = container.querySelectorAll('input[type="tel"]');
+        let val1 = inputs[0] ? inputs[0].value : '';
+        let val2 = inputs[1] ? inputs[1].value : '';
 
-        if(val1 === '' || val2 === '') { 
-            alert(`Preencha o placar.`); 
-            return; 
-        }
+        if(val1 === '' || val2 === '') { alert(`Preencha o placar.`); return; }
         
         let s1 = parseInt(val1); let s2 = parseInt(val2);
-
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
         m.s1 = s1; m.s2 = s2; m.saved = true;
@@ -776,7 +769,6 @@
         const savePromise = m.gid.includes('ko') 
             ? update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches)
             : update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-            
         savePromise.catch(err => { alert("Erro de conexão ao salvar: " + err.message); });
     }
 
@@ -910,9 +902,9 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" id="input_mata_mata_s1_${m.mid}" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" id="input_mata_mata_s2_${m.mid}" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
                                 `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
                                  <div class="ko-vs">X</div>
@@ -923,7 +915,7 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko')">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" onclick="saveS('${m.mid}', this)">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
@@ -950,9 +942,9 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" id="input_mata_mata_s1_${m.mid}" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" id="input_mata_mata_s2_${m.mid}" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
                                 `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
                                  <div class="ko-vs">X</div>
@@ -961,7 +953,7 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko')">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" onclick="saveS('${m.mid}', this)">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
@@ -984,7 +976,7 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" id="input_grupo_s1_${m.mid}" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" id="input_grupo_s2_${m.mid}" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}', this)">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
