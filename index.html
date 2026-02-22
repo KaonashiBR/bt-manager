@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V151 (Confronto Direto CBT)</title>
+    <title>BT Manager - V152 (CBT Game Average)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,6 @@
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
-        /* NAVBAR */
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
@@ -25,29 +24,21 @@
         .user-name { font-size: 0.9em; font-weight: 600; color: #555; display: none; }
         @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.3em; } }
 
-        /* SCREENS */
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; width: 100%; }
         
-        /* CARDS */
         .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
         .std-card:active { transform: scale(0.97); }
-        .std-card.selected { border: 3px solid var(--primary); transform: scale(0.95); background: #fff3e0; }
         .card-img { width: 100%; height: 100%; object-fit: cover; }
         .card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 10px 10px; color: white; }
         .card-title { font-weight: 700; font-size: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
-        .card-subtitle { font-size: 0.9em; opacity: 0.8; margin-top: 2px; }
         .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4.5em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
         .bg-masc { background: var(--blue-masc); } .bg-fem { background: var(--pink-fem); } .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
         .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
         .bg-tourney .material-icons { font-size: 4.5em; color: white; opacity: 0.3; }
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
-        .btn-icon-circle { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.95); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; border: 1px solid #ddd; }
-        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
-        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+        .btn-icon-circle { width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.9); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.3em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; border: 1px solid #ddd; }
 
-        /* UI */
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
         .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 1em; margin-bottom: 15px;}
@@ -55,26 +46,21 @@
         button.btn-std { border: none; border-radius: 4px; padding: 12px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.95em; width: 100%; margin-bottom: 5px; }
         .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; } .btn-dark { background: #444; }
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
-        .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
+        
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        .court-select { border: 1px solid #999; border-radius: 4px; font-weight: 700; font-size: 1em; background: #eee; padding: 2px; width: 50px; text-align: center; color: #333; }
-
+        
         .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
 
-        /* GROUP BOX */
         .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
-        .group-header:hover { opacity: 0.9; }
-        .group-header.target { border: 2px dashed #fff; }
 
-        /* LAYOUT BOARD */
         .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
         #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
         #groups-container { display: flex; flex-direction: column; gap: 15px; }
@@ -86,14 +72,11 @@
             .group-box { flex: unset; width: 100%; }
         }
 
-        /* JOGOS LIST */
         .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
         .match-main-content { padding: 0 10px; }
         .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
         .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
-        .match-actions { display: flex; flex-direction: column; gap: 5px; }
-        .match-group-tag { font-size: 0.8em; background: #eee; padding: 2px 6px; border-radius: 4px; color: #555; }
         
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
         .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
@@ -104,25 +87,19 @@
         .player-link { cursor: pointer; border-bottom: 1px dashed #999; transition:0.2s; }
         .player-link:hover { color: var(--primary); border-bottom-color: var(--primary); font-weight:bold; }
         .player-link.empty { color: #999; font-style: italic; }
-        .viewer-mode .player-link { cursor: default; border-bottom: none; pointer-events: none; }
-        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 8px; font-size: 0.8em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
-        .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
         
         #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-player-select { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
         .modal-box { background: white; width: 100%; max-width: 440px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
-        .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1.1em; }
         .btn-google { background: #db4437; } .btn-logout { background: #555; }
         .rank-table { width: 100%; border-collapse: collapse; background: white; }
         .rank-table th { background: #333; color: white; padding: 6px; font-size: 0.8em; }
         .rank-table td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.9em; }
-        .rank-pos { width: 26px; height: 26px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 1em; }
-        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
         
         .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
 
-        /* KNOCKOUT LIST VIEW */
         .ko-round-header { background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; }
         .ko-list { background: white; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
         .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -454,13 +431,10 @@
         if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-        save();
-        renderApp();
-        alert("Mata-Mata excluído!");
-        switchAppView('groups');
+        save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
     }
 
-    // NOVA FUNÇÃO DE ORDENAÇÃO CBT (V151 - Confronto Direto)
+    // NOVA FUNÇÃO DE ORDENAÇÃO CBT (V151 - Confronto Direto + Game Average)
     function sortPlayersCBT(players, matches) {
         return [...players].sort((a, b) => {
             // 1. Mais pontos
@@ -469,7 +443,6 @@
             // Se empatou em pontos, verifica se são EXATAMENTE DUAS duplas empatadas com essa pontuação
             const tiedPoints = players.filter(p => p.pts === a.pts);
             if (tiedPoints.length === 2) {
-                // CONFRONTO DIRETO
                 const match = matches.find(m => 
                     m.saved && !m.isBye &&
                     (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
@@ -478,7 +451,7 @@
                 if (match) {
                     let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
                     let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
-                    if (aScore !== bScore) return bScore - aScore; // Quem venceu fica na frente
+                    if (aScore !== bScore) return bScore - aScore;
                 }
             }
 
@@ -488,7 +461,6 @@
             // Se empatou no Saldo, verifica se sobraram EXATAMENTE DUAS duplas empatadas no saldo
             const tiedBal = tiedPoints.filter(p => p.bal === a.bal);
             if (tiedBal.length === 2) {
-                 // CONFRONTO DIRETO NOVAMENTE
                  const match = matches.find(m => 
                     m.saved && !m.isBye &&
                     (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
@@ -501,22 +473,28 @@
                 }
             }
 
-            // 3. Maior número de vitórias
+            // 3. (V152) GAME AVERAGE PARA DESEMPATE DE GRUPO
+            const aGA = a.gameAvg || 0;
+            const bGA = b.gameAvg || 0;
+            if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+
+            // 4. Maior número de vitórias
             if (b.wins !== a.wins) return b.wins - a.wins;
 
-            // 4. Sorteio (aqui usamos o nome como fallback seguro)
+            // 5. Sorteio (alfabético para manter consistência no frontend)
             return a.name.localeCompare(b.name);
         });
     }
 
-    // === EXECUÇÃO MATA-MATA (GLOBAL SEEDING) ===
+    // === EXECUÇÃO MATA-MATA (V152 - PRO SEEDING) ===
     window.execKnockout = () => {
         let qualified = [];
+        
+        // COLETA E ORDENAÇÃO DENTRO DOS GRUPOS
         appState.groups.forEach(g => {
             if(g.id.includes('ko')) return;
             const n = parseInt(document.getElementById(`ko-n-${g.id}`).value) || 0;
             if(n > 0) {
-                // USA A NOVA ORDENAÇÃO CBT PARA PEGAR OS CLASSIFICADOS DO GRUPO
                 const ps = appState.players.filter(p=>p.groupId===g.id);
                 const sortedPs = sortPlayersCBT(ps, appState.matches);
                 qualified.push(...sortedPs.slice(0, n));
@@ -525,8 +503,29 @@
 
         if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
 
-        qualified.sort((a,b)=> b.pts-a.pts || b.wins-a.wins || b.bal-a.bal);
+        // IDENTIFICA SE OS GRUPOS TÊM TAMANHOS DIFERENTES
+        const regularGroups = appState.groups.filter(g => !g.id.includes('ko'));
+        const groupSizes = new Set(regularGroups.map(g => appState.players.filter(p => p.groupId === g.id).length));
+        const diffSizes = groupSizes.size > 1;
 
+        // ORDENAÇÃO GLOBAL PARA CABEÇAS DE CHAVE
+        if (diffSizes) {
+            // Regra CBT: Tamanhos diferentes -> % Vitórias (Sets avg) -> Game Average
+            qualified.sort((a,b) => {
+                const aWinPct = a.games > 0 ? a.wins / a.games : 0;
+                const bWinPct = b.games > 0 ? b.wins / b.games : 0;
+                if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
+                
+                const aGA = a.gameAvg || 0;
+                const bGA = b.gameAvg || 0;
+                return bGA - aGA;
+            });
+        } else {
+            // Regra Clássica: Tamanhos iguais -> Pontos -> Saldo
+            qualified.sort((a,b) => b.pts - a.pts || b.bal - a.bal || b.wins - a.wins);
+        }
+
+        // LIMPEZA
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
 
@@ -554,13 +553,9 @@
             
             let m = {
                 mid: 'm' + Date.now() + Math.random().toString().substr(2, 3) + i, 
-                gid: gid, 
-                round: 1,
-                pos: i/2, 
-                p1: seedA ? seedA.id : 'BYE', 
-                p2: seedA ? seedA.id : 'BYE',
-                p3: seedB ? seedB.id : 'BYE', 
-                p4: seedB ? seedB.id : 'BYE',
+                gid: gid, round: 1, pos: i/2, 
+                p1: seedA ? seedA.id : 'BYE', p2: seedA ? seedA.id : 'BYE',
+                p3: seedB ? seedB.id : 'BYE', p4: seedB ? seedB.id : 'BYE',
                 s1:'', s2:'', saved: false, isBye: false
             };
             if (!seedA || !seedB) m.isBye = true;
@@ -573,9 +568,7 @@
             for(let i=0; i<matchesInRound; i++) {
                 koMatches.push({
                     mid: 'm-r' + r + '-' + i + '-' + Date.now(), 
-                    gid: gid, 
-                    round: r,
-                    pos: i,
+                    gid: gid, round: r, pos: i,
                     p1: '', p2: '', p3: '', p4: '',
                     s1:'', s2:'', saved: false, isBye: false
                 });
@@ -584,158 +577,52 @@
         
         // 3rd PLACE MATCH
         koMatches.push({
-            mid: 'm-3rd-' + Date.now(),
-            gid: gid,
-            round: totalRounds,
-            isThirdPlace: true,
-            p1: '', p2: '', p3: '', p4: '',
-            s1:'', s2:'', saved: false, isBye: false
+            mid: 'm-3rd-' + Date.now(), gid: gid, round: totalRounds, isThirdPlace: true,
+            p1: '', p2: '', p3: '', p4: '', s1:'', s2:'', saved: false, isBye: false
         });
 
         appState.matches.push(...koMatches);
 
+        // AUTO BYE PROCESS
         koMatches.forEach(m => {
             if (m.isBye) {
-                if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
-                    m.s1 = 6; m.s2 = 0; m.saved = true;
-                    advanceWinner(m.mid, m, 6, 0);
-                } else if (m.p1 === 'BYE' && m.p3 !== 'BYE') {
-                    m.s1 = 0; m.s2 = 6; m.saved = true;
-                    advanceWinner(m.mid, m, 0, 6);
-                }
+                if (m.p3 === 'BYE' && m.p1 !== 'BYE') { m.s1 = 6; m.s2 = 0; m.saved = true; advanceWinner(m.mid, m, 6, 0); } 
+                else if (m.p1 === 'BYE' && m.p3 !== 'BYE') { m.s1 = 0; m.s2 = 6; m.saved = true; advanceWinner(m.mid, m, 0, 6); }
             }
         });
         
         document.getElementById('modal-knockout').style.display = 'none';
-        save();
-        alert("Chave Gerada!");
-        switchAppView('bracket');
+        save(); alert("Chave Gerada!"); switchAppView('bracket');
     }
 
-    function addMatch(gid, p1, p2, p3, p4, isBye=false) { 
-        appState.matches.push({
-            mid:'m'+Date.now()+Math.random().toString().substr(2,3), 
-            gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye
-        }); 
-    }
-
-    window.editName = (pid, oldName, e) => {
-        e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return;
-        const newName = prompt("Novo nome:", oldName);
-        if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } }
-    }
-
-    window.renameGroup = (gid, e) => {
-        e.stopPropagation();
-        if(document.body.classList.contains('viewer-mode')) return;
-        const g = appState.groups.find(x => x.id === gid);
-        if(g) {
-            const newName = prompt("Novo nome do grupo:", g.name);
-            if(newName) { g.name = newName; save(); }
-        }
-    }
-
-    window.returnToPool = (pid) => {
-        if(confirm("Voltar jogador para a reserva?")) {
-            const p = appState.players.find(x => x.id === pid);
-            if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); }
-        }
-    }
+    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
+    window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } } }
+    window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); } } }
+    window.returnToPool = (pid) => { if(confirm("Voltar jogador para a reserva?")) { const p = appState.players.find(x => x.id === pid); if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); } } }
 
     window.openPlayerSelect = (mid, slot) => {
         if(document.body.classList.contains('viewer-mode')) return;
         selectingMatch = mid; selectingSlot = slot;
         const m = appState.matches.find(x => x.mid === mid);
         if(!m) return;
-        
         const isKO = m.gid.includes('ko');
-        const list = document.getElementById('select-list-container');
-        list.innerHTML = '';
-        
-        const noneItem = document.createElement('div');
-        noneItem.className = 'select-item';
-        noneItem.innerText = '[ Vazio ]';
-        noneItem.onclick = () => confirmPlayerSelect('');
-        list.appendChild(noneItem);
-
-        let candidates = [];
-        if(isKO) candidates = appState.players;
-        else candidates = appState.players.filter(p => p.groupId === m.gid);
-
-        candidates.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
-            const item = document.createElement('div');
-            item.className = 'select-item'; item.innerText = p.name;
-            item.onclick = () => confirmPlayerSelect(p.id);
-            list.appendChild(item);
-        });
-        
+        const list = document.getElementById('select-list-container'); list.innerHTML = '';
+        const noneItem = document.createElement('div'); noneItem.className = 'select-item'; noneItem.innerText = '[ Vazio ]'; noneItem.onclick = () => confirmPlayerSelect(''); list.appendChild(noneItem);
+        let candidates = isKO ? appState.players : appState.players.filter(p => p.groupId === m.gid);
+        candidates.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => { const item = document.createElement('div'); item.className = 'select-item'; item.innerText = p.name; item.onclick = () => confirmPlayerSelect(p.id); list.appendChild(item); });
         document.getElementById('modal-player-select').style.display = 'flex';
     }
 
-    window.confirmPlayerSelect = (pid) => {
-        if(!selectingMatch || !selectingSlot) return;
-        const m = appState.matches.find(x => x.mid === selectingMatch);
-        if(m) { m[selectingSlot] = pid; save(); renderApp(); }
-        document.getElementById('modal-player-select').style.display = 'none';
-        selectingMatch = null; selectingSlot = null;
-    }
-
-    window.tryAdmin = () => { 
-        if(!document.body.classList.contains('viewer-mode')) return; 
-        const p = prompt("Senha:"); 
-        if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { 
-            document.body.classList.remove('viewer-mode'); 
-            document.getElementById('btn-lock').innerText = '🔓'; 
-            localAdmin = true; updateUserUI();
-        } else alert("Senha incorreta"); 
-    }
-
+    window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; save(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
+    window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
     window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
     function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
-    window.addPlayer = () => { 
-        const n=document.getElementById('pName').value.trim(); if(!n)return; 
-        if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!");
-        appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); 
-        if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } 
-        document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); 
-    }
+    window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); }
     
-    window.addGroup = () => {
-        try {
-            if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = [];
-            const nextNum = appState.groups.length + 1;
-            const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); 
-            appState.groups.push({ id: 'g' + Date.now(), name: groupName });
-            save(); renderApp();
-        } catch(e) { alert("Erro ao criar grupo: " + e.message); }
-    }
-
-    window.exportData = () => {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", "bt_manager_backup.json");
-        document.body.appendChild(downloadAnchorNode); 
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
-    }
-
-    window.importData = (input) => {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const json = JSON.parse(e.target.result);
-                if (confirm("Isso substituirá os dados atuais desta etapa. Confirmar?")) {
-                    appState = json; save(); renderApp(); alert("Dados restaurados com sucesso!");
-                }
-            } catch(err) { alert("Erro ao ler arquivo: " + err.message); }
-        };
-        reader.readAsText(file);
-    }
-
+    window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now(), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
+    window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
+    window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; save(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro: " + err.message); } }; reader.readAsText(file); }
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
     window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); } }
     window.toggleSel = (pid,e) => { if(document.body.classList.contains('viewer-mode'))return; e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
@@ -746,37 +633,22 @@
     
     window.genMatches = (gid) => { 
         const existing = appState.matches.filter(m => m.gid === gid);
-        if(existing.length > 0) return alert("Os jogos automáticos já foram gerados. Para adicionar mais, use o modo Manual (Mãozinha).");
-
+        if(existing.length > 0) return alert("Já existem jogos.");
         const ps=appState.players.filter(p=>p.groupId===gid); 
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
-        
         let roundMatches = [];
-        
-        if(appState.mode==='fixed') { 
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } 
-        } 
-        else if(ps.length===4) {
-            roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); 
-            roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); 
-            roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); 
-        }
-        else if(ps.length===5) { 
-             [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); });
-        } 
+        if(appState.mode==='fixed') { for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } } 
+        else if(ps.length===4) { roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); }
+        else if(ps.length===5) { [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); } 
         else { 
             let pairs=[]; 
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { const k=[ps[i].id,ps[j].id].sort().join('-'); pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
+            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
             pairs.sort(()=>Math.random()-0.5); 
             while(pairs.length) { 
                 let pA=pairs[0], found=false; 
                 for(let k=1; k<pairs.length; k++) { 
                     let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
-                    if(all.size===4) { 
-                        roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2});
-                        pairs.splice(k,1); pairs.splice(0,1); found=true; 
-                        break; 
-                    } 
+                    if(all.size===4) { roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2}); pairs.splice(k,1); pairs.splice(0,1); found=true; break; } 
                 } 
                 if(!found) pairs.splice(0,1); 
             } 
@@ -787,37 +659,28 @@
     
     window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); }
     
-    // --- FUNÇÃO DE SALVAR COM IDENTIFICADOR EXATO ---
-    window.saveScore = async (mid, type) => { 
+    window.saveScore = async (mid, type, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
 
         if(m.saved) {
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
-                m.saved = false;
-                recalc();
-                await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
-                renderApp(); 
-            }
-            return;
+                m.saved = false; recalc(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false }); renderApp(); 
+            } return;
         }
 
-        // BUSCA O VALOR NO CAMPO COM O NOME EXATO E EXCLUSIVO
-        let prefix = type === 'ko' ? 'input_mata_mata' : 'input_grupo';
-        let el1 = document.getElementById(`${prefix}_s1_${mid}`);
-        let el2 = document.getElementById(`${prefix}_s2_${mid}`);
+        let container = btnElement.parentElement;
+        if (btnElement.closest('tr')) container = btnElement.closest('tr');
+        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
         
-        let val1 = el1 ? el1.value : '';
-        let val2 = el2 ? el2.value : '';
+        let inputs = container.querySelectorAll('input[type="tel"]');
+        let val1 = inputs[0] ? inputs[0].value : '';
+        let val2 = inputs[1] ? inputs[1].value : '';
 
-        if(val1 === '' || val2 === '') { 
-            alert(`Preencha o placar.\n(Erro: Nenhum número detectado)`); 
-            return; 
-        }
+        if(val1 === '' || val2 === '') { alert(`Preencha o placar.`); return; }
         
         let s1 = parseInt(val1); let s2 = parseInt(val2);
-
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
         m.s1 = s1; m.s2 = s2; m.saved = true;
@@ -830,7 +693,6 @@
         const savePromise = m.gid.includes('ko') 
             ? update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches)
             : update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-            
         savePromise.catch(err => { alert("Erro de conexão ao salvar: " + err.message); });
     }
 
@@ -839,13 +701,8 @@
         if(!currentMatch.round) return; 
         
         let w1, w2, l1, l2;
-        if(s1 > s2) { 
-            w1 = currentMatch.p1; w2 = currentMatch.p2; 
-            l1 = currentMatch.p3; l2 = currentMatch.p4;
-        } else { 
-            w1 = currentMatch.p3; w2 = currentMatch.p4; 
-            l1 = currentMatch.p1; l2 = currentMatch.p2;
-        }
+        if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; l1 = currentMatch.p3; l2 = currentMatch.p4; } 
+        else { w1 = currentMatch.p3; w2 = currentMatch.p4; l1 = currentMatch.p1; l2 = currentMatch.p2; }
         
         const currentRound = currentMatch.round;
         const currentPos = currentMatch.pos; 
@@ -857,13 +714,8 @@
         if(targetMatch) {
             const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
             if(globalTargetIndex > -1) {
-                if(currentPos % 2 === 0) {
-                    appState.matches[globalTargetIndex].p1 = w1; 
-                    appState.matches[globalTargetIndex].p2 = w2;
-                } else {
-                    appState.matches[globalTargetIndex].p3 = w1; 
-                    appState.matches[globalTargetIndex].p4 = w2;
-                }
+                if(currentPos % 2 === 0) { appState.matches[globalTargetIndex].p1 = w1; appState.matches[globalTargetIndex].p2 = w2; } 
+                else { appState.matches[globalTargetIndex].p3 = w1; appState.matches[globalTargetIndex].p4 = w2; }
             }
         }
 
@@ -873,11 +725,8 @@
             if(thirdPlaceMatch) {
                 const tIdx = appState.matches.findIndex(m => m.mid === thirdPlaceMatch.mid);
                 if(tIdx > -1) {
-                    if(currentPos === 0) { 
-                        appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2;
-                    } else {
-                        appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2;
-                    }
+                    if(currentPos === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
+                    else { appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2; }
                 }
             }
         }
@@ -886,23 +735,37 @@
     window.editS = (mid) => {
         if(!confirm("Editar placar?")) return;
         const mIdx = appState.matches.findIndex(x => x.mid === mid);
-        if(mIdx > -1) {
-            appState.matches[mIdx].saved = false;
-            renderApp(); 
-            update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false});
-        }
+        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
     }
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
+    
+    // (V152) ATUALIZA O RECALC PARA EXTRAIR GAMES JOGADOS/GANHOS E CALCULAR GA
     function recalc() { 
-        appState.players.forEach(p=>{p.games=0; p.wins=0; p.bal=0; p.pts=0;}); 
-        appState.matches.forEach(m=>{ 
+        appState.players.forEach(p => {
+            p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0;
+            p.gamesWon = 0; p.gamesPlayed = 0; 
+        }); 
+        appState.matches.forEach(m => { 
             if(m.saved && !m.isBye) { 
-                const run = (id,my,op) => { const pl=appState.players.find(x=>x.id===id); if(pl){pl.games++; pl.bal+=my-op; if(my>op){pl.wins++; pl.pts+=3;}} }; 
-                run(m.p1,m.s1,m.s2); run(m.p3,m.s2,m.s1); 
-                if(appState.mode==='individual'){ run(m.p2,m.s1,m.s2); run(m.p4,m.s2,m.s1); } 
+                const run = (id, my, op) => { 
+                    const pl = appState.players.find(x => x.id === id); 
+                    if(pl) {
+                        pl.games++; 
+                        pl.bal += my - op; 
+                        pl.gamesWon += my;
+                        pl.gamesPlayed += (my + op);
+                        if(my > op) { pl.wins++; pl.pts += 3; }
+                    } 
+                }; 
+                run(m.p1, m.s1, m.s2); run(m.p3, m.s2, m.s1); 
+                if(appState.mode === 'individual'){ run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); } 
             }
         }); 
+        
+        appState.players.forEach(p => {
+            p.gameAvg = p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0;
+        });
     }
     
     function renderApp() {
@@ -923,7 +786,6 @@
         let h = ''; 
 
         appState.groups.forEach((g,i) => {
-            // ORDENAÇÃO CBT (AQUI É USADA A FUNÇÃO CORRETA DA V151)
             let ps = appState.players.filter(p=>p.groupId===g.id);
             ps = sortPlayersCBT(ps, appState.matches);
             
@@ -947,7 +809,7 @@
                     }
                 });
                 
-                let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort();
+                let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
                 
                 roundKeys.forEach(rNum => {
                     let rName = 'Fase ' + rNum;
@@ -959,7 +821,8 @@
 
                     h += `<div class="ko-round-header">${rName}</div>`;
                     
-                    rounds[rNum].forEach(m => {
+                    // Ordena pela posição para a chave ficar simétrica
+                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
                         const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...');
                         const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
@@ -977,20 +840,20 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" id="input_mata_mata_s1_${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" id="input_mata_mata_s2_${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
-                                `<div class="ko-score">${m.s1||'-'}</div>
+                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
                                  <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2||'-'}</div>`
+                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
                             }
                             
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko')">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
@@ -1014,19 +877,24 @@
                          const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
 
                          h += `<div class="ko-match-item">
-                            <div class="ko-player">${t1}</div>
+                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
+                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
+                            
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" id="input_mata_mata_s1_${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" id="input_mata_mata_s2_${m.mid}" class="tbl-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
-                                `<div class="ko-score">${m.s1||'-'}</div>
+                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
                                  <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2||'-'}</div>`
+                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
                             }
-                            <div class="ko-player">${t2}</div>
+                            
+                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
+                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
+                            
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko')">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
@@ -1049,14 +917,15 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" id="input_grupo_s1_${m.mid}" class="tbl-input auth-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" id="input_grupo_s2_${m.mid}" class="tbl-input auth-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
                 
                 if(ps.length) { 
-                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="6" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>Pts</td></tr>`; 
-                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${p.pts}</td></tr>`); 
+                    // ADICIONADA A COLUNA GA AQUI (V152)
+                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>GA</td><td>Pts</td></tr>`; 
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${(p.gameAvg||0).toFixed(2)}</td><td>${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
             }
