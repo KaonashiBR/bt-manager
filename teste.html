@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - TESTE BETA (Tooltips & UX)</title>
+    <title>BT Manager - TESTE BETA (Fila & Separação)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -62,7 +62,6 @@
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
-        /* Adicionando cursor de ajuda nas siglas para indicar que tem dica */
         .bt-table th[title], .bt-table td[title] { cursor: help; }
         
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
@@ -96,7 +95,7 @@
         .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
-        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
+        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s;}
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .view-section { display: none; } .view-section.active { display: block; }
         .viewer-mode .admin-only { display: none !important; }
@@ -197,13 +196,11 @@
             <button onclick="document.getElementById('import-file').click()" class="btn-std btn-dark" style="width:auto;">📂 Restaurar</button>
             <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(this)">
         </div>
-        <div style="margin-top:5px; font-size:0.8em; color:#666; text-align:center;">
-            <span class="material-icons" style="font-size:1.1em; vertical-align:middle;">lightbulb</span> O botão "⚡ Grupos CBT" cria e sorteia os grupos na regra oficial.
-        </div>
     </div>
 
     <div class="app-tabs">
         <div class="app-tab active" onclick="switchAppView('groups')">GRUPOS</div>
+        <div class="app-tab" onclick="switchAppView('queue')">FILA DE JOGOS</div>
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
@@ -220,11 +217,17 @@
         </div>
         
         <div id="general-ranking-container" style="margin-top: 20px; width: 100%;"></div>
-
     </div>
     
+    <div id="view-queue" class="view-section">
+        <div class="group-box" style="border-color:var(--primary); max-width:800px; margin:0 auto;">
+            <div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🎾 ORDEM DE JOGOS (DESCANSO MÁXIMO)</div>
+            <div id="queue-container" style="padding: 10px; background: white; border-radius: 0 0 8px 8px;"></div>
+        </div>
+    </div>
+
     <div id="view-bracket" class="view-section">
-        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto;"></div>
+        <div id="bracket-container" style="width:100%; max-width:800px; margin:0 auto;"></div>
     </div>
 </div>
 
@@ -407,8 +410,18 @@
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        if(view === 'groups') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
-        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
+        if(view === 'groups') { 
+            document.querySelectorAll('.app-tab')[0].classList.add('active'); 
+            document.getElementById('view-groups').classList.add('active'); 
+        }
+        else if(view === 'queue') { 
+            document.querySelectorAll('.app-tab')[1].classList.add('active'); 
+            document.getElementById('view-queue').classList.add('active'); 
+        }
+        else if(view === 'bracket') { 
+            document.querySelectorAll('.app-tab')[2].classList.add('active'); 
+            document.getElementById('view-bracket').classList.add('active'); 
+        }
     }
 
     function loadArenas() {
@@ -826,6 +839,43 @@
     
     window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); renderApp(); }
     
+    // FILA DE JOGOS OTIMIZADA (V155)
+    function getOptimizedMatchOrder(matches) {
+        let groupMatches = matches.filter(m => !m.gid.includes('ko') && !m.isBye);
+        let pending = groupMatches.map((m, originalIndex) => ({ m, originalIndex }));
+        let scheduled = [];
+        let lastPlayed = {}; 
+
+        while(pending.length > 0) {
+            let bestIdx = -1;
+            let maxScore = -Infinity;
+
+            for(let i = 0; i < pending.length; i++) {
+                let item = pending[i];
+                let m = item.m;
+                let p = [m.p1, m.p2, m.p3, m.p4].filter(x => x && x !== 'd');
+                
+                let minWait = Infinity;
+                for(let pid of p) {
+                    let last = lastPlayed[pid] !== undefined ? lastPlayed[pid] : -100;
+                    let wait = scheduled.length - last;
+                    if(wait < minWait) minWait = wait;
+                }
+
+                let score = minWait * 1000 - item.originalIndex;
+                if(score > maxScore) {
+                    maxScore = score;
+                    bestIdx = i;
+                }
+            }
+            let selected = pending.splice(bestIdx, 1)[0];
+            scheduled.push(selected.m);
+            let p = [selected.m.p1, selected.m.p2, selected.m.p3, selected.m.p4].filter(x => x && x !== 'd');
+            for(let pid of p) { lastPlayed[pid] = scheduled.length - 1; }
+        }
+        return scheduled;
+    }
+    
     window.saveScore = async (mid, type, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -910,7 +960,8 @@
     function recalc() { 
         appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
         appState.matches.forEach(m => { 
-            if(m.saved && !m.isBye) { 
+            // V155: ESTATISTICAS ISOLADAS (MATA MATA NAO ENTRA NA SOMA)
+            if(m.saved && !m.isBye && !m.gid.includes('ko')) { 
                 const run = (id, my, op) => { 
                     const pl = appState.players.find(x => x.id === id); 
                     if(pl) { pl.games++; pl.bal += my - op; pl.gamesWon += my; pl.gamesPlayed += (my + op); if(my > op) { pl.wins++; pl.pts += 3; } } 
@@ -938,8 +989,49 @@
             pl.appendChild(d); 
         });
         
+        // RENDER QUEUE (FILA V155)
+        const queueContainer = document.getElementById('queue-container');
+        if(queueContainer) {
+            let sortedMatches = getOptimizedMatchOrder(appState.matches);
+            if (sortedMatches.length === 0) {
+                queueContainer.innerHTML = '<div style="text-align:center; color:#999; padding: 20px;">Nenhum jogo de grupo gerado.</div>';
+            } else {
+                let qHtml = '';
+                sortedMatches.forEach((m, idx) => {
+                    const g = appState.groups.find(x => x.id === m.gid);
+                    const n = (id) => appState.players.find(x=>x.id===id)?.name || '...';
+                    const p1Name = m.p1 ? n(m.p1) : '...'; const p2Name = m.p2 ? n(m.p2) : '...';
+                    const p3Name = m.p3 ? n(m.p3) : '...'; const p4Name = m.p4 ? n(m.p4) : '...';
+                    const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
+                    const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                    
+                    let statusColor = m.saved ? '#4CAF50' : '#ff9800';
+                    let statusIcon = m.saved ? 'check_circle' : 'schedule';
+                    let opacity = m.saved ? '0.5' : '1';
+                    
+                    qHtml += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0; opacity: ${opacity};">
+                        <div style="font-weight:900; color:#333; width:35px; font-size:1.1em;" title="Ordem do Jogo">#${idx+1}</div>
+                        <div style="flex:1; display:flex; flex-direction:column;">
+                            <div style="font-size:0.75em; color:var(--primary); font-weight:800; text-transform:uppercase; margin-bottom:2px;">${g ? g.name : ''}</div>
+                            <div style="display:flex; justify-content:space-between; padding-right:15px; font-weight:700; font-size:0.95em;">
+                                <span style="text-align:right; flex:1;">${t1}</span>
+                                <span style="color:#aaa; margin:0 10px; font-size:0.9em;">X</span>
+                                <span style="text-align:left; flex:1;">${t2}</span>
+                            </div>
+                        </div>
+                        <div style="display:flex; align-items:center;" title="${m.saved?'Finalizado':'Pendente'}">
+                            <span class="material-icons" style="color:${statusColor}; font-size:1.5em;">${statusIcon}</span>
+                        </div>
+                    </div>`;
+                });
+                queueContainer.innerHTML = qHtml;
+            }
+        }
+
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         let h = ''; 
+        let bracketHtml = '';
 
         appState.groups.forEach((g,i) => {
             let ps = appState.players.filter(p=>p.groupId===g.id);
@@ -953,23 +1045,16 @@
             }
             
             const ms = appState.matches.filter(m=>m.gid===g.id);
-            const col = document.createElement('div'); col.className='group-box'; 
             
             if(g.id.includes('ko-')) { 
-                col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
-                
-                h += `<div class="ko-list">`;
+                bracketHtml += `<div class="group-box" style="grid-column: 1 / -1; border-color: #444;">`;
+                bracketHtml += `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
+                bracketHtml += `<div class="ko-list">`;
                 
                 const rounds = {};
                 ms.forEach(m => {
-                    if(m.isThirdPlace) {
-                        if(!rounds['3rd']) rounds['3rd'] = [];
-                        rounds['3rd'].push(m);
-                    } else {
-                        if(!rounds[m.round]) rounds[m.round] = [];
-                        rounds[m.round].push(m);
-                    }
+                    if(m.isThirdPlace) { if(!rounds['3rd']) rounds['3rd'] = []; rounds['3rd'].push(m); } 
+                    else { if(!rounds[m.round]) rounds[m.round] = []; rounds[m.round].push(m); }
                 });
                 
                 let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
@@ -982,7 +1067,7 @@
                     if(count === 2) rName = 'SEMI-FINAL';
                     if(count === 1) rName = 'FINAL';
 
-                    h += `<div class="ko-round-header">${rName}</div>`;
+                    bracketHtml += `<div class="ko-round-header">${rName}</div>`;
                     
                     rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
@@ -997,7 +1082,7 @@
                         const isEditing = !m.saved && !m.isBye;
                         const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
                         
-                        h += `<div class="ko-match-item">
+                        bracketHtml += `<div class="ko-match-item">
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
@@ -1015,7 +1100,7 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
                             }
@@ -1024,7 +1109,7 @@
                 });
 
                 if(rounds['3rd']) {
-                    h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
+                    bracketHtml += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
                     rounds['3rd'].forEach(m => {
                          const n = (id) => appState.players.find(x=>x.id===id)?.name;
                         const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...';
@@ -1038,7 +1123,7 @@
                          const isEditing = !m.saved;
                          const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
 
-                         h += `<div class="ko-match-item">
+                         bracketHtml += `<div class="ko-match-item">
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             ${isEditing && hasPlayers ? 
@@ -1053,18 +1138,18 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
                             }
                         </div>`;
                     });
                 }
-                
-                h += `</div>`;
-                document.getElementById('bracket-container').innerHTML = h;
+                bracketHtml += `</div></div>`;
+                document.getElementById('bracket-container').innerHTML = bracketHtml;
                 
             } else {
+                const col = document.createElement('div'); col.className='group-box'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
                 
                 if(ms.length) {
@@ -1076,19 +1161,19 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer; text-align:center; font-weight:bold; margin-top:5px;" onclick="delM('${m.mid}')" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
                 
                 if(ps.length) { 
                     h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`; 
-                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Game Average">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`); 
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Game Average">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
+                col.innerHTML = h;
+                gc.appendChild(col);
             }
-            col.innerHTML = h;
-            gc.appendChild(col);
         });
 
         // --- TABELA GERAL (ESTREITA) ---
@@ -1109,7 +1194,6 @@
 
                 const genCol = document.createElement('div');
                 genCol.className = 'group-box';
-                // Deixa a tabela centralizada e restringe a largura no desktop
                 genCol.style.gridColumn = '1 / -1'; 
                 genCol.style.borderColor = 'var(--primary)';
                 genCol.style.maxWidth = '800px'; 
