@@ -1,0 +1,16 @@
+{
+  "name": "BT Manager - Torneios",
+  "short_name": "BT Manager",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#004e98",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/847/847969.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
