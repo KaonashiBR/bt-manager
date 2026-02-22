@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V152 (Icons & UI Fixed)</title>
+    <title>BT Manager - V153 (CBT Smart Groups & Draw)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,7 +43,7 @@
         .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
         .bg-tourney .material-icons { font-size: 4.5em; color: white; opacity: 0.3; }
         .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
-        .btn-icon-circle { width: 35px; height: 35px; border-radius: 50%; background: rgba(255,255,255,0.9); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.3em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
+        .btn-icon-circle { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.95); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; border: 1px solid #ddd; }
         .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
         .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
 
@@ -57,7 +57,6 @@
         input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
         
-        /* TABLES & LISTS */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
@@ -69,12 +68,10 @@
         .pool-card:hover { border-color: var(--primary); }
         .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
 
-        /* GROUP BOX */
         .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
         .group-header:hover { opacity: 0.9; }
-        
-        /* LAYOUT BOARD */
+
         .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
         #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
         #groups-container { display: flex; flex-direction: column; gap: 15px; }
@@ -86,7 +83,6 @@
             .group-box { flex: unset; width: 100%; }
         }
 
-        /* JOGOS LIST */
         .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
         .match-main-content { padding: 0 10px; }
@@ -120,7 +116,6 @@
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
 
-        /* KNOCKOUT LIST VIEW */
         .ko-round-header { background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; }
         .ko-list { background: white; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
         .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -181,7 +176,7 @@
         <div style="display:flex; gap:5px; margin-bottom:5px;">
             <input type="text" id="pName" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
             <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
-            <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
+            <button class="btn-std btn-blue" style="width:auto;" onclick="promptAddGroup()">+ Grupo</button>
         </div>
         <div style="display:flex; gap:5px; flex-wrap:wrap;">
             <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
@@ -195,7 +190,7 @@
             <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(this)">
         </div>
         <div style="margin-top:5px; font-size:0.8em; color:#666; text-align:center;">
-            <span class="material-icons" style="font-size:1.1em; vertical-align:middle;">touch_app</span> Clique no jogador da reserva, depois no Grupo.
+            <span class="material-icons" style="font-size:1.1em; vertical-align:middle;">lightbulb</span> O botão "+ Grupo" sugere a quantidade oficial da CBT.
         </div>
     </div>
 
@@ -316,7 +311,6 @@
         e.target.innerText = isFav ? 'favorite' : 'favorite_border';
     }
 
-    function loadArenaPlayers(arenaId) { }
     function fixDriveLink(url) { if (url && url.includes('drive.google.com') && url.includes('/file/d/')) { const id = url.match(/\/d\/(.*?)\//)[1]; return `https://drive.google.com/uc?export=view&id=${id}`; } return url; }
 
     window.openModal = (type, id='', name='', extra1='', extra2='') => {
@@ -331,10 +325,7 @@
         document.getElementById('field-pwd').style.display = 'none';
         if(type === 'arena') { document.getElementById('field-arena').style.display = 'block'; document.getElementById('inp-url').value = extra1; document.getElementById('img-preview').src = extra1 || 'https://via.placeholder.com/150'; } 
         else if(type === 'category') { document.getElementById('field-category').style.display = 'block'; } 
-        else if(type === 'tournament') { 
-            document.getElementById('field-pwd').style.display = 'block'; 
-            document.getElementById('inp-pwd').value = extra1 || "1234";
-        }
+        else if(type === 'tournament') { document.getElementById('field-pwd').style.display = 'block'; document.getElementById('inp-pwd').value = extra1 || "1234"; }
     }
     window.closeModal = () => { document.getElementById('modal-overlay').style.display = 'none'; }
     window.updatePreview = (url) => { document.getElementById('img-preview').src = fixDriveLink(url); }
@@ -399,16 +390,14 @@
 
     window.enterApp = (tId, name, pwd, ownerId) => {
         curTourneyId = tId; document.getElementById('t-title-header').innerText = name; showScreen('screen-app');
-        if(curArenaId) loadArenaPlayers(curArenaId);
         
         const isOwner = localAdmin || (user && (user.uid === ownerId || ADMIN_EMAILS.includes(user.email)));
         if(isOwner) { 
             document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; 
-            switchAppView('groups');
         } else { 
             document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
-            switchAppView('groups');
         }
+        switchAppView('groups');
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
         
@@ -420,12 +409,8 @@
                     if(!appState[k]) appState[k]=[];
                     else if(!Array.isArray(appState[k])) appState[k] = Object.values(appState[k]);
                 });
-            }
-            else { 
+            } else { 
                 appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
-            }
-            if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
-                appState.groupCount = appState.groups ? appState.groups.length : 0;
             }
             recalc(); 
             renderApp();
@@ -448,7 +433,14 @@
         document.getElementById('modal-knockout').style.display = 'flex';
     }
 
-    // NOVA FUNÇÃO DE ORDENAÇÃO CBT (V152 - Confronto Direto + Game Average)
+    window.resetKnockout = () => {
+        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
+        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
+        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
+        save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
+    }
+
+    // NOVA FUNÇÃO DE ORDENAÇÃO CBT (V151 - Confronto Direto + Game Average)
     function sortPlayersCBT(players, matches) {
         return [...players].sort((a, b) => {
             if (b.pts !== a.pts) return b.pts - a.pts;
@@ -493,14 +485,7 @@
         });
     }
 
-    window.resetKnockout = () => {
-        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
-        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-        save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
-    }
-
-    // === EXECUÇÃO MATA-MATA (V152 - PRO SEEDING) ===
+    // === EXECUÇÃO MATA-MATA (V153 - CBT SMART DRAW) ===
     window.execKnockout = () => {
         let qualified = [];
         
@@ -573,6 +558,38 @@
             koMatches.push(m);
         }
 
+        // MOTOR ANTI-CONFLITO CBT (Evitar mesmo grupo na primeira rodada)
+        for(let i=0; i<koMatches.length; i++) {
+            let m = koMatches[i];
+            if(m.round === 1 && m.p1 !== 'BYE' && m.p3 !== 'BYE') {
+                let pA = appState.players.find(x=>x.id===m.p1);
+                let pB = appState.players.find(x=>x.id===m.p3);
+                if(pA && pB && pA.groupId === pB.groupId) {
+                    // Achou conflito! Procura uma troca válida
+                    for(let j=0; j<koMatches.length; j++) {
+                        if(i === j) continue;
+                        let m2 = koMatches[j];
+                        if(m2.round === 1) {
+                            let pC = appState.players.find(x=>x.id===m2.p1);
+                            let pD = appState.players.find(x=>x.id===m2.p3);
+                            
+                            // A nova configuração pode gerar conflito?
+                            let valid1 = !pD || pA.groupId !== pD.groupId;
+                            let valid2 = !pC || pB.groupId !== pC.groupId;
+                            
+                            if(valid1 && valid2) {
+                                // Troca os oponentes (m.p3 com m2.p3)
+                                let temp1 = m.p3; let temp2 = m.p4;
+                                m.p3 = m2.p3; m.p4 = m2.p4;
+                                m2.p3 = temp1; m2.p4 = temp2;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         let matchesInRound = size / 2;
         for(let r=2; r<=totalRounds; r++) {
             matchesInRound /= 2;
@@ -588,6 +605,7 @@
             }
         }
         
+        // 3rd PLACE MATCH (V148 Logic)
         koMatches.push({
             mid: 'm-3rd-' + Date.now(),
             gid: gid,
@@ -599,18 +617,27 @@
 
         appState.matches.push(...koMatches);
 
+        // AUTO PROCESS BYES
         koMatches.forEach(m => {
             if (m.isBye) {
-                if (m.p3 === 'BYE' && m.p1 !== 'BYE') { m.s1 = 6; m.s2 = 0; m.saved = true; advanceWinner(m.mid, m, 6, 0); } 
-                else if (m.p1 === 'BYE' && m.p3 !== 'BYE') { m.s1 = 0; m.s2 = 6; m.saved = true; advanceWinner(m.mid, m, 0, 6); }
+                if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
+                    m.s1 = 6; m.s2 = 0; m.saved = true;
+                    advanceWinner(m.mid, m, 6, 0);
+                } else if (m.p1 === 'BYE' && m.p3 !== 'BYE') {
+                    m.s1 = 0; m.s2 = 6; m.saved = true;
+                    advanceWinner(m.mid, m, 0, 6);
+                }
             }
         });
         
         document.getElementById('modal-knockout').style.display = 'none';
-        save(); alert("Chave Gerada!"); switchAppView('bracket');
+        save();
+        alert("Chave Gerada!");
+        switchAppView('bracket');
     }
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
+
     window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } } }
     window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); } } }
     window.returnToPool = (pid) => { if(confirm("Voltar jogador para a reserva?")) { const p = appState.players.find(x => x.id === pid); if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); } } }
@@ -629,13 +656,46 @@
     }
 
     window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; save(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
+    
     window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
     window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
+    
     function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
     window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); }
     
+    // === GERAÇÃO INTELIGENTE DE GRUPOS CBT (V153) ===
+    window.promptAddGroup = () => {
+        const poolCount = appState.players.filter(p => p.groupId === 'pool').length;
+        
+        // Só sugere a criação automática se não houver grupos criados e houver no mínimo 3 duplas na reserva
+        if(appState.groups.length === 0 && poolCount >= 3) {
+            let G = poolCount <= 5 ? 1 : Math.floor(poolCount / 3);
+            
+            if(confirm(`REGRAS CBT: Para ${poolCount} inscritos, o ideal é formar ${G} grupo(s).\n\nDeseja gerar e distribuir os jogadores automaticamente?`)) {
+                // Cria os grupos
+                for(let i=0; i<G; i++) {
+                    const groupName = "GRUPO " + String.fromCharCode(64 + i + 1);
+                    appState.groups.push({ id: 'g' + Date.now() + i, name: groupName });
+                }
+                
+                // Distribui os jogadores de forma equitativa (ex: 7 duplas = 1 grupo de 3 e 1 grupo de 4)
+                const pool = appState.players.filter(p=>p.groupId==='pool');
+                pool.sort(()=>Math.random()-0.5); // Embaralha para ficar justo
+                pool.forEach((p, index) => {
+                    p.groupId = appState.groups[index % G].id;
+                });
+                
+                save(); renderApp(); return;
+            }
+        }
+        
+        // Caso o usuário recuse ou já existam grupos, adiciona 1 grupo manualmente (Comportamento antigo)
+        addGroup();
+    }
+
     window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now(), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
+
     window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
     window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; save(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro ao ler arquivo: " + err.message); } }; reader.readAsText(file); }
     window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
@@ -674,29 +734,36 @@
     
     window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); }
     
-    // --- SAVE SCORE (V152 - DOM RELATIVE) ---
-    window.saveS = async (mid, btnElement) => { 
+    // --- SAVE SCORE COM IDENTIFICADOR ÚNICO (V151/V153) ---
+    window.saveScore = async (mid, type) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
 
         if(m.saved) {
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
-                m.saved = false; recalc(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false }); renderApp(); 
-            } return;
+                m.saved = false;
+                recalc();
+                await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false });
+                renderApp(); 
+            }
+            return;
         }
 
-        let container = btnElement.parentElement;
-        if (btnElement.closest('tr')) container = btnElement.closest('tr');
-        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
+        let prefix = type === 'ko' ? 'input_mata_mata' : 'input_grupo';
+        let el1 = document.getElementById(`${prefix}_s1_${mid}`);
+        let el2 = document.getElementById(`${prefix}_s2_${mid}`);
         
-        let inputs = container.querySelectorAll('input[type="tel"]');
-        let val1 = inputs[0] ? inputs[0].value : '';
-        let val2 = inputs[1] ? inputs[1].value : '';
+        let val1 = el1 ? el1.value : '';
+        let val2 = el2 ? el2.value : '';
 
-        if(val1 === '' || val2 === '') { alert(`Preencha o placar.`); return; }
+        if(val1 === '' || val2 === '') { 
+            alert(`Preencha o placar.`); 
+            return; 
+        }
         
         let s1 = parseInt(val1); let s2 = parseInt(val2);
+
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
         m.s1 = s1; m.s2 = s2; m.saved = true;
@@ -709,6 +776,7 @@
         const savePromise = m.gid.includes('ko') 
             ? update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches)
             : update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
+            
         savePromise.catch(err => { alert("Erro de conexão ao salvar: " + err.message); });
     }
 
@@ -748,40 +816,27 @@
         }
     }
 
-    window.editS = (mid) => {
+    window.editS = async (mid) => {
         if(!confirm("Editar placar?")) return;
         const mIdx = appState.matches.findIndex(x => x.mid === mid);
-        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
+        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
     }
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
     
-    // (V152) ATUALIZA O RECALC PARA EXTRAIR GAMES JOGADOS/GANHOS E CALCULAR GA
     function recalc() { 
-        appState.players.forEach(p => {
-            p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0;
-            p.gamesWon = 0; p.gamesPlayed = 0; 
-        }); 
+        appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
         appState.matches.forEach(m => { 
             if(m.saved && !m.isBye) { 
                 const run = (id, my, op) => { 
                     const pl = appState.players.find(x => x.id === id); 
-                    if(pl) {
-                        pl.games++; 
-                        pl.bal += my - op; 
-                        pl.gamesWon += my;
-                        pl.gamesPlayed += (my + op);
-                        if(my > op) { pl.wins++; pl.pts += 3; }
-                    } 
+                    if(pl) { pl.games++; pl.bal += my - op; pl.gamesWon += my; pl.gamesPlayed += (my + op); if(my > op) { pl.wins++; pl.pts += 3; } } 
                 }; 
                 run(m.p1, m.s1, m.s2); run(m.p3, m.s2, m.s1); 
                 if(appState.mode === 'individual'){ run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); } 
             }
         }); 
-        
-        appState.players.forEach(p => {
-            p.gameAvg = p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0;
-        });
+        appState.players.forEach(p => { p.gameAvg = p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0; });
     }
     
     function renderApp() {
@@ -855,9 +910,9 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" id="input_mata_mata_s1_${m.mid}" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" id="input_mata_mata_s2_${m.mid}" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
                                 `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
                                  <div class="ko-vs">X</div>
@@ -868,9 +923,9 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}', this)">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko')">✓</button>` 
                                 : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
+                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
                         </div>`;
                     });
@@ -895,9 +950,9 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" id="input_mata_mata_s1_${m.mid}" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" id="input_mata_mata_s2_${m.mid}" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
                                 `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
                                  <div class="ko-vs">X</div>
@@ -906,9 +961,9 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#4CAF50;color:white;border:none;" onclick="saveS('${m.mid}', this)">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko')">✓</button>` 
                                 : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="width:30px;height:30px;margin-left:5px;background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
+                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
                         </div>`;
                     });
@@ -929,7 +984,7 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="width:30px; height:30px; background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}', this)">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" id="input_grupo_s1_${m.mid}" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" id="input_grupo_s2_${m.mid}" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp')">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
