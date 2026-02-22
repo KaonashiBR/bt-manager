@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - TESTE BETA (Fila Interativa)</title>
+    <title>BT Manager - TESTE BETA (Fix Abas)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -87,6 +87,12 @@
             #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
             .group-box { flex: unset; width: 100%; }
         }
+
+        .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
+        .match-main-content { padding: 0 10px; }
+        .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
         .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s;}
@@ -401,16 +407,18 @@
     window.switchTab = (tabName) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if(tabName === 'tournaments') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-tournaments').classList.add('active'); } else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-ranking').classList.add('active'); loadRanking(); } }
     window.showScreen = (id) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
+    // === FIX V157: CORREÇÃO DOS ÍNDICES DAS ABAS ===
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        if(view === 'groups') { 
+        
+        if(view === 'queue') { 
             document.querySelectorAll('.app-tab')[0].classList.add('active'); 
-            document.getElementById('view-groups').classList.add('active'); 
-        }
-        else if(view === 'queue') { 
-            document.querySelectorAll('.app-tab')[1].classList.add('active'); 
             document.getElementById('view-queue').classList.add('active'); 
+        }
+        else if(view === 'groups') { 
+            document.querySelectorAll('.app-tab')[1].classList.add('active'); 
+            document.getElementById('view-groups').classList.add('active'); 
         }
         else if(view === 'bracket') { 
             document.querySelectorAll('.app-tab')[2].classList.add('active'); 
@@ -499,7 +507,7 @@
         } else { 
             document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
         }
-        switchAppView('queue'); // V156: Inicia na aba da Fila
+        switchAppView('queue');
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
         
@@ -833,7 +841,6 @@
     
     window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); renderApp(); }
     
-    // ALGORITMO FILA INTELIGENTE
     function getOptimizedMatchOrder(matches) {
         let groupMatches = matches.filter(m => !m.gid.includes('ko') && !m.isBye);
         let pending = groupMatches.map((m, originalIndex) => ({ m, originalIndex }));
@@ -870,7 +877,6 @@
         return scheduled;
     }
 
-    // --- SAVE SCORE DA FILA OU MATA-MATA ---
     window.saveScore = async (mid, type, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -984,7 +990,6 @@
             pl.appendChild(d); 
         });
 
-        // --- RENDER FILA DE JOGOS COM IMPUT ---
         const queueContainer = document.getElementById('queue-container');
         if(queueContainer) {
             let sortedMatches = getOptimizedMatchOrder(appState.matches);
@@ -1192,7 +1197,6 @@
             gc.appendChild(col);
         });
 
-        // --- TABELA GERAL (ESTREITA) ---
         const activeGroups = appState.groups.filter(g => !g.id.includes('ko-'));
         if (activeGroups.length > 0) {
             let allPlayers = appState.players.filter(p => p.tempGroupRank);
