@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V1.0 Oficial</title>
-    
-    <link rel="manifest" href="manifest.json">
-    <script>if('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js'); }</script>
+    <title>BT Manager - Beta v1.0</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +17,7 @@
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
         /* NAVBAR */
-        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
+        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #ff3b30;}
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
@@ -65,6 +62,8 @@
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
         .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
+        .bt-table th[title], .bt-table td[title] { cursor: help; }
+        
         .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
         .tbl-input:disabled { border: none; background: transparent; color: #555; }
         
@@ -96,7 +95,7 @@
         .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
-        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
+        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s;}
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .view-section { display: none; } .view-section.active { display: block; }
         .viewer-mode .admin-only { display: none !important; }
@@ -135,16 +134,25 @@
 <body class="viewer-mode">
 
 <div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-    <div style="font-size:3.5em;">🎾</div><b>Carregando...</b>
+    <div style="font-size:3.5em;">🎾</div><b>Carregando BETA...</b>
 </div>
 
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager<br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#ff3b30; font-size:0.7em; vertical-align:super;">BETA</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
     <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
 </div>
 
 <div id="screen-arenas" class="screen active">
-    <div class="header-bar"><h2 class="section-title">Arenas</h2></div>
+    <div class="header-bar"><h2 class="section-title">Arenas (BETA)</h2></div>
+    
+    <div style="background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">👑 Use o BT Manager na sua Arena</div>
+        <div style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 12px;">Destrave a criação de torneios, ligas e chaves automáticas.</div>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <a href="https://wa.me/5543999199481?text=Ola%20Lucas,%20quero%20usar%20o%20BT%20Manager!" target="_blank" style="background: #25D366; color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">chat</span> WhatsApp</a>
+            <a href="https://instagram.com/lsibie" target="_blank" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">photo_camera</span> Instagram</a>
+        </div>
+    </div>
     <div id="grid-arenas" class="grid-container"></div>
     <button id="btn-add-arena" class="btn-add-float" onclick="openModal('arena')" style="display:none;">+</button>
     <div style="text-align:center; margin-top:55px; color:#999; font-size:0.9em;" id="msg-login">Clique no bonequinho para Login e ver as arenas completas.</div>
@@ -173,8 +181,8 @@
         <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.2em;">arrow_back</span> Sair</div>
         <div style="display:flex; align-items:center; gap:5px;">
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
-            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
-            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
+            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Compartilhar Link"><span class="material-icons">link</span></button>
+            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;" title="Acesso Admin">🔒</button>
         </div>
     </div>
     <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
@@ -197,17 +205,22 @@
             <button onclick="document.getElementById('import-file').click()" class="btn-std btn-dark" style="width:auto;">📂 Restaurar</button>
             <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(this)">
         </div>
-        <div style="margin-top:5px; font-size:0.8em; color:#666; text-align:center;">
-            <span class="material-icons" style="font-size:1.1em; vertical-align:middle;">lightbulb</span> O botão "⚡ Grupos CBT" cria e sorteia os grupos na regra oficial.
-        </div>
     </div>
 
     <div class="app-tabs">
-        <div class="app-tab active" onclick="switchAppView('groups')">GRUPOS</div>
+        <div class="app-tab active" onclick="switchAppView('queue')">FILA DE JOGOS</div>
+        <div class="app-tab" onclick="switchAppView('groups')">GRUPOS</div>
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-groups" class="view-section active">
+    <div id="view-queue" class="view-section active">
+        <div class="group-box" style="border-color:var(--primary); max-width:800px; margin:0 auto;">
+            <div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🎾 FILA DA FASE DE GRUPOS</div>
+            <div id="queue-container" style="padding: 10px; background: white; border-radius: 0 0 8px 8px;"></div>
+        </div>
+    </div>
+
+    <div id="view-groups" class="view-section">
         <div class="board">
             <div class="column" id="col-pool">
                 <div style="background:var(--secondary); color:white; padding:8px; font-weight:bold; display:flex; justify-content:space-between; font-size:0.9em; border-radius: 8px 8px 0 0;">
@@ -218,6 +231,8 @@
             </div>
             <div id="groups-container"></div>
         </div>
+        
+        <div id="general-ranking-container" style="margin-top: 20px; width: 100%;"></div>
     </div>
     
     <div id="view-bracket" class="view-section">
@@ -264,7 +279,6 @@
     let selectingMatch = null; 
     let selectingSlot = null;
 
-    // --- RBAC PERMISSIONS LOGIC (V1.0) ---
     window.hasEditPermission = (ownerUid, managersString) => {
         if (localAdmin) return true;
         if (!user) return false;
@@ -405,8 +419,19 @@
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        if(view === 'groups') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
-        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
+        
+        if(view === 'queue') { 
+            document.querySelectorAll('.app-tab')[0].classList.add('active'); 
+            document.getElementById('view-queue').classList.add('active'); 
+        }
+        else if(view === 'groups') { 
+            document.querySelectorAll('.app-tab')[1].classList.add('active'); 
+            document.getElementById('view-groups').classList.add('active'); 
+        }
+        else if(view === 'bracket') { 
+            document.querySelectorAll('.app-tab')[2].classList.add('active'); 
+            document.getElementById('view-bracket').classList.add('active'); 
+        }
     }
 
     function loadArenas() {
@@ -431,7 +456,7 @@
         const isFav = favorites[id]; const heartIcon = isFav ? 'favorite' : 'favorite_border'; const heartClass = isFav ? 'card-fav active' : 'card-fav'; const heartHTML = (type === 'arena') ? `<span class="material-icons ${heartClass}" onclick="toggleFavorite('${id}', event)">${heartIcon}</span>` : '';
         const managersSafe = d.managers ? d.managers.replace(/'/g,"\\'") : '';
         
-        div.innerHTML = `${content}${heartHTML}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}', '${managersSafe}'); event.stopPropagation()">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div></div>` : ''}`;
+        div.innerHTML = `${content}${heartHTML}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}', '${managersSafe}'); event.stopPropagation()" title="Editar">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()" title="Excluir">✕</div></div>` : ''}`;
         div.onclick = onClick; return div;
     }
 
@@ -479,7 +504,7 @@
         }); 
     }
     
-    function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th>#</th><th>Nome</th><th>Pts</th><th>J</th><th>V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-size:1.1em;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
+    function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th title="Posição Geral">#</th><th title="Nome do Jogador">Nome</th><th title="Pontuação Total">Pts</th><th title="Jogos Disputados">J</th><th title="Vitórias">V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-size:1.1em; font-weight:bold;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
 
     window.enterApp = (tId, name, pwd, ownerId) => {
         curTourneyId = tId; document.getElementById('t-title-header').innerText = name; showScreen('screen-app');
@@ -490,7 +515,7 @@
         } else { 
             document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
         }
-        switchAppView('groups');
+        switchAppView('queue');
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
         
@@ -725,9 +750,23 @@
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
 
-    window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } } }
-    window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); } } }
-    window.returnToPool = (pid) => { if(confirm("Voltar jogador para a reserva?")) { const p = appState.players.find(x => x.id === pid); if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); } } }
+    window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); renderApp(); } } }
+    window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); renderApp(); } } }
+    
+    window.removeFromGroup = (pid, e) => { 
+        e.stopPropagation(); 
+        if(confirm("Remover do grupo e voltar para a reserva?")) { 
+            const p = appState.players.find(x => x.id === pid); 
+            if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); renderApp(); } 
+        } 
+    }
+    
+    window.delPlayer = (pid) => { 
+        if(confirm("Excluir este jogador do torneio permanentemente?")) { 
+            appState.players = appState.players.filter(p=>p.id!==pid); 
+            save(); renderApp(); 
+        } 
+    }
 
     window.openPlayerSelect = (mid, slot) => {
         if(document.body.classList.contains('viewer-mode')) return;
@@ -749,7 +788,7 @@
     
     function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
-    window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); }
+    window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); renderApp(); }
     
     window.autoGroupsCBT = () => {
         const pool = appState.players.filter(p => p.groupId === 'pool');
@@ -775,13 +814,12 @@
 
     window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
     window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; save(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro ao ler arquivo: " + err.message); } }; reader.readAsText(file); }
-    window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); }
-    window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); } }
+    window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); renderApp(); }
+    window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); renderApp(); } }
     window.toggleSel = (pid,e) => { if(document.body.classList.contains('viewer-mode'))return; e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
-    window.moveSel = (gid) => { if(!selectedPid)return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); save();} }
-    window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); save(); }
-    window.delGroup = (gid) => { if(confirm("Excluir?")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); }}
-    window.delPlayer = (pid) => { if(confirm("Excluir?")) { appState.players=appState.players.filter(p=>p.id!==pid); save(); }}
+    window.moveSel = (gid) => { if(!selectedPid)return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); save(); renderApp();} }
+    window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); save(); renderApp(); }
+    window.delGroup = (gid, e) => { e.stopPropagation(); if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); renderApp(); }}
     
     window.genMatches = (gid) => { 
         const existing = appState.matches.filter(m => m.gid === gid);
@@ -806,11 +844,47 @@
             } 
         } 
         roundMatches.forEach(m => { addMatch(gid, m.p1, m.p2, m.p3, m.p4, false); });
-        save(); 
+        save(); renderApp();
     }
     
-    window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); }
+    window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); renderApp(); }
     
+    function getOptimizedMatchOrder(matches) {
+        let groupMatches = matches.filter(m => !m.gid.includes('ko') && !m.isBye);
+        let pending = groupMatches.map((m, originalIndex) => ({ m, originalIndex }));
+        let scheduled = [];
+        let lastPlayed = {}; 
+
+        while(pending.length > 0) {
+            let bestIdx = -1;
+            let maxScore = -Infinity;
+
+            for(let i = 0; i < pending.length; i++) {
+                let item = pending[i];
+                let m = item.m;
+                let p = [m.p1, m.p2, m.p3, m.p4].filter(x => x && x !== 'd');
+                
+                let minWait = Infinity;
+                for(let pid of p) {
+                    let last = lastPlayed[pid] !== undefined ? lastPlayed[pid] : -100;
+                    let wait = scheduled.length - last;
+                    if(wait < minWait) minWait = wait;
+                }
+
+                let score = minWait * 1000 - item.originalIndex;
+                if(score > maxScore) {
+                    maxScore = score;
+                    bestIdx = i;
+                }
+            }
+            let selected = pending.splice(bestIdx, 1)[0];
+            scheduled.push(selected.m);
+            let p = [selected.m.p1, selected.m.p2, selected.m.p3, selected.m.p4].filter(x => x && x !== 'd');
+            for(let pid of p) { lastPlayed[pid] = scheduled.length - 1; }
+        }
+        return scheduled;
+    }
+
     window.saveScore = async (mid, type, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
@@ -825,6 +899,7 @@
         let container = btnElement.parentElement;
         if (btnElement.closest('tr')) container = btnElement.closest('tr');
         if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
+        if (btnElement.closest('.queue-match-item')) container = btnElement.closest('.queue-match-item');
         
         let inputs = container.querySelectorAll('input[type="tel"]');
         let val1 = inputs[0] ? inputs[0].value : '';
@@ -884,18 +959,18 @@
         }
     }
 
-    window.editS = (mid) => {
+    window.editS = async (mid) => {
         if(!confirm("Editar placar?")) return;
         const mIdx = appState.matches.findIndex(x => x.mid === mid);
-        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
+        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
     }
 
-    window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
+    window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); renderApp(); } }
     
     function recalc() { 
         appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
         appState.matches.forEach(m => { 
-            if(m.saved && !m.isBye) { 
+            if(m.saved && !m.isBye && !m.gid.includes('ko')) { 
                 const run = (id, my, op) => { 
                     const pl = appState.players.find(x => x.id === id); 
                     if(pl) { pl.games++; pl.bal += my - op; pl.gamesWon += my; pl.gamesPlayed += (my + op); if(my > op) { pl.wins++; pl.pts += 3; } } 
@@ -908,6 +983,18 @@
     }
     
     function renderApp() {
+        appState.players.forEach(p => { p.tempGroupRank = null; p.tempGroupName = null; });
+        appState.groups.forEach(g => {
+            if (!g.id.includes('ko-')) {
+                let ps = appState.players.filter(p=>p.groupId===g.id);
+                ps = sortPlayersCBT(ps, appState.matches);
+                ps.forEach((p, ix) => {
+                    p.tempGroupRank = ix + 1;
+                    p.tempGroupName = g.name;
+                });
+            }
+        });
+
         const focusedId = document.activeElement ? document.activeElement.id : null;
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
         document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
@@ -917,9 +1004,63 @@
             const d = document.createElement('div'); 
             d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
             d.onclick=(e)=>window.toggleSel(p.id,e);
-            d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer;">✕</span></div>`; 
+            d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer;" title="Excluir do Torneio">✕</span></div>`; 
             pl.appendChild(d); 
         });
+
+        const queueContainer = document.getElementById('queue-container');
+        if(queueContainer) {
+            let sortedMatches = getOptimizedMatchOrder(appState.matches);
+            if (sortedMatches.length === 0) {
+                queueContainer.innerHTML = '<div style="text-align:center; color:#999; padding: 20px;">Nenhum jogo de grupo pendente ou gerado.</div>';
+            } else {
+                let qHtml = '';
+                sortedMatches.forEach((m, idx) => {
+                    const g = appState.groups.find(x => x.id === m.gid);
+                    const n = (id) => appState.players.find(x=>x.id===id)?.name || '...';
+                    const p1Name = m.p1 ? n(m.p1) : '...'; const p2Name = m.p2 ? n(m.p2) : '...';
+                    const p3Name = m.p3 ? n(m.p3) : '...'; const p4Name = m.p4 ? n(m.p4) : '...';
+                    const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
+                    const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                    
+                    let isEditing = !m.saved;
+                    let opacity = m.saved ? '0.6' : '1';
+                    
+                    qHtml += `
+                    <div class="queue-match-item" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0; opacity: ${opacity};">
+                        <div style="font-weight:900; color:#333; width:35px; font-size:1.1em;" title="Ordem do Jogo">#${idx+1}</div>
+                        <div style="flex:1; display:flex; flex-direction:column;">
+                            <div style="font-size:0.75em; color:var(--primary); font-weight:800; text-transform:uppercase; margin-bottom:2px;">${g ? g.name : ''}</div>
+                            <div style="display:flex; justify-content:center; align-items:center; padding-right:5px; font-weight:700; font-size:0.95em;">
+                                <div style="text-align:right; flex:1; line-height:1.2;">${t1}</div>
+                                
+                                <div style="display:flex; align-items:center; margin: 0 10px;">
+                                    ${isEditing ? 
+                                        `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                         <span style="color:#aaa; font-size:0.9em;">X</span>
+                                         <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                        : 
+                                        `<div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s1}</div>
+                                         <span style="color:#aaa; font-size:0.9em; margin:0 5px;">X</span>
+                                         <div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s2}</div>`
+                                    }
+                                </div>
+                                
+                                <div style="text-align:left; flex:1; line-height:1.2;">${t2}</div>
+                            </div>
+                        </div>
+                        <div class="admin-only" style="display:flex; align-items:center; width:35px; justify-content:flex-end;">
+                             ${isEditing ? 
+                                `<button class="btn-icon-circle" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'queue', this)" title="Salvar Placar">✓</button>` 
+                                : 
+                                `<button class="btn-icon-circle" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>`
+                            }
+                        </div>
+                    </div>`;
+                });
+                queueContainer.innerHTML = qHtml;
+            }
+        }
         
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         let h = ''; 
@@ -927,13 +1068,12 @@
         appState.groups.forEach((g,i) => {
             let ps = appState.players.filter(p=>p.groupId===g.id);
             ps = sortPlayersCBT(ps, appState.matches);
-            
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='group-box'; 
             
             if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div>`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
                 
                 h += `<div class="ko-list">`;
                 
@@ -967,8 +1107,29 @@
                         const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...');
                         const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
                         
-                        const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
-                        const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                        const formatName = (pid, name) => {
+                            if (!pid || pid === 'BYE') return name;
+                            const p = appState.players.find(x => x.id === pid);
+                            if(p && p.tempGroupRank && p.tempGroupName) {
+                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
+                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                            }
+                            return name;
+                        };
+
+                        let t1 = '';
+                        if (appState.mode === 'fixed') {
+                            t1 = formatName(m.p1, p1Name);
+                        } else {
+                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                        }
+                        
+                        let t2 = '';
+                        if (appState.mode === 'fixed') {
+                            t2 = formatName(m.p3, p3Name);
+                        } else {
+                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                        }
                         
                         const isEditing = !m.saved && !m.isBye;
                         const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
@@ -978,9 +1139,9 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
                                 `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
                                  <div class="ko-vs">X</div>
@@ -991,9 +1152,9 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
                                 : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
+                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
                             }
                         </div>`;
                     });
@@ -1008,8 +1169,29 @@
                         const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
                         const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
                         
-                        const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
-                        const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                        const formatName = (pid, name) => {
+                            if (!pid || pid === 'BYE') return name;
+                            const p = appState.players.find(x => x.id === pid);
+                            if(p && p.tempGroupRank && p.tempGroupName) {
+                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
+                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                            }
+                            return name;
+                        };
+
+                        let t1 = '';
+                        if (appState.mode === 'fixed') {
+                            t1 = formatName(m.p1, p1Name);
+                        } else {
+                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                        }
+                        
+                        let t2 = '';
+                        if (appState.mode === 'fixed') {
+                            t2 = formatName(m.p3, p3Name);
+                        } else {
+                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                        }
 
                          const isEditing = !m.saved;
                          const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
@@ -1018,9 +1200,9 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
                                  <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                 <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                 : 
                                 `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
                                  <div class="ko-vs">X</div>
@@ -1029,9 +1211,9 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
                                 : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
+                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
                             }
                         </div>`;
                     });
@@ -1041,7 +1223,7 @@
                 document.getElementById('bracket-container').innerHTML = h;
                 
             } else {
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}'); event.stopPropagation()" style="color:red;">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
                 
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
@@ -1052,14 +1234,14 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer; text-align:center; font-weight:bold; margin-top:5px;" onclick="delM('${m.mid}')" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
                 
                 if(ps.length) { 
-                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>GA</td><td>Pts</td></tr>`; 
-                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="returnToPool('${p.id}'); event.stopPropagation()" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Voltar p/ Reserva">⬆</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer; margin-left:8px;" title="Excluir">✕</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${(p.gameAvg||0).toFixed(2)}</td><td>${p.pts}</td></tr>`); 
+                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`; 
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Game Average">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
             }
@@ -1067,9 +1249,54 @@
             gc.appendChild(col);
         });
 
+        const activeGroups = appState.groups.filter(g => !g.id.includes('ko-'));
+        if (activeGroups.length > 0) {
+            let allPlayers = appState.players.filter(p => p.tempGroupRank);
+            if(allPlayers.length > 0) {
+                allPlayers.sort((a,b) => {
+                    if (a.tempGroupRank !== b.tempGroupRank) return a.tempGroupRank - b.tempGroupRank;
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    const aGA = a.gameAvg || 0;
+                    const bGA = b.gameAvg || 0;
+                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+                    if (b.bal !== a.bal) return b.bal - a.bal;
+                    if (b.wins !== a.wins) return b.wins - a.wins;
+                    return a.name.localeCompare(b.name);
+                });
+
+                const genCol = document.createElement('div');
+                genCol.className = 'group-box';
+                genCol.style.gridColumn = '1 / -1'; 
+                genCol.style.borderColor = 'var(--primary)';
+                genCol.style.maxWidth = '800px'; 
+                genCol.style.margin = '0 auto';
+                genCol.style.width = '100%';
+                
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                <table class="bt-table" style="margin-top:0; border-top:none;">
+                <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`;
+                
+                allPlayers.forEach(p => {
+                    let rankClass = p.tempGroupRank === 1 ? 'color: var(--primary); font-weight: 900;' : (p.tempGroupRank === 2 ? 'color: #2196F3; font-weight:bold;' : 'color: #666;');
+                    thHtml += `<tr style="font-size:0.85em">
+                        <td style="${rankClass}" title="Posição Geral">${p.tempGroupRank}º</td>
+                        <td style="font-weight:bold; font-size:0.8em; color:#555;" title="Grupo de Origem">${p.tempGroupName.replace('GRUPO ', '')}</td>
+                        <td style="text-align:left; font-weight:bold;" title="${p.name}">${p.name}</td>
+                        <td title="Jogos Disputados">${p.games}</td>
+                        <td title="Vitórias">${p.wins}</td>
+                        <td title="Saldo de Games">${p.bal}</td>
+                        <td title="Game Average">${(p.gameAvg||0).toFixed(2)}</td>
+                        <td style="font-weight:bold; color:var(--secondary)" title="Pontuação">${p.pts}</td>
+                    </tr>`;
+                });
+                thHtml += `</table>`;
+                genCol.innerHTML = thHtml;
+                gc.appendChild(genCol);
+            }
+        }
+
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
 </script>
 </body>
 </html>
-
