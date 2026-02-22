@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - TESTE BETA (Fix Abas)</title>
+    <title>BT Manager - TESTE BETA (Origem Mata-Mata)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -407,7 +407,6 @@
     window.switchTab = (tabName) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if(tabName === 'tournaments') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-tournaments').classList.add('active'); } else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-ranking').classList.add('active'); loadRanking(); } }
     window.showScreen = (id) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 
-    // === FIX V157: CORREÇÃO DOS ÍNDICES DAS ABAS ===
     window.switchAppView = (view) => {
         document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
@@ -976,6 +975,16 @@
     
     function renderApp() {
         appState.players.forEach(p => { p.tempGroupRank = null; p.tempGroupName = null; });
+        appState.groups.forEach(g => {
+            if (!g.id.includes('ko-')) {
+                let ps = appState.players.filter(p=>p.groupId===g.id);
+                ps = sortPlayersCBT(ps, appState.matches);
+                ps.forEach((p, ix) => {
+                    p.tempGroupRank = ix + 1;
+                    p.tempGroupName = g.name;
+                });
+            }
+        });
 
         const focusedId = document.activeElement ? document.activeElement.id : null;
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
@@ -1050,14 +1059,6 @@
         appState.groups.forEach((g,i) => {
             let ps = appState.players.filter(p=>p.groupId===g.id);
             ps = sortPlayersCBT(ps, appState.matches);
-            
-            if (!g.id.includes('ko-')) {
-                ps.forEach((p, ix) => {
-                    p.tempGroupRank = ix + 1;
-                    p.tempGroupName = g.name;
-                });
-            }
-            
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='group-box'; 
             
@@ -1097,8 +1098,29 @@
                         const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...');
                         const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
                         
-                        const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
-                        const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                        const formatName = (pid, name) => {
+                            if (!pid || pid === 'BYE') return name;
+                            const p = appState.players.find(x => x.id === pid);
+                            if(p && p.tempGroupRank && p.tempGroupName) {
+                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
+                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                            }
+                            return name;
+                        };
+
+                        let t1 = '';
+                        if (appState.mode === 'fixed') {
+                            t1 = formatName(m.p1, p1Name);
+                        } else {
+                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                        }
+                        
+                        let t2 = '';
+                        if (appState.mode === 'fixed') {
+                            t2 = formatName(m.p3, p3Name);
+                        } else {
+                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                        }
                         
                         const isEditing = !m.saved && !m.isBye;
                         const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
@@ -1138,8 +1160,29 @@
                         const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
                         const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
                         
-                        const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
-                        const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                        const formatName = (pid, name) => {
+                            if (!pid || pid === 'BYE') return name;
+                            const p = appState.players.find(x => x.id === pid);
+                            if(p && p.tempGroupRank && p.tempGroupName) {
+                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
+                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                            }
+                            return name;
+                        };
+
+                        let t1 = '';
+                        if (appState.mode === 'fixed') {
+                            t1 = formatName(m.p1, p1Name);
+                        } else {
+                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                        }
+                        
+                        let t2 = '';
+                        if (appState.mode === 'fixed') {
+                            t2 = formatName(m.p3, p3Name);
+                        } else {
+                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                        }
 
                          const isEditing = !m.saved;
                          const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
