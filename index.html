@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - V154 (Auto Groups Fix)</title>
+    <title>BT Manager - V1.0 Oficial</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -144,7 +144,7 @@
     <div class="header-bar"><h2 class="section-title">Arenas</h2></div>
     <div id="grid-arenas" class="grid-container"></div>
     <button id="btn-add-arena" class="btn-add-float" onclick="openModal('arena')" style="display:none;">+</button>
-    <div style="text-align:center; margin-top:55px; color:#999; font-size:0.9em;" id="msg-login">Clique no bonequinho para Login.</div>
+    <div style="text-align:center; margin-top:55px; color:#999; font-size:0.9em;" id="msg-login">Clique no bonequinho para Login e ver as arenas completas.</div>
 </div>
 
 <div id="screen-categories" class="screen">
@@ -226,7 +226,7 @@
 
 <div id="modal-login"><div class="modal-box"><h3 class="modal-title">Entrar</h3><button class="btn-login-opt btn-google" onclick="doGoogleLogin()">Google (Gmail)</button><button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button></div></div>
 <div id="modal-player-select"><div class="modal-box"><h3 class="modal-title">Selecionar Jogador</h3><div id="select-list-container" class="select-list"></div><button class="btn-std btn-red" onclick="document.getElementById('modal-player-select').style.display='none'" style="margin-top:10px;">Cancelar</button></div></div>
-<div id="modal-overlay"><div class="modal-box"><h3 class="modal-title" id="modal-h3">Criar</h3><input type="hidden" id="modal-type"><input type="hidden" id="modal-id"><div id="field-common"><label class="modal-label">Nome</label><input type="text" id="inp-name" class="inp-std auth-input"></div><div id="field-arena" style="display:none;"><label class="modal-label">Imagem de Capa</label><img id="img-preview" class="preview-img" src=""><div style="display:flex;gap:10px;margin-bottom:10px;"><button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Upload</button><input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)"></div><input type="text" id="inp-url" class="inp-std auth-input" placeholder="Ou cole o link..." oninput="updatePreview(this.value)"></div><div id="field-category" style="display:none;"><label class="modal-label">Estilo</label><select id="inp-cat-type" class="inp-std auth-input"><option value="masc">Masculino (Azul)</option><option value="fem">Feminino (Rosa)</option><option value="mista">Mista (Diagonal)</option></select><label class="modal-label">Sigla</label><input type="text" id="inp-cat-short" class="inp-std auth-input"><label class="modal-label">Pontuação Ranking</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input type="number" id="pts-1" class="inp-std auth-input" placeholder="1º"><input type="number" id="pts-2" class="inp-std auth-input" placeholder="2º"><input type="number" id="pts-3" class="inp-std auth-input" placeholder="3º"><input type="number" id="pts-part" class="inp-std auth-input" placeholder="Part."></div></div><div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
+<div id="modal-overlay"><div class="modal-box"><h3 class="modal-title" id="modal-h3">Criar</h3><input type="hidden" id="modal-type"><input type="hidden" id="modal-id"><div id="field-common"><label class="modal-label">Nome</label><input type="text" id="inp-name" class="inp-std auth-input"></div><div id="field-arena" style="display:none;"><label class="modal-label">Imagem de Capa</label><img id="img-preview" class="preview-img" src=""><div style="display:flex;gap:10px;margin-bottom:10px;"><button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Upload</button><input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)"></div><input type="text" id="inp-url" class="inp-std auth-input" placeholder="Ou cole o link..." oninput="updatePreview(this.value)"><label class="modal-label" style="margin-top:10px;">Administradores (E-mails separados por vírgula)</label><input type="text" id="inp-arena-managers" class="inp-std auth-input" placeholder="email@gmail.com, parceiro@gmail.com"></div><div id="field-category" style="display:none;"><label class="modal-label">Estilo</label><select id="inp-cat-type" class="inp-std auth-input"><option value="masc">Masculino (Azul)</option><option value="fem">Feminino (Rosa)</option><option value="mista">Mista (Diagonal)</option></select><label class="modal-label">Sigla</label><input type="text" id="inp-cat-short" class="inp-std auth-input"><label class="modal-label">Pontuação Ranking</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input type="number" id="pts-1" class="inp-std auth-input" placeholder="1º"><input type="number" id="pts-2" class="inp-std auth-input" placeholder="2º"><input type="number" id="pts-3" class="inp-std auth-input" placeholder="3º"><input type="number" id="pts-part" class="inp-std auth-input" placeholder="Part."></div></div><div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
 <div id="modal-knockout"><div class="modal-box"><h3 class="modal-title">Configurar Mata-Mata</h3><p style="font-size:0.9em;color:#666;">Classificados por grupo:</p><div id="knockout-config-list" style="max-height:50vh;overflow-y:auto;margin-bottom:15px;"></div><div style="display:flex;gap:10px;"><button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button></div></div></div>
 <div id="modal-finals"><div class="modal-box"><h3 class="modal-title">Encerrar & Pontuar</h3><label class="modal-label">🥇 1º Lugar</label><select id="sel-win-1" class="inp-std auth-input"></select><label class="modal-label">🥈 2º Lugar</label><select id="sel-win-2" class="inp-std auth-input"></select><label class="modal-label">🥉 3º Lugar</label><select id="sel-win-3" class="inp-std auth-input"></select><div style="display:flex;gap:10px;margin-top:15px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div></div></div>
 
@@ -254,15 +254,28 @@
 
     let user = null;
     let localAdmin = false;
-    let curArenaId = null; let curCatId = null; let curCatData = null; let curTourneyId = null; let appRef = null;
+    let curArenaId = null; let curArenaData = null; let curCatId = null; let curCatData = null; let curTourneyId = null; let appRef = null;
     let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
     let selectedPid = null;
     let favorites = {}; 
     let selectingMatch = null; 
     let selectingSlot = null;
 
+    // --- RBAC PERMISSIONS LOGIC (V1.0) ---
+    window.hasEditPermission = (ownerUid, managersString) => {
+        if (localAdmin) return true;
+        if (!user) return false;
+        if (ADMIN_EMAILS.includes(user.email)) return true;
+        if (ownerUid === user.uid) return true;
+        if (managersString && user.email) {
+            const emails = managersString.split(',').map(e => e.trim().toLowerCase());
+            if (emails.includes(user.email.toLowerCase())) return true;
+        }
+        return false;
+    }
+
     window.goHome = () => { 
-        curArenaId = null; curCatId = null; curTourneyId = null; 
+        curArenaId = null; curArenaData = null; curCatId = null; curTourneyId = null; 
         history.pushState("", document.title, window.location.pathname + window.location.search); 
         showScreen('screen-arenas'); loadArenas(); 
     }
@@ -272,9 +285,22 @@
         if(hash && hash.includes('/')) {
             const [a, c, t] = hash.split('/');
             curArenaId = a; curCatId = c; curTourneyId = t;
-            get(ref(db, `arenas/${a}`)).then(s => { if(s.exists()) document.getElementById('title-arena').innerText = s.val().name });
-            get(ref(db, `categories/${a}/${c}`)).then(s => { if(s.exists()) { document.getElementById('title-cat').innerText = s.val().name; curCatData = s.val(); }});
-            get(ref(db, `tournaments_meta/${c}/${t}`)).then(s => { if(s.exists()) enterApp(t, s.val().name, s.val().pwd, s.val().owner); });
+            
+            get(ref(db, `arenas/${a}`)).then(s => { 
+                if(s.exists()) {
+                    curArenaData = s.val();
+                    document.getElementById('title-arena').innerText = curArenaData.name;
+                }
+                get(ref(db, `categories/${a}/${c}`)).then(sc => { 
+                    if(sc.exists()) { 
+                        document.getElementById('title-cat').innerText = sc.val().name; 
+                        curCatData = sc.val(); 
+                    }
+                    get(ref(db, `tournaments_meta/${c}/${t}`)).then(st => { 
+                        if(st.exists()) enterApp(t, st.val().name, st.val().pwd, st.val().owner); 
+                    });
+                });
+            });
         }
     }
 
@@ -289,7 +315,8 @@
         if(user) {
             document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : "Usuário";
-            document.getElementById('btn-add-arena').style.display = 'flex'; 
+            const isMaster = ADMIN_EMAILS.includes(user.email);
+            document.getElementById('btn-add-arena').style.display = (isMaster || localAdmin) ? 'flex' : 'none'; 
             document.getElementById('msg-login').style.display = 'none';
             onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
                 favorites = snap.val() || {};
@@ -328,7 +355,13 @@
         document.getElementById('field-arena').style.display = 'none';
         document.getElementById('field-category').style.display = 'none';
         document.getElementById('field-pwd').style.display = 'none';
-        if(type === 'arena') { document.getElementById('field-arena').style.display = 'block'; document.getElementById('inp-url').value = extra1; document.getElementById('img-preview').src = extra1 || 'https://via.placeholder.com/150'; } 
+        
+        if(type === 'arena') { 
+            document.getElementById('field-arena').style.display = 'block'; 
+            document.getElementById('inp-url').value = extra1; 
+            document.getElementById('img-preview').src = extra1 || 'https://via.placeholder.com/150'; 
+            document.getElementById('inp-arena-managers').value = extra2 || '';
+        } 
         else if(type === 'category') { document.getElementById('field-category').style.display = 'block'; } 
         else if(type === 'tournament') { document.getElementById('field-pwd').style.display = 'block'; document.getElementById('inp-pwd').value = extra1 || "1234"; }
     }
@@ -343,7 +376,12 @@
         const name = document.getElementById('inp-name').value.trim();
         if(!name) return alert("Nome obrigatório");
         let path = ''; let data = { name, owner: user ? user.uid : 'local' };
-        if (type === 'arena') { path = 'arenas'; data.img = document.getElementById('inp-url').value; } 
+        
+        if (type === 'arena') { 
+            path = 'arenas'; 
+            data.img = document.getElementById('inp-url').value; 
+            data.managers = document.getElementById('inp-arena-managers').value.trim();
+        } 
         else if (type === 'category') { path = `categories/${curArenaId}`; data.type = document.getElementById('inp-cat-type').value; data.short = document.getElementById('inp-cat-short').value.toUpperCase(); data.points = { p1: parseInt(document.getElementById('pts-1').value)||0, p2: parseInt(document.getElementById('pts-2').value)||0, p3: parseInt(document.getElementById('pts-3').value)||0, part: parseInt(document.getElementById('pts-part').value)||0 }; } 
         else if (type === 'tournament') { path = `tournaments_meta/${curCatId}`; data.pwd = document.getElementById('inp-pwd').value || "1234"; data.date = Date.now(); }
 
@@ -373,30 +411,77 @@
             const list = document.getElementById('grid-arenas'); list.innerHTML = '';
             const data = snap.val(); if(!data) return; 
             const keys = Object.keys(data).sort((a,b) => { const favA = favorites[a] ? 1 : 0; const favB = favorites[b] ? 1 : 0; return favB - favA; });
-            keys.forEach(key => { const d = data[key]; const isOwner = localAdmin || (user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email))); list.appendChild(createCard(key, d.name, d.img, isOwner, 'arena', () => enterArena(key, d))); });
+            keys.forEach(key => { 
+                const d = data[key]; 
+                const isOwner = hasEditPermission(d.owner, d.managers); 
+                list.appendChild(createCard(key, d, d.img, isOwner, 'arena', () => enterArena(key, d))); 
+            });
         });
     }
 
-    function createCard(id, name, imgOrClass, isOwner, type, onClick, subtitle='') {
+    function createCard(id, d, imgOrClass, isOwner, type, onClick, subtitle='') {
+        const name = d.name;
         const div = document.createElement('div'); div.className = 'std-card'; let content = '';
         if(type === 'category') { const bgClass = `bg-${imgOrClass.type}`; content = `<div class="cat-card-content ${bgClass}">${imgOrClass.short}</div>`; } 
         else if (type === 'tournament') { content = `<div class="cat-card-content bg-tourney"><span class="material-icons">emoji_events</span></div>`; } 
         else { content = `<img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">`; }
         const isFav = favorites[id]; const heartIcon = isFav ? 'favorite' : 'favorite_border'; const heartClass = isFav ? 'card-fav active' : 'card-fav'; const heartHTML = (type === 'arena') ? `<span class="material-icons ${heartClass}" onclick="toggleFavorite('${id}', event)">${heartIcon}</span>` : '';
-        div.innerHTML = `${content}${heartHTML}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}'); event.stopPropagation()">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div></div>` : ''}`;
+        const managersSafe = d.managers ? d.managers.replace(/'/g,"\\'") : '';
+        
+        div.innerHTML = `${content}${heartHTML}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}', '${managersSafe}'); event.stopPropagation()">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div></div>` : ''}`;
         div.onclick = onClick; return div;
     }
 
-    window.enterArena = (id, data) => { curArenaId = id; document.getElementById('title-arena').innerText = data.name; document.getElementById('btn-add-cat').style.display = (user || localAdmin) ? 'flex' : 'none'; showScreen('screen-categories'); loadCategories(id); if(user || localAdmin) loadArenaPlayers(id); }
-    function loadCategories(arenaId) { onValue(ref(db, `categories/${arenaId}`), (snap) => { const list = document.getElementById('grid-categories'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; } Object.keys(data).forEach(key => { const d = data[key]; const isOwner = localAdmin || (user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email))); list.appendChild(createCard(key, d.name, {type: d.type, short: d.short}, isOwner, 'category', () => enterCategory(key, d))); }); }); }
-    window.enterCategory = (id, data) => { curCatId = id; curCatData = data; document.getElementById('title-cat').innerText = data.name; document.getElementById('btn-add-tourney').style.display = (user || localAdmin) ? 'flex' : 'none'; switchTab('tournaments'); showScreen('screen-tournaments'); loadTournaments(id); }
-    function loadTournaments(catId) { onValue(ref(db, `tournaments_meta/${catId}`), (snap) => { const list = document.getElementById('grid-tournaments'); list.innerHTML = ''; const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; } Object.keys(data).forEach(key => { const d = data[key]; const isOwner = localAdmin || (user && (user.uid === d.owner || ADMIN_EMAILS.includes(user.email))); const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : ''); list.appendChild(createCard(key, d.name, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub)); }); }); }
+    window.enterArena = (id, data) => { 
+        curArenaId = id; 
+        curArenaData = data;
+        document.getElementById('title-arena').innerText = data.name; 
+        document.getElementById('btn-add-cat').style.display = hasEditPermission(data.owner, data.managers) ? 'flex' : 'none'; 
+        showScreen('screen-categories'); 
+        loadCategories(id); 
+    }
+    
+    function loadCategories(arenaId) { 
+        onValue(ref(db, `categories/${arenaId}`), (snap) => { 
+            const list = document.getElementById('grid-categories'); list.innerHTML = ''; 
+            const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; } 
+            Object.keys(data).forEach(key => { 
+                const d = data[key]; 
+                const isOwner = hasEditPermission(curArenaData?.owner, curArenaData?.managers); 
+                list.appendChild(createCard(key, d, {type: d.type, short: d.short}, isOwner, 'category', () => enterCategory(key, d))); 
+            }); 
+        }); 
+    }
+    
+    window.enterCategory = (id, data) => { 
+        curCatId = id; 
+        curCatData = data; 
+        document.getElementById('title-cat').innerText = data.name; 
+        document.getElementById('btn-add-tourney').style.display = hasEditPermission(curArenaData?.owner, curArenaData?.managers) ? 'flex' : 'none'; 
+        switchTab('tournaments'); 
+        showScreen('screen-tournaments'); 
+        loadTournaments(id); 
+    }
+    
+    function loadTournaments(catId) { 
+        onValue(ref(db, `tournaments_meta/${catId}`), (snap) => { 
+            const list = document.getElementById('grid-tournaments'); list.innerHTML = ''; 
+            const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; } 
+            Object.keys(data).forEach(key => { 
+                const d = data[key]; 
+                const isOwner = hasEditPermission(curArenaData?.owner, curArenaData?.managers); 
+                const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : ''); 
+                list.appendChild(createCard(key, d, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub)); 
+            }); 
+        }); 
+    }
+    
     function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th>#</th><th>Nome</th><th>Pts</th><th>J</th><th>V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-size:1.1em;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
 
     window.enterApp = (tId, name, pwd, ownerId) => {
         curTourneyId = tId; document.getElementById('t-title-header').innerText = name; showScreen('screen-app');
         
-        const isOwner = localAdmin || (user && (user.uid === ownerId || ADMIN_EMAILS.includes(user.email)));
+        const isOwner = hasEditPermission(curArenaData ? curArenaData.owner : ownerId, curArenaData ? curArenaData.managers : '');
         if(isOwner) { 
             document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; 
         } else { 
@@ -438,13 +523,6 @@
             div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="2" min="0"></div>`;
         });
         document.getElementById('modal-knockout').style.display = 'flex';
-    }
-
-    window.resetKnockout = () => {
-        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
-        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-        save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
     }
 
     function sortPlayersCBT(players, matches) {
@@ -491,7 +569,13 @@
         });
     }
 
-    // === EXECUÇÃO MATA-MATA (V153 - CBT SMART DRAW) ===
+    window.resetKnockout = () => {
+        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
+        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
+        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
+        save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
+    }
+
     window.execKnockout = () => {
         let qualified = [];
         
@@ -564,7 +648,6 @@
             koMatches.push(m);
         }
 
-        // MOTOR ANTI-CONFLITO CBT
         for(let i=0; i<koMatches.length; i++) {
             let m = koMatches[i];
             if(m.round === 1 && m.p1 !== 'BYE' && m.p3 !== 'BYE') {
@@ -638,6 +721,7 @@
     }
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
+
     window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); } } }
     window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); } } }
     window.returnToPool = (pid) => { if(confirm("Voltar jogador para a reserva?")) { const p = appState.players.find(x => x.id === pid); if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); } } }
@@ -664,37 +748,26 @@
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
     window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); }
     
-    // === V154: NOVA FUNÇÃO DEDICADA PARA GERAR GRUPOS CBT ===
     window.autoGroupsCBT = () => {
         const pool = appState.players.filter(p => p.groupId === 'pool');
         const N = pool.length;
-        
         if(N < 3) return alert("Mínimo de 3 jogadores na reserva para gerar grupos.");
-        
         let G = N <= 5 ? 1 : Math.floor(N / 3);
-        
         if(!confirm(`Regras CBT:\nPara ${N} inscritos na reserva, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
         
         let startIndex = appState.groups.length;
         let newGroups = [];
-        
         for(let i=0; i<G; i++) {
             const groupName = "GRUPO " + String.fromCharCode(64 + startIndex + i + 1);
             let newG = { id: 'g' + Date.now() + i, name: groupName };
             appState.groups.push(newG);
             newGroups.push(newG);
         }
-        
         pool.sort(()=>Math.random()-0.5); 
-        pool.forEach((p, index) => {
-            p.groupId = newGroups[index % G].id;
-        });
-        
-        save(); 
-        renderApp();
+        pool.forEach((p, index) => { p.groupId = newGroups[index % G].id; });
+        save(); renderApp();
     }
 
-    // O +Grupo original não tem mais prompt, só adiciona um.
     window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now(), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
 
     window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
@@ -735,7 +808,7 @@
     
     window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); }
     
-    window.saveS = async (mid, btnElement) => { 
+    window.saveScore = async (mid, type, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
@@ -808,10 +881,10 @@
         }
     }
 
-    window.editS = async (mid) => {
+    window.editS = (mid) => {
         if(!confirm("Editar placar?")) return;
         const mIdx = appState.matches.findIndex(x => x.mid === mid);
-        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
+        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
     }
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); } }
@@ -915,7 +988,7 @@
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveS('${m.mid}', this)">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
@@ -953,7 +1026,7 @@
                             <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveS('${m.mid}', this)">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
                                 : 
                                 (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
@@ -976,7 +1049,7 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveS('${m.mid}', this)">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
