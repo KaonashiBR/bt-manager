@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#004e98">
+    <title>BT Manager - TESTE BETA</title>
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* BASE & VARS */
+        :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
+        
+        /* NAVBAR */
+        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #ff3b30;} /* Linha vermelha no menu pra lembrar que é o BETA */
+        .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+        .nav-logo span { font-size: 1.4em; }
+        .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
+        .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #ddd; object-fit: cover; }
+        .user-name { font-size: 0.9em; font-weight: 600; color: #555; display: none; }
+        @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.3em; } }
+
+        /* SCREENS */
+        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
+        .screen.active { display: flex; flex-direction: column; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; width: 100%; }
+        
+        /* CARDS */
+        .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
+        .std-card:active { transform: scale(0.97); }
+        .std-card.selected { border: 3px solid var(--primary); transform: scale(0.95); background: #fff3e0; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        .card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 10px 10px; color: white; }
+        .card-title { font-weight: 700; font-size: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
+        .card-subtitle { font-size: 0.9em; opacity: 0.8; margin-top: 2px; }
+        .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4.5em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
+        .bg-masc { background: var(--blue-masc); } .bg-fem { background: var(--pink-fem); } .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
+        .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
+        .bg-tourney .material-icons { font-size: 4.5em; color: white; opacity: 0.3; }
+        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
+        .btn-icon-circle { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.95); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; border: 1px solid #ddd; }
+        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
+        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
+
+        /* UI */
+        .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
+        .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 1em; margin-bottom: 15px;}
+        .status-bar { background: #333; color: white; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9em; font-weight: bold; }
+        button.btn-std { border: none; border-radius: 4px; padding: 12px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.95em; width: 100%; margin-bottom: 5px; }
+        .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; } .btn-dark { background: #444; }
+        input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
+        .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
+        
+        /* TABLES & LISTS */
+        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
+        .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
+        .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
+        .bt-table tr:nth-child(even) { background: #f9f9f9; }
+        .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
+        .tbl-input:disabled { border: none; background: transparent; color: #555; }
+        
+        .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
+        .pool-card:hover { border-color: var(--primary); }
+        .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
+
+        /* GROUP BOX */
+        .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
+        .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
+        .group-header:hover { opacity: 0.9; }
+
+        /* LAYOUT BOARD */
+        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
+        #groups-container { display: flex; flex-direction: column; gap: 15px; }
+
+        @media(min-width: 1100px) { 
+            .board { grid-template-columns: 200px 1fr; align-items: start; } 
+            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
+            #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
+            .group-box { flex: unset; width: 100%; }
+        }
+
+        .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
+        .match-main-content { padding: 0 10px; }
+        .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
+        .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
+        
+        .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
+        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; }
+        .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .view-section { display: none; } .view-section.active { display: block; }
+        .viewer-mode .admin-only { display: none !important; }
+        .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
+        .player-link { cursor: pointer; border-bottom: 1px dashed #999; transition:0.2s; }
+        .player-link:hover { color: var(--primary); border-bottom-color: var(--primary); font-weight:bold; }
+        .player-link.empty { color: #999; font-style: italic; }
+        .viewer-mode .player-link { cursor: default; border-bottom: none; pointer-events: none; }
+        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 8px; font-size: 0.8em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
+        .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+        
+        #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-player-select { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-box { background: white; width: 100%; max-width: 440px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
+        .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1.1em; }
+        .btn-google { background: #db4437; } .btn-logout { background: #555; }
+        .rank-table { width: 100%; border-collapse: collapse; background: white; }
+        .rank-table th { background: #333; color: white; padding: 6px; font-size: 0.8em; }
+        .rank-table td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.9em; }
+        .rank-pos { width: 26px; height: 26px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 1em; }
+        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
+        
+        .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
+        .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
+        .select-item:hover { background: #e0e0e0; }
+
+        /* KNOCKOUT LIST VIEW */
+        .ko-round-header { background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; }
+        .ko-list { background: white; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
+        .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .ko-match-item:last-child { border-bottom: none; }
+        .ko-player { flex: 1; text-align: center; font-weight: 600; cursor: pointer; }
+        .ko-vs { font-size: 0.8em; color: #999; margin: 0 10px; }
+        .ko-score { width: 40px; text-align: center; font-weight: 900; color: var(--primary); }
+    </style>
+</head>
+<body class="viewer-mode">
+
+<div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
+    <div style="font-size:3.5em;">🎾</div><b>Carregando BETA...</b>
+</div>
+
+<div class="navbar">
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#ff3b30; font-size:0.7em; vertical-align:super;">BETA</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
+</div>
+
+<div id="screen-arenas" class="screen active">
+    <div class="header-bar"><h2 class="section-title">Arenas (BETA)</h2></div>
+    <div id="grid-arenas" class="grid-container"></div>
+    <button id="btn-add-arena" class="btn-add-float" onclick="openModal('arena')" style="display:none;">+</button>
+    <div style="text-align:center; margin-top:55px; color:#999; font-size:0.9em;" id="msg-login">Clique no bonequinho para Login.</div>
+</div>
+
+<div id="screen-categories" class="screen">
+    <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Arenas</div>
+    <div class="header-bar"><div><h2 class="section-title" id="title-arena">Nome Arena</h2><div style="font-size:0.9em; color:#777;">Categorias</div></div></div>
+    <div id="grid-categories" class="grid-container"></div>
+    <button id="btn-add-cat" class="btn-add-cat-float btn-add-float" onclick="openModal('category')" style="display:none;">+</button>
+</div>
+
+<div id="screen-tournaments" class="screen">
+    <div class="back-btn" onclick="showScreen('screen-categories')"><span class="material-icons">arrow_back</span> Voltar para Categorias</div>
+    <div class="header-bar"><div><h2 class="section-title" id="title-cat">Categoria</h2></div></div>
+    <div class="tabs"><div class="tab active" onclick="switchTab('tournaments')">TORNEIOS</div><div class="tab" onclick="switchTab('ranking')">RANKING</div></div>
+    <div id="tab-tournaments" class="tab-content active">
+        <div id="grid-tournaments" class="grid-container"></div>
+        <button id="btn-add-tourney" class="btn-add-tourney-float btn-add-float" onclick="openModal('tournament')" style="display:none;">+</button>
+    </div>
+    <div id="tab-ranking" class="tab-content"><div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd;"><table class="rank-table" id="table-ranking"></table></div></div>
+</div>
+
+<div id="screen-app" class="screen">
+    <div class="status-bar">
+        <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.2em;">arrow_back</span> Sair</div>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
+            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;"><span class="material-icons">link</span></button>
+            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;">🔒</button>
+        </div>
+    </div>
+    <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
+    
+    <div class="admin-only" style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;">
+        <div style="display:flex; gap:5px; margin-bottom:5px;">
+            <input type="text" id="pName" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
+            <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
+            <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
+            <button class="btn-std btn-green" style="width:auto;" onclick="autoGroupsCBT()">⚡ Grupos CBT</button>
+        </div>
+        <div style="display:flex; gap:5px; flex-wrap:wrap;">
+            <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
+            <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std" style="width:auto;">Fixas</button>
+            <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Mata-Mata</button>
+            <button onclick="resetKnockout()" class="btn-std btn-red" style="width:auto;">❌ Excluir Mata-Mata</button>
+            <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
+            <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
+            <button onclick="exportData()" class="btn-std btn-dark" style="width:auto;">💾 Backup</button>
+            <button onclick="document.getElementById('import-file').click()" class="btn-std btn-dark" style="width:auto;">📂 Restaurar</button>
+            <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(this)">
+        </div>
+    </div>
+
+    <div class="app-tabs">
+        <div class="app-tab active" onclick="switchAppView('groups')">GRUPOS</div>
+        <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
+    </div>
+
+    <div id="view-groups" class="view-section active">
+        <div class="board">
+            <div class="column" id="col-pool">
+                <div style="background:var(--secondary); color:white; padding:8px; font-weight:bold; display:flex; justify-content:space-between; font-size:0.9em; border-radius: 8px 8px 0 0;">
+                    <span>RESERVAS (<span id="pool-cnt">0</span>)</span>
+                    <button class="admin-only btn-std" style="background:white; color:var(--secondary); width:auto; padding:0px 5px; margin:0; font-size:1em;" onclick="distribute()">Distribuir</button>
+                </div>
+                <div id="pool-list" style="padding:5px; display:flex; flex-direction:column; gap:2px;"></div>
+            </div>
+            <div id="groups-container"></div>
+        </div>
+    </div>
+    
+    <div id="view-bracket" class="view-section">
+        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto;"></div>
+    </div>
+</div>
+
+<div class="app-footer">Todos os direitos reservados © 2026<br>Desenvolvido por <a href="https://instagram.com/lsibie" target="_blank">@LSIBIE</a></div>
+
+<div id="modal-login"><div class="modal-box"><h3 class="modal-title">Entrar</h3><button class="btn-login-opt btn-google" onclick="doGoogleLogin()">Google (Gmail)</button><button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button></div></div>
+<div id="modal-player-select"><div class="modal-box"><h3 class="modal-title">Selecionar Jogador</h3><div id="select-list-container" class="select-list"></div><button class="btn-std btn-red" onclick="document.getElementById('modal-player-select').style.display='none'" style="margin-top:10px;">Cancelar</button></div></div>
+<div id="modal-overlay"><div class="modal-box"><h3 class="modal-title" id="modal-h3">Criar</h3><input type="hidden" id="modal-type"><input type="hidden" id="modal-id"><div id="field-common"><label class="modal-label">Nome</label><input type="text" id="inp-name" class="inp-std auth-input"></div><div id="field-arena" style="display:none;"><label class="modal-label">Imagem de Capa</label><img id="img-preview" class="preview-img" src=""><div style="display:flex;gap:10px;margin-bottom:10px;"><button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Upload</button><input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)"></div><input type="text" id="inp-url" class="inp-std auth-input" placeholder="Ou cole o link..." oninput="updatePreview(this.value)"><label class="modal-label" style="margin-top:10px;">Administradores (E-mails separados por vírgula)</label><input type="text" id="inp-arena-managers" class="inp-std auth-input" placeholder="email@gmail.com, parceiro@gmail.com"></div><div id="field-category" style="display:none;"><label class="modal-label">Estilo</label><select id="inp-cat-type" class="inp-std auth-input"><option value="masc">Masculino (Azul)</option><option value="fem">Feminino (Rosa)</option><option value="mista">Mista (Diagonal)</option></select><label class="modal-label">Sigla</label><input type="text" id="inp-cat-short" class="inp-std auth-input"><label class="modal-label">Pontuação Ranking</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input type="number" id="pts-1" class="inp-std auth-input" placeholder="1º"><input type="number" id="pts-2" class="inp-std auth-input" placeholder="2º"><input type="number" id="pts-3" class="inp-std auth-input" placeholder="3º"><input type="number" id="pts-part" class="inp-std auth-input" placeholder="Part."></div></div><div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
+<div id="modal-knockout"><div class="modal-box"><h3 class="modal-title">Configurar Mata-Mata</h3><p style="font-size:0.9em;color:#666;">Classificados por grupo:</p><div id="knockout-config-list" style="max-height:50vh;overflow-y:auto;margin-bottom:15px;"></div><div style="display:flex;gap:10px;"><button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button></div></div></div>
+<div id="modal-finals"><div class="modal-box"><h3 class="modal-title">Encerrar & Pontuar</h3><label class="modal-label">🥇 1º Lugar</label><select id="sel-win-1" class="inp-std auth-input"></select><label class="modal-label">🥈 2º Lugar</label><select id="sel-win-2" class="inp-std auth-input"></select><label class="modal-label">🥉 3º Lugar</label><select id="sel-win-3" class="inp-std auth-input"></select><div style="display:flex;gap:10px;margin-top:15px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div></div></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
+    const MASTER_PASS = "lucas10";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
+        authDomain: "beach-tennis-manager-92f17.firebaseapp.com",
+        projectId: "beach-tennis-manager-92f17",
+        storageBucket: "beach-tennis-manager-92f17.firebasestorage.app",
+        messagingSenderId: "311372138486",
+        appId: "1:311372138486:web:50c9e403ad877ab094e9d7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    let user = null;
+    let localAdmin = false;
+    let curArenaId = null; let curArenaData = null; let curCatId = null; let curCatData = null; let curTourneyId = null; let appRef = null;
+    let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
+    let selectedPid = null;
+    let favorites = {}; 
+    let selectingMatch = null; 
+    let selectingSlot = null;
+
+    window.hasEditPermission = (ownerUid, managersString) => {
+        if (localAdmin) return true;
+        if (!user) return false;
+        if (ADMIN_EMAILS.includes(user.email)) return true;
+        if (ownerUid === user.uid) return true;
+        if (managersString && user.email) {
+            const emails = managersString.split(',').map(e => e.trim().toLowerCase());
+            if (emails.includes(user.email.toLowerCase())) return true;
+        }
+        return false;
+    }
+
+    window.goHome = () => { 
+        curArenaId = null; curArenaData = null; curCatId = null; curTourneyId = null; 
+        history.pushState("", document.title, window.location.pathname + window.location.search); 
+        showScreen('screen-arenas'); loadArenas(); 
+    }
+
+    window.onload = () => {
+        const hash = window.location.hash.substring(1);
+        if(hash && hash.includes('/')) {
+            const [a, c, t] = hash.split('/');
+            curArenaId = a; curCatId = c; curTourneyId = t;
+            
+            get(ref(db, `arenas/${a}`)).then(s => { 
+                if(s.exists()) {
+                    curArenaData = s.val();
+                    document.getElementById('title-arena').innerText = curArenaData.name;
+                }
+                get(ref(db, `categories/${a}/${c}`)).then(sc => { 
+                    if(sc.exists()) { 
+                        document.getElementById('title-cat').innerText = sc.val().name; 
+                        curCatData = sc.val(); 
+                    }
+                    get(ref(db, `tournaments_meta/${c}/${t}`)).then(st => { 
+                        if(st.exists()) enterApp(t, st.val().name, st.val().pwd, st.val().owner); 
+                    });
+                });
+            });
+        }
+    }
+
+    onAuthStateChanged(auth, (u) => {
+        document.getElementById('loading').style.display = 'none';
+        user = u;
+        updateUserUI();
+        loadArenas(); 
+    });
+
+    function updateUserUI() {
+        if(user) {
+            document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+            document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : "Usuário";
+            const isMaster = ADMIN_EMAILS.includes(user.email);
+            document.getElementById('btn-add-arena').style.display = (isMaster || localAdmin) ? 'flex' : 'none'; 
+            document.getElementById('msg-login').style.display = 'none';
+            onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
+                favorites = snap.val() || {};
+                if(document.getElementById('screen-arenas').classList.contains('active')) loadArenas();
+            });
+        } else {
+            document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+            document.getElementById('nav-username').innerText = localAdmin ? "Admin Local" : "Visitante";
+            document.getElementById('btn-add-arena').style.display = localAdmin ? 'flex' : 'none';
+            document.getElementById('msg-login').style.display = localAdmin ? 'none' : 'block';
+            favorites = {};
+        }
+    }
+
+    window.openLoginModal = () => { if(user) { if(confirm("Sair da conta?")) signOut(auth); } else { document.getElementById('modal-login').style.display = 'flex'; } }
+    window.closeLoginModal = () => { document.getElementById('modal-login').style.display = 'none'; }
+    window.doGoogleLogin = async () => { try { await signInWithPopup(auth, googleProvider); closeLoginModal(); } catch(e) { alert("Erro Google: " + e.message); } }
+    window.toggleFavorite = (id, e) => {
+        e.stopPropagation();
+        if(!user) return alert("Faça login para favoritar.");
+        const isFav = favorites[id] ? null : true; 
+        update(ref(db, `users/${user.uid}/favorites`), { [id]: isFav });
+        e.target.classList.toggle('active');
+        e.target.innerText = isFav ? 'favorite' : 'favorite_border';
+    }
+
+    function fixDriveLink(url) { if (url && url.includes('drive.google.com') && url.includes('/file/d/')) { const id = url.match(/\/d\/(.*?)\//)[1]; return `https://drive.google.com/uc?export=view&id=${id}`; } return url; }
+
+    window.openModal = (type, id='', name='', extra1='', extra2='') => {
+        const titleMap = { 'arena': 'Arena', 'category': 'Categoria', 'tournament': 'Torneio' };
+        document.getElementById('modal-h3').innerText = (id ? 'Editar ' : 'Nova ') + titleMap[type];
+        document.getElementById('modal-overlay').style.display = 'flex';
+        document.getElementById('modal-type').value = type;
+        document.getElementById('modal-id').value = id;
+        document.getElementById('inp-name').value = name;
+        document.getElementById('field-arena').style.display = 'none';
+        document.getElementById('field-category').style.display = 'none';
+        document.getElementById('field-pwd').style.display = 'none';
+        
+        if(type === 'arena') { 
+            document.getElementById('field-arena').style.display = 'block'; 
+            document.getElementById('inp-url').value = extra1; 
+            document.getElementById('img-preview').src = extra1 || 'https://via.placeholder.com/150'; 
+            document.getElementById('inp-arena-managers').value = extra2 || '';
+        } 
+        else if(type === 'category') { document.getElementById('field-category').style.display = 'block'; } 
+        else if(type === 'tournament') { document.getElementById('field-pwd').style.display = 'block'; document.getElementById('inp-pwd').value = extra1 || "1234"; }
+    }
+    window.closeModal = () => { document.getElementById('modal-overlay').style.display = 'none'; }
+    window.updatePreview = (url) => { document.getElementById('img-preview').src = fixDriveLink(url); }
+    window.handleFileSelect = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d'); const scale = 500 / img.width; cvs.width = 500; cvs.height = img.height * scale; ctx.drawImage(img, 0, 0, cvs.width, cvs.height); const data = cvs.toDataURL('image/jpeg', 0.7); document.getElementById('inp-url').value = data; updatePreview(data); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
+
+    window.saveModal = async () => {
+        if(!user && !localAdmin) return;
+        const type = document.getElementById('modal-type').value;
+        const id = document.getElementById('modal-id').value;
+        const name = document.getElementById('inp-name').value.trim();
+        if(!name) return alert("Nome obrigatório");
+        let path = ''; let data = { name, owner: user ? user.uid : 'local' };
+        
+        if (type === 'arena') { 
+            path = 'arenas'; 
+            data.img = document.getElementById('inp-url').value; 
+            data.managers = document.getElementById('inp-arena-managers').value.trim();
+        } 
+        else if (type === 'category') { path = `categories/${curArenaId}`; data.type = document.getElementById('inp-cat-type').value; data.short = document.getElementById('inp-cat-short').value.toUpperCase(); data.points = { p1: parseInt(document.getElementById('pts-1').value)||0, p2: parseInt(document.getElementById('pts-2').value)||0, p3: parseInt(document.getElementById('pts-3').value)||0, part: parseInt(document.getElementById('pts-part').value)||0 }; } 
+        else if (type === 'tournament') { path = `tournaments_meta/${curCatId}`; data.pwd = document.getElementById('inp-pwd').value || "1234"; data.date = Date.now(); }
+
+        try {
+            if (id) { await update(ref(db, `${path}/${id}`), data); } 
+            else {
+                data.createdAt = Date.now();
+                const newRef = push(ref(db, path), data);
+                if(type === 'tournament') { await set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user?user.uid:'local' }); }
+            }
+            closeModal();
+        } catch(e) { console.error(e); alert("Erro ao salvar: " + e.message); }
+    }
+
+    window.switchTab = (tabName) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if(tabName === 'tournaments') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-tournaments').classList.add('active'); } else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-ranking').classList.add('active'); loadRanking(); } }
+    window.showScreen = (id) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+    window.switchAppView = (view) => {
+        document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        if(view === 'groups') { document.querySelectorAll('.app-tab')[0].classList.add('active'); document.getElementById('view-groups').classList.add('active'); }
+        else if(view === 'bracket') { document.querySelectorAll('.app-tab')[1].classList.add('active'); document.getElementById('view-bracket').classList.add('active'); }
+    }
+
+    function loadArenas() {
+        onValue(ref(db, 'arenas'), (snap) => {
+            const list = document.getElementById('grid-arenas'); list.innerHTML = '';
+            const data = snap.val(); if(!data) return; 
+            const keys = Object.keys(data).sort((a,b) => { const favA = favorites[a] ? 1 : 0; const favB = favorites[b] ? 1 : 0; return favB - favA; });
+            keys.forEach(key => { 
+                const d = data[key]; 
+                const isOwner = hasEditPermission(d.owner, d.managers); 
+                list.appendChild(createCard(key, d, d.img, isOwner, 'arena', () => enterArena(key, d))); 
+            });
+        });
+    }
+
+    function createCard(id, d, imgOrClass, isOwner, type, onClick, subtitle='') {
+        const name = d.name;
+        const div = document.createElement('div'); div.className = 'std-card'; let content = '';
+        if(type === 'category') { const bgClass = `bg-${imgOrClass.type}`; content = `<div class="cat-card-content ${bgClass}">${imgOrClass.short}</div>`; } 
+        else if (type === 'tournament') { content = `<div class="cat-card-content bg-tourney"><span class="material-icons">emoji_events</span></div>`; } 
+        else { content = `<img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">`; }
+        const isFav = favorites[id]; const heartIcon = isFav ? 'favorite' : 'favorite_border'; const heartClass = isFav ? 'card-fav active' : 'card-fav'; const heartHTML = (type === 'arena') ? `<span class="material-icons ${heartClass}" onclick="toggleFavorite('${id}', event)">${heartIcon}</span>` : '';
+        const managersSafe = d.managers ? d.managers.replace(/'/g,"\\'") : '';
+        
+        div.innerHTML = `${content}${heartHTML}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}', '${managersSafe}'); event.stopPropagation()">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()">✕</div></div>` : ''}`;
+        div.onclick = onClick; return div;
+    }
+
+    window.enterArena = (id, data) => { 
+        curArenaId = id; 
+        curArenaData = data;
+        document.getElementById('title-arena').innerText = data.name; 
+        document.getElementById('btn-add-cat').style.display = hasEditPermission(data.owner, data.managers) ? 'flex' : 'none'; 
+        showScreen('screen-categories'); 
+        loadCategories(id); 
+    }
+    
+    function loadCategories(arenaId) { 
+        onValue(ref(db, `categories/${arenaId}`), (snap) => { 
+            const list = document.getElementById('grid-categories'); list.innerHTML = ''; 
+            const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; } 
+            Object.keys(data).forEach(key => { 
+                const d = data[key]; 
+                const isOwner = hasEditPermission(curArenaData?.owner, curArenaData?.managers); 
+                list.appendChild(createCard(key, d, {type: d.type, short: d.short}, isOwner, 'category', () => enterCategory(key, d))); 
+            }); 
+        }); 
+    }
+    
+    window.enterCategory = (id, data) => { 
+        curCatId = id; 
+        curCatData = data; 
+        document.getElementById('title-cat').innerText = data.name; 
+        document.getElementById('btn-add-tourney').style.display = hasEditPermission(curArenaData?.owner, curArenaData?.managers) ? 'flex' : 'none'; 
+        switchTab('tournaments'); 
+        showScreen('screen-tournaments'); 
+        loadTournaments(id); 
+    }
+    
+    function loadTournaments(catId) { 
+        onValue(ref(db, `tournaments_meta/${catId}`), (snap) => { 
+            const list = document.getElementById('grid-tournaments'); list.innerHTML = ''; 
+            const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; } 
+            Object.keys(data).forEach(key => { 
+                const d = data[key]; 
+                const isOwner = hasEditPermission(curArenaData?.owner, curArenaData?.managers); 
+                const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : ''); 
+                list.appendChild(createCard(key, d, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub)); 
+            }); 
+        }); 
+    }
+    
+    function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th>#</th><th>Nome</th><th>Pts</th><th>J</th><th>V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-size:1.1em;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
+
+    window.enterApp = (tId, name, pwd, ownerId) => {
+        curTourneyId = tId; document.getElementById('t-title-header').innerText = name; showScreen('screen-app');
+        
+        const isOwner = hasEditPermission(curArenaData ? curArenaData.owner : ownerId, curArenaData ? curArenaData.managers : '');
+        if(isOwner) { 
+            document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; 
+        } else { 
+            document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
+        }
+        switchAppView('groups');
+        
+        if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
+        
+        onValue(appRef, (snap) => {
+            document.getElementById('loading').style.display = 'none'; const d = snap.val();
+            if(d) { 
+                appState = d; 
+                ['players','groups','matches'].forEach(k => {
+                    if(!appState[k]) appState[k]=[];
+                    else if(!Array.isArray(appState[k])) appState[k] = Object.values(appState[k]);
+                });
+            } else { 
+                appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
+            }
+            if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
+                appState.groupCount = appState.groups ? appState.groups.length : 0;
+            }
+            recalc(); 
+            renderApp();
+        });
+    }
+
+    window.exitApp = () => { if(appRef) off(appRef); showScreen('screen-tournaments'); }
+    window.shareLink = () => { const url = `${window.location.origin}${window.location.pathname}#${curArenaId}/${curCatId}/${curTourneyId}`; navigator.clipboard.writeText(url).then(() => alert("Link copiado!")); }
+    window.openFinalsModal = () => { document.getElementById('modal-finals').style.display = 'flex'; const fills = [document.getElementById('sel-win-1'), document.getElementById('sel-win-2'), document.getElementById('sel-win-3')]; fills.forEach(s => { s.innerHTML = '<option value="">Selecione...</option>'; appState.players.forEach(p => s.innerHTML += `<option value="${p.name}">${p.name}</option>`); }); }
+    window.submitPoints = async () => { if(!curCatData || !curCatData.points) return alert("Erro na config da categoria."); const p1 = document.getElementById('sel-win-1').value; const p2 = document.getElementById('sel-win-2').value; const p3 = document.getElementById('sel-win-3').value; if(!p1) return alert("Selecione o campeão."); update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); const rankRef = ref(db, `rankings/${curCatId}`); const snap = await get(rankRef); let ranking = snap.val() || {}; const updatePlayer = (name, pts, isWin=false) => { const key = name.replace(/[.#$/[\]]/g, ""); if(!ranking[key]) ranking[key] = { name: name, points: 0, tournaments: 0, wins: 0 }; ranking[key].points += pts; ranking[key].tournaments += 1; if(isWin) ranking[key].wins += 1; }; if(p1) updatePlayer(p1, curCatData.points.p1, true); if(p2) updatePlayer(p2, curCatData.points.p2); if(p3) updatePlayer(p3, curCatData.points.p3); appState.players.forEach(p => { if(p.name !== p1 && p.name !== p2 && p.name !== p3) updatePlayer(p.name, curCatData.points.part); }); await set(rankRef, ranking); alert("Ranking Atualizado!"); document.getElementById('modal-finals').style.display = 'none'; }
+
+    window.openConfigKnockout = () => {
+        const div = document.getElementById('knockout-config-list');
+        div.innerHTML = '';
+        appState.groups.forEach(g => {
+            if(g.id.includes('ko')) return;
+            div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="2" min="0"></div>`;
+        });
+        document.getElementById('modal-knockout').style.display = 'flex';
+    }
+
+    function sortPlayersCBT(players, matches) {
+        return [...players].sort((a, b) => {
+            if (b.pts !== a.pts) return b.pts - a.pts;
+
+            const tiedPoints = players.filter(p => p.pts === a.pts);
+            if (tiedPoints.length === 2) {
+                const match = matches.find(m => 
+                    m.saved && !m.isBye &&
+                    (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
+                    (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
+                );
+                if (match) {
+                    let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
+                    let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
+                    if (aScore !== bScore) return bScore - aScore;
+                }
+            }
+
+            if (b.bal !== a.bal) return b.bal - a.bal;
+
+            const tiedBal = tiedPoints.filter(p => p.bal === a.bal);
+            if (tiedBal.length === 2) {
+                 const match = matches.find(m => 
+                    m.saved && !m.isBye &&
+                    (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
+                    (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
+                );
+                if (match) {
+                    let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
+                    let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
+                    if (aScore !== bScore) return bScore - aScore;
+                }
+            }
+
+            const aGA = a.gameAvg || 0;
+            const bGA = b.gameAvg || 0;
+            if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+
+            if (b.wins !== a.wins) return b.wins - a.wins;
+
+            return a.name.localeCompare(b.name);
+        });
+    }
+
+    window.resetKnockout = () => {
+        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
+        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
+        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
+        save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
+    }
+
+    window.execKnockout = () => {
+        let qualified = [];
+        
+        appState.groups.forEach(g => {
+            if(g.id.includes('ko')) return;
+            const n = parseInt(document.getElementById(`ko-n-${g.id}`).value) || 0;
+            if(n > 0) {
+                const ps = appState.players.filter(p=>p.groupId===g.id);
+                const sortedPs = sortPlayersCBT(ps, appState.matches);
+                qualified.push(...sortedPs.slice(0, n));
+            }
+        });
+
+        if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
+
+        const regularGroups = appState.groups.filter(g => !g.id.includes('ko'));
+        const groupSizes = new Set(regularGroups.map(g => appState.players.filter(p => p.groupId === g.id).length));
+        const diffSizes = groupSizes.size > 1;
+
+        if (diffSizes) {
+            qualified.sort((a,b) => {
+                const aWinPct = a.games > 0 ? a.wins / a.games : 0;
+                const bWinPct = b.games > 0 ? b.wins / b.games : 0;
+                if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
+                const aGA = a.gameAvg || 0;
+                const bGA = b.gameAvg || 0;
+                return bGA - aGA;
+            });
+        } else {
+            qualified.sort((a,b) => b.pts - a.pts || b.bal - a.bal || b.wins - a.wins);
+        }
+
+        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
+        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
+
+        let size = 2;
+        while(size < qualified.length) size *= 2;
+        
+        const gid = `g-ko-${Date.now()}`;
+        appState.groups.push({ id: gid, name: `MATA-MATA (Chave de ${size})` });
+
+        let seeds = new Array(size).fill(null);
+        for(let i=0; i<qualified.length; i++) seeds[i] = qualified[i];
+
+        let pairingOrder = [];
+        if(size === 2) pairingOrder = [0, 1];
+        else if(size === 4) pairingOrder = [0, 3, 1, 2]; 
+        else if(size === 8) pairingOrder = [0, 7, 3, 4, 2, 5, 1, 6]; 
+        else if(size === 16) pairingOrder = [0, 15, 7, 8, 4, 11, 3, 12, 2, 13, 5, 10, 6, 9, 1, 14];
+
+        let koMatches = [];
+        let totalRounds = Math.log2(size);
+        
+        for(let i=0; i<pairingOrder.length; i+=2) {
+            const seedA = seeds[pairingOrder[i]];
+            const seedB = seeds[pairingOrder[i+1]];
+            
+            let m = {
+                mid: 'm' + Date.now() + Math.random().toString().substr(2, 3) + i, 
+                gid: gid, 
+                round: 1,
+                pos: i/2, 
+                p1: seedA ? seedA.id : 'BYE', 
+                p2: seedA ? seedA.id : 'BYE',
+                p3: seedB ? seedB.id : 'BYE', 
+                p4: seedB ? seedB.id : 'BYE',
+                s1:'', s2:'', saved: false, isBye: false
+            };
+            if (!seedA || !seedB) m.isBye = true;
+            koMatches.push(m);
+        }
+
+        for(let i=0; i<koMatches.length; i++) {
+            let m = koMatches[i];
+            if(m.round === 1 && m.p1 !== 'BYE' && m.p3 !== 'BYE') {
+                let pA = appState.players.find(x=>x.id===m.p1);
+                let pB = appState.players.find(x=>x.id===m.p3);
+                if(pA && pB && pA.groupId === pB.groupId) {
+                    for(let j=0; j<koMatches.length; j++) {
+                        if(i === j) continue;
+                        let m2 = koMatches[j];
+                        if(m2.round === 1 && m2.p3 !== 'BYE') {
+                            let pC = appState.players.find(x=>x.id===m2.p1);
+                            let pD = appState.players.find(x=>x.id===m2.p3);
+                            
+                            let valid1 = !pD || pA.groupId !== pD.groupId;
+                            let valid2 = !pC || pB.groupId !== pC.groupId;
+                            
+                            if(valid1 && valid2) {
+                                let temp1 = m.p3; let temp2 = m.p4;
+                                m.p3 = m2.p3; m.p4 = m2.p4;
+                                m2.p3 = temp1; m2.p4 = temp2;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        let matchesInRound = size / 2;
+        for(let r=2; r<=totalRounds; r++) {
+            matchesInRound /= 2;
+            for(let i=0; i<matchesInRound; i++) {
+                koMatches.push({
+                    mid: 'm-r' + r + '-' + i + '-' + Date.now(), 
+                    gid: gid, 
+                    round: r,
+                    pos: i,
+                    p1: '', p2: '', p3: '', p4: '',
+                    s1:'', s2:'', saved: false, isBye: false
+                });
+            }
+        }
+        
+        koMatches.push({
+            mid: 'm-3rd-' + Date.now(),
+            gid: gid,
+            round: totalRounds,
+            isThirdPlace: true,
+            p1: '', p2: '', p3: '', p4: '',
+            s1:'', s2:'', saved: false, isBye: false
+        });
+
+        appState.matches.push(...koMatches);
+
+        koMatches.forEach(m => {
+            if (m.isBye) {
+                if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
+                    m.s1 = 6; m.s2 = 0; m.saved = true;
+                    advanceWinner(m.mid, m, 6, 0);
+                } else if (m.p1 === 'BYE' && m.p3 !== 'BYE') {
+                    m.s1 = 0; m.s2 = 6; m.saved = true;
+                    advanceWinner(m.mid, m, 0, 6);
+                }
+            }
+        });
+        
+        document.getElementById('modal-knockout').style.display = 'none';
+        save();
+        alert("Chave Gerada!");
+        switchAppView('bracket');
+    }
+
+    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
+
+    window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); renderApp(); } } }
+    window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); renderApp(); } } }
+    
+    window.removeFromGroup = (pid, e) => { 
+        e.stopPropagation(); 
+        if(confirm("Remover do grupo e voltar para a reserva?")) { 
+            const p = appState.players.find(x => x.id === pid); 
+            if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); renderApp(); } 
+        } 
+    }
+    
+    window.delPlayer = (pid) => { 
+        if(confirm("Excluir este jogador do torneio permanentemente?")) { 
+            appState.players = appState.players.filter(p=>p.id!==pid); 
+            save(); renderApp(); 
+        } 
+    }
+
+    window.openPlayerSelect = (mid, slot) => {
+        if(document.body.classList.contains('viewer-mode')) return;
+        selectingMatch = mid; selectingSlot = slot;
+        const m = appState.matches.find(x => x.mid === mid);
+        if(!m) return;
+        const isKO = m.gid.includes('ko');
+        const list = document.getElementById('select-list-container'); list.innerHTML = '';
+        const noneItem = document.createElement('div'); noneItem.className = 'select-item'; noneItem.innerText = '[ Vazio ]'; noneItem.onclick = () => confirmPlayerSelect(''); list.appendChild(noneItem);
+        let candidates = isKO ? appState.players : appState.players.filter(p => p.groupId === m.gid);
+        candidates.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => { const item = document.createElement('div'); item.className = 'select-item'; item.innerText = p.name; item.onclick = () => confirmPlayerSelect(p.id); list.appendChild(item); });
+        document.getElementById('modal-player-select').style.display = 'flex';
+    }
+
+    window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; save(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
+    
+    window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
+    window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
+    
+    function save() { if(appRef) set(appRef, appState); }
+    const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
+    window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); renderApp(); }
+    
+    window.autoGroupsCBT = () => {
+        const pool = appState.players.filter(p => p.groupId === 'pool');
+        const N = pool.length;
+        if(N < 3) return alert("Mínimo de 3 jogadores na reserva para gerar grupos.");
+        let G = N <= 5 ? 1 : Math.floor(N / 3);
+        if(!confirm(`Regras CBT:\nPara ${N} inscritos na reserva, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
+        
+        let startIndex = appState.groups.length;
+        let newGroups = [];
+        for(let i=0; i<G; i++) {
+            const groupName = "GRUPO " + String.fromCharCode(64 + startIndex + i + 1);
+            let newG = { id: 'g' + Date.now() + i, name: groupName };
+            appState.groups.push(newG);
+            newGroups.push(newG);
+        }
+        pool.sort(()=>Math.random()-0.5); 
+        pool.forEach((p, index) => { p.groupId = newGroups[index % G].id; });
+        save(); renderApp();
+    }
+
+    window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now(), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
+
+    window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
+    window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; save(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro ao ler arquivo: " + err.message); } }; reader.readAsText(file); }
+    window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); renderApp(); }
+    window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); renderApp(); } }
+    window.toggleSel = (pid,e) => { if(document.body.classList.contains('viewer-mode'))return; e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
+    window.moveSel = (gid) => { if(!selectedPid)return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); save(); renderApp();} }
+    window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); save(); renderApp(); }
+    window.delGroup = (gid, e) => { e.stopPropagation(); if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); renderApp(); }}
+    
+    window.genMatches = (gid) => { 
+        const existing = appState.matches.filter(m => m.gid === gid);
+        if(existing.length > 0) return alert("Já existem jogos.");
+        const ps=appState.players.filter(p=>p.groupId===gid); 
+        if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
+        let roundMatches = [];
+        if(appState.mode==='fixed') { for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } } 
+        else if(ps.length===4) { roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); }
+        else if(ps.length===5) { [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); } 
+        else { 
+            let pairs=[]; 
+            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
+            pairs.sort(()=>Math.random()-0.5); 
+            while(pairs.length) { 
+                let pA=pairs[0], found=false; 
+                for(let k=1; k<pairs.length; k++) { 
+                    let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
+                    if(all.size===4) { roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2}); pairs.splice(k,1); pairs.splice(0,1); found=true; break; } 
+                } 
+                if(!found) pairs.splice(0,1); 
+            } 
+        } 
+        roundMatches.forEach(m => { addMatch(gid, m.p1, m.p2, m.p3, m.p4, false); });
+        save(); renderApp();
+    }
+    
+    window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); renderApp(); }
+    
+    window.saveScore = async (mid, type, btnElement) => { 
+        const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
+        if(matchIndex === -1) return;
+        const m = appState.matches[matchIndex];
+
+        if(m.saved) {
+            if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
+                m.saved = false; recalc(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false }); renderApp(); 
+            } return;
+        }
+
+        let container = btnElement.parentElement;
+        if (btnElement.closest('tr')) container = btnElement.closest('tr');
+        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
+        
+        let inputs = container.querySelectorAll('input[type="tel"]');
+        let val1 = inputs[0] ? inputs[0].value : '';
+        let val2 = inputs[1] ? inputs[1].value : '';
+
+        if(val1 === '' || val2 === '') { alert(`Preencha o placar.`); return; }
+        
+        let s1 = parseInt(val1); let s2 = parseInt(val2);
+        if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
+        
+        m.s1 = s1; m.s2 = s2; m.saved = true;
+        recalc();
+
+        if(m.gid.includes('ko')) advanceWinner(mid, m, s1, s2);
+        
+        renderApp(); 
+        
+        const savePromise = m.gid.includes('ko') 
+            ? update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches)
+            : update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
+        savePromise.catch(err => { alert("Erro de conexão ao salvar: " + err.message); });
+    }
+
+    function advanceWinner(mid, currentMatch, s1, s2) {
+        const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
+        if(!currentMatch.round) return; 
+        
+        let w1, w2, l1, l2;
+        if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; l1 = currentMatch.p3; l2 = currentMatch.p4; } 
+        else { w1 = currentMatch.p3; w2 = currentMatch.p4; l1 = currentMatch.p1; l2 = currentMatch.p2; }
+        
+        const currentRound = currentMatch.round;
+        const currentPos = currentMatch.pos; 
+        const nextRound = currentRound + 1;
+        const nextPos = Math.floor(currentPos / 2);
+        
+        const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos);
+        
+        if(targetMatch) {
+            const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
+            if(globalTargetIndex > -1) {
+                if(currentPos % 2 === 0) { appState.matches[globalTargetIndex].p1 = w1; appState.matches[globalTargetIndex].p2 = w2; } 
+                else { appState.matches[globalTargetIndex].p3 = w1; appState.matches[globalTargetIndex].p4 = w2; }
+            }
+        }
+
+        const matchesInNextRound = koMatches.filter(m => m.round === nextRound).length;
+        if(matchesInNextRound === 1) {
+            const thirdPlaceMatch = koMatches.find(m => m.isThirdPlace === true);
+            if(thirdPlaceMatch) {
+                const tIdx = appState.matches.findIndex(m => m.mid === thirdPlaceMatch.mid);
+                if(tIdx > -1) {
+                    if(currentPos === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
+                    else { appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2; }
+                }
+            }
+        }
+    }
+
+    window.editS = async (mid) => {
+        if(!confirm("Editar placar?")) return;
+        const mIdx = appState.matches.findIndex(x => x.mid === mid);
+        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
+    }
+
+    window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); renderApp(); } }
+    
+    function recalc() { 
+        appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
+        appState.matches.forEach(m => { 
+            if(m.saved && !m.isBye) { 
+                const run = (id, my, op) => { 
+                    const pl = appState.players.find(x => x.id === id); 
+                    if(pl) { pl.games++; pl.bal += my - op; pl.gamesWon += my; pl.gamesPlayed += (my + op); if(my > op) { pl.wins++; pl.pts += 3; } } 
+                }; 
+                run(m.p1, m.s1, m.s2); run(m.p3, m.s2, m.s1); 
+                if(appState.mode === 'individual'){ run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); } 
+            }
+        }); 
+        appState.players.forEach(p => { p.gameAvg = p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0; });
+    }
+    
+    function renderApp() {
+        // RESET TEMP DATA PARA TABELA GERAL
+        appState.players.forEach(p => { p.tempGroupRank = null; p.tempGroupName = null; });
+
+        const focusedId = document.activeElement ? document.activeElement.id : null;
+        document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
+        document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
+        const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
+        
+        poolPs.forEach(p => { 
+            const d = document.createElement('div'); 
+            d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
+            d.onclick=(e)=>window.toggleSel(p.id,e);
+            d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer;" title="Excluir do Torneio">✕</span></div>`; 
+            pl.appendChild(d); 
+        });
+        
+        const gc = document.getElementById('groups-container'); gc.innerHTML='';
+        let h = ''; 
+
+        appState.groups.forEach((g,i) => {
+            let ps = appState.players.filter(p=>p.groupId===g.id);
+            ps = sortPlayersCBT(ps, appState.matches);
+            
+            // MARCA O RANKING DE GRUPO PARA A TABELA GERAL
+            if (!g.id.includes('ko-')) {
+                ps.forEach((p, ix) => {
+                    p.tempGroupRank = ix + 1;
+                    p.tempGroupName = g.name;
+                });
+            }
+            
+            const ms = appState.matches.filter(m=>m.gid===g.id);
+            const col = document.createElement('div'); col.className='group-box'; 
+            
+            if(g.id.includes('ko-')) { 
+                col.style.gridColumn = '1 / -1'; 
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;">✕</span></div></div>`;
+                
+                h += `<div class="ko-list">`;
+                
+                const rounds = {};
+                ms.forEach(m => {
+                    if(m.isThirdPlace) {
+                        if(!rounds['3rd']) rounds['3rd'] = [];
+                        rounds['3rd'].push(m);
+                    } else {
+                        if(!rounds[m.round]) rounds[m.round] = [];
+                        rounds[m.round].push(m);
+                    }
+                });
+                
+                let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
+                
+                roundKeys.forEach(rNum => {
+                    let rName = 'Fase ' + rNum;
+                    const count = rounds[rNum].length;
+                    if(count === 8) rName = 'OITAVAS DE FINAL';
+                    if(count === 4) rName = 'QUARTAS DE FINAL';
+                    if(count === 2) rName = 'SEMI-FINAL';
+                    if(count === 1) rName = 'FINAL';
+
+                    h += `<div class="ko-round-header">${rName}</div>`;
+                    
+                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        
+                        const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
+                        const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                        
+                        const isEditing = !m.saved && !m.isBye;
+                        const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
+                        
+                        h += `<div class="ko-match-item">
+                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
+                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
+                            
+                            ${isEditing && hasPlayers ? 
+                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                 <span class="ko-vs">X</span>
+                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                : 
+                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
+                                 <div class="ko-vs">X</div>
+                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
+                            }
+                            
+                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
+                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
+                            
+                            ${isEditing && hasPlayers ? 
+                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
+                                : 
+                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
+                            }
+                        </div>`;
+                    });
+                });
+
+                if(rounds['3rd']) {
+                    h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
+                    rounds['3rd'].forEach(m => {
+                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...';
+                        const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
+                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
+                        const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
+                        
+                        const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
+                        const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+
+                         const isEditing = !m.saved;
+                         const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
+
+                         h += `<div class="ko-match-item">
+                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
+                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
+                            ${isEditing && hasPlayers ? 
+                                `<input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                 <span class="ko-vs">X</span>
+                                 <input type="tel" class="tbl-input score-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                : 
+                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
+                                 <div class="ko-vs">X</div>
+                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
+                            }
+                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
+                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
+                            ${isEditing && hasPlayers ? 
+                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
+                                : 
+                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')">✎</button>` : '')
+                            }
+                        </div>`;
+                    });
+                }
+                
+                h += `</div>`;
+                document.getElementById('bracket-container').innerHTML = h;
+                
+            } else {
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                
+                if(ms.length) {
+                    h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
+                    ms.forEach(m => {
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name || (id===''?'<span style="color:var(--primary); font-style:italic;">Selecionar...</span>':'?');
+                        const p1Block = `<span class="player-link ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>`;
+                        const p2Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p2===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p2')">${n(m.p2)}</span>`;
+                        const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
+                        const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
+
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer" onclick="delM('${m.mid}')">✕</div>` : ''}</td></tr>`;
+                    });
+                    h += `</tbody></table>`;
+                } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
+                
+                if(ps.length) { 
+                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td>#</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>GA</td><td>Pts</td></tr>`; 
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td>${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo">⬆</span></div></td><td>${p.games}</td><td>${p.wins}</td><td>${p.bal}</td><td>${(p.gameAvg||0).toFixed(2)}</td><td>${p.pts}</td></tr>`); 
+                    h += `</table>`; 
+                }
+            }
+            col.innerHTML = h;
+            gc.appendChild(col);
+        });
+
+        // --- INÍCIO DA TABELA GERAL (NOVO RECURSO BETA) ---
+        const activeGroups = appState.groups.filter(g => !g.id.includes('ko-'));
+        if (activeGroups.length > 0) {
+            let allPlayers = appState.players.filter(p => p.tempGroupRank);
+            if(allPlayers.length > 0) {
+                allPlayers.sort((a,b) => {
+                    if (a.tempGroupRank !== b.tempGroupRank) return a.tempGroupRank - b.tempGroupRank;
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    const aGA = a.gameAvg || 0;
+                    const bGA = b.gameAvg || 0;
+                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+                    if (b.bal !== a.bal) return b.bal - a.bal;
+                    if (b.wins !== a.wins) return b.wins - a.wins;
+                    return a.name.localeCompare(b.name);
+                });
+
+                const genCol = document.createElement('div');
+                genCol.className = 'group-box';
+                genCol.style.gridColumn = '1 / -1'; 
+                genCol.style.borderColor = 'var(--primary)';
+                
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                <table class="bt-table" style="margin-top:0; border-top:none;">
+                <tr style="background:#ccc; font-size:0.8em"><td>Pos</td><td>Grupo</td><td>Nome</td><td>J</td><td>V</td><td>S</td><td>GA</td><td>Pts</td></tr>`;
+                
+                allPlayers.forEach(p => {
+                    let rankClass = p.tempGroupRank === 1 ? 'color: var(--primary); font-weight: 900;' : (p.tempGroupRank === 2 ? 'color: #2196F3; font-weight:bold;' : 'color: #666;');
+                    thHtml += `<tr style="font-size:0.85em">
+                        <td style="${rankClass}">${p.tempGroupRank}º</td>
+                        <td style="font-weight:bold; font-size:0.8em; color:#555;">${p.tempGroupName.replace('GRUPO ', '')}</td>
+                        <td style="text-align:left; font-weight:bold;">${p.name}</td>
+                        <td>${p.games}</td>
+                        <td>${p.wins}</td>
+                        <td>${p.bal}</td>
+                        <td>${(p.gameAvg||0).toFixed(2)}</td>
+                        <td style="font-weight:bold; color:var(--secondary)">${p.pts}</td>
+                    </tr>`;
+                });
+                thHtml += `</table>`;
+                genCol.innerHTML = thHtml;
+                gc.appendChild(genCol);
+            }
+        }
+        // --- FIM DA TABELA GERAL ---
+
+        if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
+    }
+</script>
+</body>
+</html>
