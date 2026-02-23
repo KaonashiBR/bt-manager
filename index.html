@@ -817,7 +817,6 @@
         save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
     }
 
-    // V163: MOTOR DE SORTEIO CRUZADO PARA MATA-MATA (INDIVIDUAL E FIXAS)
     window.execKnockout = () => {
         let qualified = [];
         
@@ -1186,6 +1185,7 @@
         savePromise.catch(err => { alert("Erro de conexão ao salvar: " + err.message); });
     }
 
+    // FUNÇÃO CORRIGIDA PARA O 3º LUGAR
     function advanceWinner(mid, currentMatch, s1, s2) {
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         if(!currentMatch.round) return; 
@@ -1199,7 +1199,8 @@
         const nextRound = currentRound + 1;
         const nextPos = Math.floor(currentPos / 2);
         
-        const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos);
+        // Manda o vencedor para o próximo jogo principal
+        const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos && !m.isThirdPlace);
         
         if(targetMatch) {
             const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
@@ -1209,13 +1210,14 @@
             }
         }
 
-        const matchesInNextRound = koMatches.filter(m => m.round === nextRound).length;
-        if(matchesInNextRound === 1) {
+        // Manda o perdedor para o jogo de 3º Lugar (Apenas se a próxima rodada for a Final)
+        const regularMatchesInNextRound = koMatches.filter(m => m.round === nextRound && !m.isThirdPlace).length;
+        if(regularMatchesInNextRound === 1) {
             const thirdPlaceMatch = koMatches.find(m => m.isThirdPlace === true);
             if(thirdPlaceMatch) {
                 const tIdx = appState.matches.findIndex(m => m.mid === thirdPlaceMatch.mid);
                 if(tIdx > -1) {
-                    if(currentPos === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
+                    if(currentPos % 2 === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
                     else { appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2; }
                 }
             }
