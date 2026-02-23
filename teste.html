@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - TESTE BETA (Pontuação Expandida)</title>
+    <title>BT Manager - TESTE BETA</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -208,19 +208,19 @@
     </div>
 
     <div class="app-tabs">
-        <div class="app-tab active" onclick="switchAppView('queue')">FILA DE JOGOS</div>
-        <div class="app-tab" onclick="switchAppView('groups')">GRUPOS</div>
+        <div class="app-tab" onclick="switchAppView('queue')">FILA DE JOGOS</div>
+        <div class="app-tab active" onclick="switchAppView('groups')">GRUPOS</div>
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-queue" class="view-section active">
+    <div id="view-queue" class="view-section">
         <div class="group-box" style="border-color:var(--primary); max-width:800px; margin:0 auto;">
             <div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🎾 FILA DA FASE DE GRUPOS</div>
             <div id="queue-container" style="padding: 10px; background: white; border-radius: 0 0 8px 8px;"></div>
         </div>
     </div>
 
-    <div id="view-groups" class="view-section">
+    <div id="view-groups" class="view-section active">
         <div class="board">
             <div class="column" id="col-pool">
                 <div style="background:var(--secondary); color:white; padding:8px; font-weight:bold; display:flex; justify-content:space-between; font-size:0.9em; border-radius: 8px 8px 0 0;">
@@ -562,7 +562,7 @@
         } else { 
             document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
         }
-        switchAppView('queue');
+        switchAppView('groups'); // <-- Modificado para abrir a aba "GRUPOS" primeiro
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
         
