@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
+   <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - TESTE BETA</title>
     
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BT Manager">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/847/847969.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>BT Manager - TESTE BETA</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
@@ -1537,7 +1542,14 @@
             }
         }
 
-        if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
+       if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
+    }
+
+    // REGISTRO DO MOTOR DO APLICATIVO (Service Worker)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('Erro PWA:', err));
+        });
     }
 </script>
 </body>
