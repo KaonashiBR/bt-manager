@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - TESTE BETA</title>
+    <title>BT Manager - TESTE BETA (Salvar Tudo)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -203,6 +203,7 @@
             <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
             <button onclick="exportData()" class="btn-std btn-dark" style="width:auto;">💾 Backup</button>
             <button onclick="document.getElementById('import-file').click()" class="btn-std btn-dark" style="width:auto;">📂 Restaurar</button>
+            <button onclick="forceSave()" class="btn-std btn-green" style="width:auto;">✅ Salvar Tudo</button>
             <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(this)">
         </div>
     </div>
@@ -437,7 +438,6 @@
             path = `categories/${curArenaId}`; 
             data.type = document.getElementById('inp-cat-type').value; 
             data.short = document.getElementById('inp-cat-short').value.toUpperCase(); 
-            // V159: Pontuação Expandida salva no banco
             data.points = { 
                 p1: parseInt(document.getElementById('pts-1').value)||0, 
                 p2: parseInt(document.getElementById('pts-2').value)||0, 
@@ -562,7 +562,7 @@
         } else { 
             document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
         }
-        switchAppView('groups'); // <-- Modificado para abrir a aba "GRUPOS" primeiro
+        switchAppView('groups');
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
         
@@ -896,6 +896,14 @@
     window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
     window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
     
+    // V160: FUNÇÃO FORÇAR SALVAMENTO
+    window.forceSave = () => { 
+        recalc(); 
+        save(); 
+        renderApp(); 
+        alert("💾 Torneio salvo com sucesso na nuvem!"); 
+    };
+
     function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
     window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); renderApp(); }
