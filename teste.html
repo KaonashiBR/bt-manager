@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - TESTE BETA</title>
+    <title>BT Manager - TESTE BETA (Pontuação Expandida)</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,7 +54,7 @@
         .status-bar { background: #333; color: white; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9em; font-weight: bold; }
         button.btn-std { border: none; border-radius: 4px; padding: 12px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.95em; width: 100%; margin-bottom: 5px; }
         .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; } .btn-dark { background: #444; }
-        input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
+        input.inp-std, select.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
         .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
         
         /* TABLES & LISTS */
@@ -244,9 +244,43 @@
 
 <div id="modal-login"><div class="modal-box"><h3 class="modal-title">Entrar</h3><button class="btn-login-opt btn-google" onclick="doGoogleLogin()">Google (Gmail)</button><button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button></div></div>
 <div id="modal-player-select"><div class="modal-box"><h3 class="modal-title">Selecionar Jogador</h3><div id="select-list-container" class="select-list"></div><button class="btn-std btn-red" onclick="document.getElementById('modal-player-select').style.display='none'" style="margin-top:10px;">Cancelar</button></div></div>
-<div id="modal-overlay"><div class="modal-box"><h3 class="modal-title" id="modal-h3">Criar</h3><input type="hidden" id="modal-type"><input type="hidden" id="modal-id"><div id="field-common"><label class="modal-label">Nome</label><input type="text" id="inp-name" class="inp-std auth-input"></div><div id="field-arena" style="display:none;"><label class="modal-label">Imagem de Capa</label><img id="img-preview" class="preview-img" src=""><div style="display:flex;gap:10px;margin-bottom:10px;"><button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Upload</button><input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)"></div><input type="text" id="inp-url" class="inp-std auth-input" placeholder="Ou cole o link..." oninput="updatePreview(this.value)"><label class="modal-label" style="margin-top:10px;">Administradores (E-mails separados por vírgula)</label><input type="text" id="inp-arena-managers" class="inp-std auth-input" placeholder="email@gmail.com, parceiro@gmail.com"></div><div id="field-category" style="display:none;"><label class="modal-label">Estilo</label><select id="inp-cat-type" class="inp-std auth-input"><option value="masc">Masculino (Azul)</option><option value="fem">Feminino (Rosa)</option><option value="mista">Mista (Diagonal)</option></select><label class="modal-label">Sigla</label><input type="text" id="inp-cat-short" class="inp-std auth-input"><label class="modal-label">Pontuação Ranking</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><input type="number" id="pts-1" class="inp-std auth-input" placeholder="1º"><input type="number" id="pts-2" class="inp-std auth-input" placeholder="2º"><input type="number" id="pts-3" class="inp-std auth-input" placeholder="3º"><input type="number" id="pts-part" class="inp-std auth-input" placeholder="Part."></div></div><div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
+<div id="modal-overlay"><div class="modal-box"><h3 class="modal-title" id="modal-h3">Criar</h3><input type="hidden" id="modal-type"><input type="hidden" id="modal-id"><div id="field-common"><label class="modal-label">Nome</label><input type="text" id="inp-name" class="inp-std auth-input"></div><div id="field-arena" style="display:none;"><label class="modal-label">Imagem de Capa</label><img id="img-preview" class="preview-img" src=""><div style="display:flex;gap:10px;margin-bottom:10px;"><button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Upload</button><input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)"></div><input type="text" id="inp-url" class="inp-std auth-input" placeholder="Ou cole o link..." oninput="updatePreview(this.value)"><label class="modal-label" style="margin-top:10px;">Administradores (E-mails separados por vírgula)</label><input type="text" id="inp-arena-managers" class="inp-std auth-input" placeholder="email@gmail.com, parceiro@gmail.com"></div>
+
+<div id="field-category" style="display:none;">
+    <label class="modal-label">Estilo</label>
+    <select id="inp-cat-type" class="inp-std auth-input"><option value="masc">Masculino (Azul)</option><option value="fem">Feminino (Rosa)</option><option value="mista">Mista (Diagonal)</option></select>
+    <label class="modal-label">Sigla</label>
+    <input type="text" id="inp-cat-short" class="inp-std auth-input">
+    
+    <label class="modal-label">Pontuação Ranking (V159 Expandida)</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <input type="number" id="pts-1" class="inp-std auth-input" placeholder="1º (Campeão)">
+        <input type="number" id="pts-2" class="inp-std auth-input" placeholder="2º (Vice)">
+        <input type="number" id="pts-3" class="inp-std auth-input" placeholder="3º Lugar">
+        <input type="number" id="pts-4" class="inp-std auth-input" placeholder="4º Lugar">
+        <input type="number" id="pts-quartas" class="inp-std auth-input" placeholder="Quartas (5º a 8º)">
+        <input type="number" id="pts-part" class="inp-std auth-input" placeholder="Participação">
+    </div>
+</div>
+
+<div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
 <div id="modal-knockout"><div class="modal-box"><h3 class="modal-title">Configurar Mata-Mata</h3><p style="font-size:0.9em;color:#666;">Classificados por grupo:</p><div id="knockout-config-list" style="max-height:50vh;overflow-y:auto;margin-bottom:15px;"></div><div style="display:flex;gap:10px;"><button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button></div></div></div>
-<div id="modal-finals"><div class="modal-box"><h3 class="modal-title">Encerrar & Pontuar</h3><label class="modal-label">🥇 1º Lugar</label><select id="sel-win-1" class="inp-std auth-input"></select><label class="modal-label">🥈 2º Lugar</label><select id="sel-win-2" class="inp-std auth-input"></select><label class="modal-label">🥉 3º Lugar</label><select id="sel-win-3" class="inp-std auth-input"></select><div style="display:flex;gap:10px;margin-top:15px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div></div></div>
+
+<div id="modal-finals"><div class="modal-box">
+    <h3 class="modal-title">Encerrar & Pontuar</h3>
+    <label class="modal-label">🥇 1º Lugar (Campeão)</label><select id="sel-win-1" class="inp-std auth-input"></select>
+    <label class="modal-label">🥈 2º Lugar (Vice)</label><select id="sel-win-2" class="inp-std auth-input"></select>
+    <label class="modal-label">🥉 3º Lugar</label><select id="sel-win-3" class="inp-std auth-input"></select>
+    <label class="modal-label">🏅 4º Lugar</label><select id="sel-win-4" class="inp-std auth-input"></select>
+    <label class="modal-label">🎖️ Perdedores das Quartas (Selecione até 4)</label>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+        <select id="sel-q-1" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-2" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-3" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-4" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:15px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div>
+</div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -399,7 +433,20 @@
             data.img = document.getElementById('inp-url').value; 
             data.managers = document.getElementById('inp-arena-managers').value.trim();
         } 
-        else if (type === 'category') { path = `categories/${curArenaId}`; data.type = document.getElementById('inp-cat-type').value; data.short = document.getElementById('inp-cat-short').value.toUpperCase(); data.points = { p1: parseInt(document.getElementById('pts-1').value)||0, p2: parseInt(document.getElementById('pts-2').value)||0, p3: parseInt(document.getElementById('pts-3').value)||0, part: parseInt(document.getElementById('pts-part').value)||0 }; } 
+        else if (type === 'category') { 
+            path = `categories/${curArenaId}`; 
+            data.type = document.getElementById('inp-cat-type').value; 
+            data.short = document.getElementById('inp-cat-short').value.toUpperCase(); 
+            // V159: Pontuação Expandida salva no banco
+            data.points = { 
+                p1: parseInt(document.getElementById('pts-1').value)||0, 
+                p2: parseInt(document.getElementById('pts-2').value)||0, 
+                p3: parseInt(document.getElementById('pts-3').value)||0, 
+                p4: parseInt(document.getElementById('pts-4').value)||0, 
+                quartas: parseInt(document.getElementById('pts-quartas').value)||0, 
+                part: parseInt(document.getElementById('pts-part').value)||0 
+            }; 
+        } 
         else if (type === 'tournament') { path = `tournaments_meta/${curCatId}`; data.pwd = document.getElementById('inp-pwd').value || "1234"; data.date = Date.now(); }
 
         try {
@@ -540,8 +587,71 @@
 
     window.exitApp = () => { if(appRef) off(appRef); showScreen('screen-tournaments'); }
     window.shareLink = () => { const url = `${window.location.origin}${window.location.pathname}#${curArenaId}/${curCatId}/${curTourneyId}`; navigator.clipboard.writeText(url).then(() => alert("Link copiado!")); }
-    window.openFinalsModal = () => { document.getElementById('modal-finals').style.display = 'flex'; const fills = [document.getElementById('sel-win-1'), document.getElementById('sel-win-2'), document.getElementById('sel-win-3')]; fills.forEach(s => { s.innerHTML = '<option value="">Selecione...</option>'; appState.players.forEach(p => s.innerHTML += `<option value="${p.name}">${p.name}</option>`); }); }
-    window.submitPoints = async () => { if(!curCatData || !curCatData.points) return alert("Erro na config da categoria."); const p1 = document.getElementById('sel-win-1').value; const p2 = document.getElementById('sel-win-2').value; const p3 = document.getElementById('sel-win-3').value; if(!p1) return alert("Selecione o campeão."); update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); const rankRef = ref(db, `rankings/${curCatId}`); const snap = await get(rankRef); let ranking = snap.val() || {}; const updatePlayer = (name, pts, isWin=false) => { const key = name.replace(/[.#$/[\]]/g, ""); if(!ranking[key]) ranking[key] = { name: name, points: 0, tournaments: 0, wins: 0 }; ranking[key].points += pts; ranking[key].tournaments += 1; if(isWin) ranking[key].wins += 1; }; if(p1) updatePlayer(p1, curCatData.points.p1, true); if(p2) updatePlayer(p2, curCatData.points.p2); if(p3) updatePlayer(p3, curCatData.points.p3); appState.players.forEach(p => { if(p.name !== p1 && p.name !== p2 && p.name !== p3) updatePlayer(p.name, curCatData.points.part); }); await set(rankRef, ranking); alert("Ranking Atualizado!"); document.getElementById('modal-finals').style.display = 'none'; }
+    
+    // V159: MODAL FINAL AMPLIADO PARA QUARTAS DE FINAL
+    window.openFinalsModal = () => { 
+        document.getElementById('modal-finals').style.display = 'flex'; 
+        const fills = [
+            document.getElementById('sel-win-1'), document.getElementById('sel-win-2'), 
+            document.getElementById('sel-win-3'), document.getElementById('sel-win-4'),
+            document.getElementById('sel-q-1'), document.getElementById('sel-q-2'),
+            document.getElementById('sel-q-3'), document.getElementById('sel-q-4')
+        ]; 
+        fills.forEach(s => { 
+            s.innerHTML = '<option value="">Selecione...</option>'; 
+            appState.players.forEach(p => s.innerHTML += `<option value="${p.name}">${p.name}</option>`); 
+        }); 
+    }
+    
+    window.submitPoints = async () => { 
+        if(!curCatData || !curCatData.points) return alert("Erro na configuração da categoria. Por favor, edite a categoria e insira os pontos."); 
+        
+        const p1 = document.getElementById('sel-win-1').value; 
+        const p2 = document.getElementById('sel-win-2').value; 
+        const p3 = document.getElementById('sel-win-3').value; 
+        const p4 = document.getElementById('sel-win-4').value; 
+        const q1 = document.getElementById('sel-q-1').value; 
+        const q2 = document.getElementById('sel-q-2').value; 
+        const q3 = document.getElementById('sel-q-3').value; 
+        const q4 = document.getElementById('sel-q-4').value; 
+        
+        if(!p1) return alert("Selecione pelo menos o campeão."); 
+        
+        update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); 
+        const rankRef = ref(db, `rankings/${curCatId}`); 
+        const snap = await get(rankRef); 
+        let ranking = snap.val() || {}; 
+        
+        const updatePlayer = (name, pts, isWin=false) => { 
+            const key = name.replace(/[.#$/[\]]/g, ""); 
+            if(!ranking[key]) ranking[key] = { name: name, points: 0, tournaments: 0, wins: 0 }; 
+            ranking[key].points += pts; 
+            ranking[key].tournaments += 1; 
+            if(isWin) ranking[key].wins += 1; 
+        }; 
+        
+        // Distribui pontos do topo
+        if(p1) updatePlayer(p1, curCatData.points.p1 || 0, true); 
+        if(p2) updatePlayer(p2, curCatData.points.p2 || 0); 
+        if(p3) updatePlayer(p3, curCatData.points.p3 || 0); 
+        if(p4) updatePlayer(p4, curCatData.points.p4 || 0); 
+        
+        // Distribui pontos das Quartas
+        const quartas = [q1, q2, q3, q4];
+        quartas.forEach(q => { if(q) updatePlayer(q, curCatData.points.quartas || 0); });
+
+        // Todos os outros levam os pontos de participação
+        const topPlayers = [p1, p2, p3, p4, q1, q2, q3, q4];
+        appState.players.forEach(p => { 
+            if(!topPlayers.includes(p.name)) {
+                updatePlayer(p.name, curCatData.points.part || 0); 
+            }
+        }); 
+        
+        await set(rankRef, ranking); 
+        alert("Torneio encerrado e Ranking Atualizado com sucesso!"); 
+        document.getElementById('modal-finals').style.display = 'none'; 
+    }
 
     window.openConfigKnockout = () => {
         const div = document.getElementById('knockout-config-list');
