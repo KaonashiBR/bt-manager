@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-   <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#004e98">
     
@@ -12,6 +12,7 @@
     <link rel="manifest" href="manifest.json">
     
     <title>BT Manager - TESTE BETA</title>
+    
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
@@ -99,9 +100,11 @@
         .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
         .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         
-        .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
-        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s;}
+        /* CORREÇÃO DO REALCE AZUL NAS ABAS */
+        .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; user-select: none; -webkit-user-select: none; }
+        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        
         .view-section { display: none; } .view-section.active { display: block; }
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
@@ -327,7 +330,6 @@
 </div></div>
 
 <script type="module">
-    // V162: IMPORTAÇÕES ATUALIZADAS PARA EMAIL E SENHA
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -431,7 +433,6 @@
     window.closeLoginModal = () => { document.getElementById('modal-login').style.display = 'none'; }
     window.doGoogleLogin = async () => { try { await signInWithPopup(auth, googleProvider); closeLoginModal(); } catch(e) { alert("Erro Google: " + e.message); } }
     
-    // V162: FUNÇÕES DE LOGIN POR EMAIL
     window.doEmailLogin = async () => {
         const email = document.getElementById('login-email').value.trim();
         const pwd = document.getElementById('login-pwd').value;
@@ -816,6 +817,7 @@
         save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
     }
 
+    // V163: MOTOR DE SORTEIO CRUZADO PARA MATA-MATA (INDIVIDUAL E FIXAS)
     window.execKnockout = () => {
         let qualified = [];
         
@@ -851,7 +853,6 @@
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
 
-        // V163: FORMAR DUPLAS NO MATA-MATA INDIVIDUAL (SNAKE SEEDING)
         let finalSeeds = [];
         if (appState.mode === 'individual') {
             if (qualified.length % 2 !== 0) return alert("Para formar duplas no Mata-Mata Individual, o número total de classificados deve ser par (ex: 4, 8, 16).");
@@ -1024,7 +1025,6 @@
     function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
     
-    // V161: ADCIONAR JOGADOR COM CELULAR
     window.addPlayer = () => { 
         const n = document.getElementById('pName').value.trim(); 
         const phone = document.getElementById('pPhone').value.trim().replace(/\D/g, ''); 
@@ -1334,7 +1334,7 @@
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='group-box'; 
             
-        if(g.id.includes('ko-')) { 
+            if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
                 
@@ -1502,145 +1502,6 @@
                 
                 h += `</div>`;
                 document.getElementById('bracket-container').innerHTML = h;
-                    } else {
-                        if(!rounds[m.round]) rounds[m.round] = [];
-                        rounds[m.round].push(m);
-                    }
-                });
-                
-                let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
-                
-                roundKeys.forEach(rNum => {
-                    let rName = 'Fase ' + rNum;
-                    const count = rounds[rNum].length;
-                    if(count === 8) rName = 'OITAVAS DE FINAL';
-                    if(count === 4) rName = 'QUARTAS DE FINAL';
-                    if(count === 2) rName = 'SEMI-FINAL';
-                    if(count === 1) rName = 'FINAL';
-
-                    h += `<div class="ko-round-header">${rName}</div>`;
-                    
-                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        
-                        const formatName = (pid, name) => {
-                            if (!pid || pid === 'BYE') return name;
-                            const p = appState.players.find(x => x.id === pid);
-                            if(p && p.tempGroupRank && p.tempGroupName) {
-                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
-                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
-                            }
-                            return name;
-                        };
-
-                        let t1 = '';
-                        if (appState.mode === 'fixed') {
-                            t1 = formatName(m.p1, p1Name);
-                        } else {
-                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
-                        }
-                        
-                        let t2 = '';
-                        if (appState.mode === 'fixed') {
-                            t2 = formatName(m.p3, p3Name);
-                        } else {
-                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
-                        }
-                        
-                        const isEditing = !m.saved && !m.isBye;
-                        const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
-                        
-                        h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                            
-                            ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                 <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
-                                : 
-                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
-                                 <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
-                            }
-                            
-                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                            
-                            ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
-                                : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
-                            }
-                        </div>`;
-                    });
-                });
-
-                if(rounds['3rd']) {
-                    h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
-                    rounds['3rd'].forEach(m => {
-                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...';
-                        const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
-                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
-                        const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
-                        
-                        const formatName = (pid, name) => {
-                            if (!pid || pid === 'BYE') return name;
-                            const p = appState.players.find(x => x.id === pid);
-                            if(p && p.tempGroupRank && p.tempGroupName) {
-                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
-                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
-                            }
-                            return name;
-                        };
-
-                        let t1 = '';
-                        if (appState.mode === 'fixed') {
-                            t1 = formatName(m.p1, p1Name);
-                        } else {
-                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
-                        }
-                        
-                        let t2 = '';
-                        if (appState.mode === 'fixed') {
-                            t2 = formatName(m.p3, p3Name);
-                        } else {
-                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
-                        }
-
-                         const isEditing = !m.saved;
-                         const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
-
-                         h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                            ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                 <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
-                                : 
-                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
-                                 <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
-                            }
-                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                            ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
-                                : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
-                            }
-                        </div>`;
-                    });
-                }
-                
-                h += `</div>`;
-                document.getElementById('bracket-container').innerHTML = h;
                 
             } else {
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
@@ -1715,9 +1576,9 @@
             }
         }
 
-       if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
+        if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
-
+    
     // REGISTRO DO MOTOR DO APLICATIVO (Service Worker)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1727,5 +1588,3 @@
 </script>
 </body>
 </html>
-
-
