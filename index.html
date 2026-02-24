@@ -746,7 +746,7 @@
             document.getElementById('sel-q-2a').value, document.getElementById('sel-q-2b').value,
             document.getElementById('sel-q-3a').value, document.getElementById('sel-q-3b').value,
             document.getElementById('sel-q-4a').value, document.getElementById('sel-q-4b').value
-        ].filter(Boolean); // Filtra os vazios
+        ].filter(Boolean);
         
         if(!p1_id_a && !p1_id_b) return alert("Selecione pelo menos um campeão."); 
         
@@ -1193,7 +1193,7 @@
 
         if(m.saved) {
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
-                m.saved = false; recalc(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false }); renderApp(); 
+                m.saved = false; recalc(); save(); renderApp(); 
             } return;
         }
 
@@ -1216,12 +1216,8 @@
 
         if(m.gid.includes('ko')) advanceWinner(mid, m, s1, s2);
         
+        save(); 
         renderApp(); 
-        
-        const savePromise = m.gid.includes('ko') 
-            ? update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches)
-            : update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-        savePromise.catch(err => { alert("Erro de conexão ao salvar: " + err.message); });
     }
 
     function advanceWinner(mid, currentMatch, s1, s2) {
@@ -1263,7 +1259,7 @@
     window.editS = async (mid) => {
         if(!confirm("Editar placar?")) return;
         const mIdx = appState.matches.findIndex(x => x.mid === mid);
-        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
+        if(mIdx > -1) { appState.matches[mIdx].saved = false; save(); renderApp(); }
     }
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); renderApp(); } }
@@ -1626,3 +1622,4 @@
 </script>
 </body>
 </html>
+
