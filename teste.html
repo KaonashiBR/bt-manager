@@ -3,9 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#004e98">
-    <title>BT Manager - TESTE BETA (Salvar Tudo)</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BT Manager">
+    <link rel="apple-touch-icon" href="./icone.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>BT Manager - TESTE BETA</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,9 +100,10 @@
         .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
         .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         
-        .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
-        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s;}
+        .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; user-select: none; -webkit-user-select: none; }
+        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        
         .view-section { display: none; } .view-section.active { display: block; }
         .viewer-mode .admin-only { display: none !important; }
         .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
@@ -143,7 +150,10 @@
 </div>
 
 <div id="screen-arenas" class="screen active">
-    <div class="header-bar"><h2 class="section-title">Arenas (BETA)</h2></div>
+    <div class="header-bar">
+        <h2 class="section-title">Arenas (BETA)</h2>
+        <button onclick="showGlobalRanking()" class="btn-std btn-dark" style="width: auto; margin:0; padding: 8px 12px; font-size: 0.85em;">🌍 Ranking Global</button>
+    </div>
     
     <div style="background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
         <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">👑 Use o BT Manager na sua Arena</div>
@@ -153,9 +163,22 @@
             <a href="https://instagram.com/lsibie" target="_blank" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">photo_camera</span> Instagram</a>
         </div>
     </div>
+
     <div id="grid-arenas" class="grid-container"></div>
     <button id="btn-add-arena" class="btn-add-float" onclick="openModal('arena')" style="display:none;">+</button>
     <div style="text-align:center; margin-top:55px; color:#999; font-size:0.9em;" id="msg-login">Clique no bonequinho para Login e ver as arenas completas.</div>
+</div>
+
+<div id="screen-global-ranking" class="screen">
+    <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Home</div>
+    <div class="header-bar">
+        <div><h2 class="section-title">🌍 Ranking Global</h2><div style="font-size:0.9em; color:#777;">Os melhores de todas as arenas</div></div>
+    </div>
+    <div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        <table class="rank-table" id="table-global-ranking">
+            <tr><td style="padding:20px;">Carregando...</td></tr>
+        </table>
+    </div>
 </div>
 
 <div id="screen-categories" class="screen">
@@ -188,13 +211,16 @@
     <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
     
     <div class="admin-only" style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;">
+        
         <div style="display:flex; gap:5px; margin-bottom:5px;">
-            <input type="text" id="pName" class="inp-std auth-input" style="margin:0;" placeholder="Nome..." autocomplete="off">
+            <input type="tel" id="pPhone" class="inp-std auth-input" style="margin:0; width:45%; font-size:0.9em;" placeholder="Celular (Opcional)" autocomplete="off">
+            <input type="text" id="pName" class="inp-std auth-input" style="margin:0; width:55%;" placeholder="Nome da dupla/atleta..." autocomplete="off">
             <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
+        </div>
+        
+        <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:10px;">
             <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
             <button class="btn-std btn-green" style="width:auto;" onclick="autoGroupsCBT()">⚡ Grupos CBT</button>
-        </div>
-        <div style="display:flex; gap:5px; flex-wrap:wrap;">
             <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
             <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std" style="width:auto;">Fixas</button>
             <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Mata-Mata</button>
@@ -243,8 +269,27 @@
 
 <div class="app-footer">Todos os direitos reservados © 2026<br>Desenvolvido por <a href="https://instagram.com/lsibie" target="_blank">@LSIBIE</a></div>
 
-<div id="modal-login"><div class="modal-box"><h3 class="modal-title">Entrar</h3><button class="btn-login-opt btn-google" onclick="doGoogleLogin()">Google (Gmail)</button><button class="btn-login-opt btn-logout" onclick="closeLoginModal()">Cancelar</button></div></div>
+<div id="modal-login">
+    <div class="modal-box">
+        <h3 class="modal-title">Entrar no Sistema</h3>
+        
+        <input type="email" id="login-email" class="inp-std auth-input" placeholder="Seu e-mail" style="margin-bottom: 10px;">
+        <input type="password" id="login-pwd" class="inp-std auth-input" placeholder="Sua senha" style="margin-bottom: 15px;">
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn-std btn-blue" onclick="doEmailLogin()">Entrar</button>
+            <button class="btn-std btn-green" onclick="doEmailSignUp()">Criar Conta</button>
+        </div>
+        
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+        
+        <button class="btn-login-opt btn-google" onclick="doGoogleLogin()">Ou entre com o Google (Gmail)</button>
+        <button class="btn-login-opt btn-logout" onclick="closeLoginModal()" style="margin-top: 5px;">Cancelar</button>
+    </div>
+</div>
+
 <div id="modal-player-select"><div class="modal-box"><h3 class="modal-title">Selecionar Jogador</h3><div id="select-list-container" class="select-list"></div><button class="btn-std btn-red" onclick="document.getElementById('modal-player-select').style.display='none'" style="margin-top:10px;">Cancelar</button></div></div>
+
 <div id="modal-overlay"><div class="modal-box"><h3 class="modal-title" id="modal-h3">Criar</h3><input type="hidden" id="modal-type"><input type="hidden" id="modal-id"><div id="field-common"><label class="modal-label">Nome</label><input type="text" id="inp-name" class="inp-std auth-input"></div><div id="field-arena" style="display:none;"><label class="modal-label">Imagem de Capa</label><img id="img-preview" class="preview-img" src=""><div style="display:flex;gap:10px;margin-bottom:10px;"><button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Upload</button><input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)"></div><input type="text" id="inp-url" class="inp-std auth-input" placeholder="Ou cole o link..." oninput="updatePreview(this.value)"><label class="modal-label" style="margin-top:10px;">Administradores (E-mails separados por vírgula)</label><input type="text" id="inp-arena-managers" class="inp-std auth-input" placeholder="email@gmail.com, parceiro@gmail.com"></div>
 
 <div id="field-category" style="display:none;">
@@ -253,7 +298,7 @@
     <label class="modal-label">Sigla</label>
     <input type="text" id="inp-cat-short" class="inp-std auth-input">
     
-    <label class="modal-label">Pontuação Ranking (V159 Expandida)</label>
+    <label class="modal-label">Pontuação Ranking</label>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <input type="number" id="pts-1" class="inp-std auth-input" placeholder="1º (Campeão)">
         <input type="number" id="pts-2" class="inp-std auth-input" placeholder="2º (Vice)">
@@ -269,23 +314,52 @@
 
 <div id="modal-finals"><div class="modal-box">
     <h3 class="modal-title">Encerrar & Pontuar</h3>
-    <label class="modal-label">🥇 1º Lugar (Campeão)</label><select id="sel-win-1" class="inp-std auth-input"></select>
-    <label class="modal-label">🥈 2º Lugar (Vice)</label><select id="sel-win-2" class="inp-std auth-input"></select>
-    <label class="modal-label">🥉 3º Lugar</label><select id="sel-win-3" class="inp-std auth-input"></select>
-    <label class="modal-label">🏅 4º Lugar</label><select id="sel-win-4" class="inp-std auth-input"></select>
-    <label class="modal-label">🎖️ Perdedores das Quartas (Selecione até 4)</label>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
-        <select id="sel-q-1" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-2" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-3" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-4" class="inp-std auth-input" style="margin:0;"></select>
+    
+    <label class="modal-label">🥇 1º Lugar (Campeões)</label>
+    <div style="display:flex; gap:5px;">
+        <select id="sel-win-1a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-win-1b" class="inp-std auth-input" style="margin:0;"></select>
     </div>
-    <div style="display:flex;gap:10px;margin-top:15px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div>
+    
+    <label class="modal-label" style="margin-top:10px;">🥈 2º Lugar (Vices)</label>
+    <div style="display:flex; gap:5px;">
+        <select id="sel-win-2a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-win-2b" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    
+    <label class="modal-label" style="margin-top:10px;">🥉 3º Lugar</label>
+    <div style="display:flex; gap:5px;">
+        <select id="sel-win-3a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-win-3b" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    
+    <label class="modal-label" style="margin-top:10px;">🏅 4º Lugar</label>
+    <div style="display:flex; gap:5px;">
+        <select id="sel-win-4a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-win-4b" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    
+    <label class="modal-label" style="margin-top:10px;">🎖️ Perdedores das Quartas (Até 8 pessoas)</label>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+        <select id="sel-q-1a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-1b" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-2a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-2b" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-3a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-3b" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-4a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-4b" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    
+    <div style="display:flex;gap:10px;margin-top:20px;">
+        <button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button>
+        <button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button>
+    </div>
 </div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
@@ -366,8 +440,8 @@
     function updateUserUI() {
         if(user) {
             document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-            document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : "Usuário";
-            const isMaster = ADMIN_EMAILS.includes(user.email);
+            document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : (user.email ? user.email.split('@')[0] : "Usuário");
+            const isMaster = user.email && ADMIN_EMAILS.includes(user.email);
             document.getElementById('btn-add-arena').style.display = (isMaster || localAdmin) ? 'flex' : 'none'; 
             document.getElementById('msg-login').style.display = 'none';
             onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
@@ -386,6 +460,34 @@
     window.openLoginModal = () => { if(user) { if(confirm("Sair da conta?")) signOut(auth); } else { document.getElementById('modal-login').style.display = 'flex'; } }
     window.closeLoginModal = () => { document.getElementById('modal-login').style.display = 'none'; }
     window.doGoogleLogin = async () => { try { await signInWithPopup(auth, googleProvider); closeLoginModal(); } catch(e) { alert("Erro Google: " + e.message); } }
+    
+    window.doEmailLogin = async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const pwd = document.getElementById('login-pwd').value;
+        if(!email || !pwd) return alert("Preencha e-mail e senha!");
+        try {
+            await signInWithEmailAndPassword(auth, email, pwd);
+            closeLoginModal();
+        } catch(e) {
+            alert("Erro ao entrar. Verifique se o e-mail e a senha estão corretos.");
+        }
+    }
+
+    window.doEmailSignUp = async () => {
+        const email = document.getElementById('login-email').value.trim();
+        const pwd = document.getElementById('login-pwd').value;
+        if(!email || !pwd) return alert("Preencha e-mail e senha!");
+        if(pwd.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+        try {
+            await createUserWithEmailAndPassword(auth, email, pwd);
+            alert("Conta criada com sucesso!");
+            closeLoginModal();
+        } catch(e) {
+            if(e.code === 'auth/email-already-in-use') return alert("Este e-mail já está cadastrado. Clique em Entrar.");
+            alert("Erro ao criar conta: " + e.message);
+        }
+    }
+
     window.toggleFavorite = (id, e) => {
         e.stopPropagation();
         if(!user) return alert("Faça login para favoritar.");
@@ -458,6 +560,27 @@
             }
             closeModal();
         } catch(e) { console.error(e); alert("Erro ao salvar: " + e.message); }
+    }
+
+    window.showGlobalRanking = () => {
+        showScreen('screen-global-ranking');
+        const table = document.getElementById('table-global-ranking');
+        table.innerHTML = '<tr><td style="padding:20px;">Carregando dados da nuvem...</td></tr>';
+        
+        get(ref(db, 'global_players')).then((snap) => {
+            table.innerHTML = '<tr><th title="Posição Global">#</th><th title="Nome do Jogador">Nome</th><th title="Pontuação Total">Pts</th><th title="Torneios Jogados">J</th><th title="Títulos de Campeão">Títulos</th></tr>';
+            const data = snap.val();
+            if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking global ainda.</td></tr>'; return; }
+            
+            const rankArr = Object.values(data).sort((a,b) => (b.points - a.points) || (b.wins - a.wins));
+            rankArr.forEach((p, i) => { 
+                const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; 
+                tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left; font-weight:bold;">${p.name}</td><td style="color:var(--primary); font-size:1.1em; font-weight:bold;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; 
+                table.appendChild(tr); 
+            });
+        }).catch(err => {
+            table.innerHTML = `<tr><td style="padding:20px; color:red;">Erro ao carregar: ${err.message}</td></tr>`;
+        });
     }
 
     window.switchTab = (tabName) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if(tabName === 'tournaments') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-tournaments').classList.add('active'); } else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-ranking').classList.add('active'); loadRanking(); } }
@@ -562,7 +685,7 @@
         } else { 
             document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
         }
-        switchAppView('groups');
+        switchAppView('groups'); 
         
         if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
         
@@ -588,68 +711,87 @@
     window.exitApp = () => { if(appRef) off(appRef); showScreen('screen-tournaments'); }
     window.shareLink = () => { const url = `${window.location.origin}${window.location.pathname}#${curArenaId}/${curCatId}/${curTourneyId}`; navigator.clipboard.writeText(url).then(() => alert("Link copiado!")); }
     
-    // V159: MODAL FINAL AMPLIADO PARA QUARTAS DE FINAL
     window.openFinalsModal = () => { 
         document.getElementById('modal-finals').style.display = 'flex'; 
         const fills = [
-            document.getElementById('sel-win-1'), document.getElementById('sel-win-2'), 
-            document.getElementById('sel-win-3'), document.getElementById('sel-win-4'),
-            document.getElementById('sel-q-1'), document.getElementById('sel-q-2'),
-            document.getElementById('sel-q-3'), document.getElementById('sel-q-4')
+            document.getElementById('sel-win-1a'), document.getElementById('sel-win-1b'), 
+            document.getElementById('sel-win-2a'), document.getElementById('sel-win-2b'), 
+            document.getElementById('sel-win-3a'), document.getElementById('sel-win-3b'), 
+            document.getElementById('sel-win-4a'), document.getElementById('sel-win-4b'),
+            document.getElementById('sel-q-1a'), document.getElementById('sel-q-1b'),
+            document.getElementById('sel-q-2a'), document.getElementById('sel-q-2b'),
+            document.getElementById('sel-q-3a'), document.getElementById('sel-q-3b'),
+            document.getElementById('sel-q-4a'), document.getElementById('sel-q-4b')
         ]; 
         fills.forEach(s => { 
             s.innerHTML = '<option value="">Selecione...</option>'; 
-            appState.players.forEach(p => s.innerHTML += `<option value="${p.name}">${p.name}</option>`); 
+            appState.players.forEach(p => s.innerHTML += `<option value="${p.id}">${p.name}</option>`); 
         }); 
     }
     
     window.submitPoints = async () => { 
         if(!curCatData || !curCatData.points) return alert("Erro na configuração da categoria. Por favor, edite a categoria e insira os pontos."); 
         
-        const p1 = document.getElementById('sel-win-1').value; 
-        const p2 = document.getElementById('sel-win-2').value; 
-        const p3 = document.getElementById('sel-win-3').value; 
-        const p4 = document.getElementById('sel-win-4').value; 
-        const q1 = document.getElementById('sel-q-1').value; 
-        const q2 = document.getElementById('sel-q-2').value; 
-        const q3 = document.getElementById('sel-q-3').value; 
-        const q4 = document.getElementById('sel-q-4').value; 
+        const p1_id_a = document.getElementById('sel-win-1a').value; 
+        const p1_id_b = document.getElementById('sel-win-1b').value; 
+        const p2_id_a = document.getElementById('sel-win-2a').value; 
+        const p2_id_b = document.getElementById('sel-win-2b').value; 
+        const p3_id_a = document.getElementById('sel-win-3a').value; 
+        const p3_id_b = document.getElementById('sel-win-3b').value; 
+        const p4_id_a = document.getElementById('sel-win-4a').value; 
+        const p4_id_b = document.getElementById('sel-win-4b').value; 
         
-        if(!p1) return alert("Selecione pelo menos o campeão."); 
+        const q_ids = [
+            document.getElementById('sel-q-1a').value, document.getElementById('sel-q-1b').value,
+            document.getElementById('sel-q-2a').value, document.getElementById('sel-q-2b').value,
+            document.getElementById('sel-q-3a').value, document.getElementById('sel-q-3b').value,
+            document.getElementById('sel-q-4a').value, document.getElementById('sel-q-4b').value
+        ].filter(Boolean);
+        
+        if(!p1_id_a && !p1_id_b) return alert("Selecione pelo menos um campeão."); 
         
         update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); 
+        
         const rankRef = ref(db, `rankings/${curCatId}`); 
         const snap = await get(rankRef); 
-        let ranking = snap.val() || {}; 
+        let localRanking = snap.val() || {}; 
+        let globalUpdates = {};
         
-        const updatePlayer = (name, pts, isWin=false) => { 
-            const key = name.replace(/[.#$/[\]]/g, ""); 
-            if(!ranking[key]) ranking[key] = { name: name, points: 0, tournaments: 0, wins: 0 }; 
-            ranking[key].points += pts; 
-            ranking[key].tournaments += 1; 
-            if(isWin) ranking[key].wins += 1; 
-        }; 
-        
-        // Distribui pontos do topo
-        if(p1) updatePlayer(p1, curCatData.points.p1 || 0, true); 
-        if(p2) updatePlayer(p2, curCatData.points.p2 || 0); 
-        if(p3) updatePlayer(p3, curCatData.points.p3 || 0); 
-        if(p4) updatePlayer(p4, curCatData.points.p4 || 0); 
-        
-        // Distribui pontos das Quartas
-        const quartas = [q1, q2, q3, q4];
-        quartas.forEach(q => { if(q) updatePlayer(q, curCatData.points.quartas || 0); });
+        for (let p of appState.players) {
+            let pts = 0;
+            let isChamp = false;
+            
+            if(p.id === p1_id_a || p.id === p1_id_b) { pts = curCatData.points.p1 || 0; isChamp = true; }
+            else if(p.id === p2_id_a || p.id === p2_id_b) pts = curCatData.points.p2 || 0;
+            else if(p.id === p3_id_a || p.id === p3_id_b) pts = curCatData.points.p3 || 0;
+            else if(p.id === p4_id_a || p.id === p4_id_b) pts = curCatData.points.p4 || 0;
+            else if(q_ids.includes(p.id)) pts = curCatData.points.quartas || 0;
+            else pts = curCatData.points.part || 0;
 
-        // Todos os outros levam os pontos de participação
-        const topPlayers = [p1, p2, p3, p4, q1, q2, q3, q4];
-        appState.players.forEach(p => { 
-            if(!topPlayers.includes(p.name)) {
-                updatePlayer(p.name, curCatData.points.part || 0); 
+            const localKey = p.name.replace(/[.#$/[\]]/g, ""); 
+            if(!localRanking[localKey]) localRanking[localKey] = { name: p.name, points: 0, tournaments: 0, wins: 0 }; 
+            localRanking[localKey].points += pts; 
+            localRanking[localKey].tournaments += 1; 
+            if(isChamp) localRanking[localKey].wins += 1; 
+
+            if(p.phone && p.phone.length >= 10) {
+                const gSnap = await get(ref(db, `global_players/${p.phone}`));
+                let gData = gSnap.val() || { name: p.name, points: 0, tournaments: 0, wins: 0 };
+                gData.points += pts;
+                gData.tournaments += 1;
+                if(isChamp) gData.wins += 1;
+                gData.name = p.name; 
+                globalUpdates[`global_players/${p.phone}`] = gData;
             }
-        }); 
+        }
         
-        await set(rankRef, ranking); 
-        alert("Torneio encerrado e Ranking Atualizado com sucesso!"); 
+        await set(rankRef, localRanking); 
+        
+        if(Object.keys(globalUpdates).length > 0) {
+            await update(ref(db), globalUpdates);
+        }
+        
+        alert("🏆 Torneio encerrado! Ranking Local e Global atualizados com sucesso."); 
         document.getElementById('modal-finals').style.display = 'none'; 
     }
 
@@ -749,14 +891,29 @@
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
 
+        let finalSeeds = [];
+        if (appState.mode === 'individual') {
+            if (qualified.length % 2 !== 0) return alert("Para formar duplas no Mata-Mata Individual, o número total de classificados deve ser par (ex: 4, 8, 16).");
+            let numPairs = qualified.length / 2;
+            for (let i = 0; i < numPairs; i++) {
+                finalSeeds.push({
+                    isPair: true,
+                    pA: qualified[i],
+                    pB: qualified[qualified.length - 1 - i]
+                });
+            }
+        } else {
+            finalSeeds = qualified.map(q => ({ isPair: false, pA: q, pB: null }));
+        }
+
         let size = 2;
-        while(size < qualified.length) size *= 2;
+        while(size < finalSeeds.length) size *= 2;
         
         const gid = `g-ko-${Date.now()}`;
         appState.groups.push({ id: gid, name: `MATA-MATA (Chave de ${size})` });
 
         let seeds = new Array(size).fill(null);
-        for(let i=0; i<qualified.length; i++) seeds[i] = qualified[i];
+        for(let i=0; i<finalSeeds.length; i++) seeds[i] = finalSeeds[i];
 
         let pairingOrder = [];
         if(size === 2) pairingOrder = [0, 1];
@@ -776,10 +933,10 @@
                 gid: gid, 
                 round: 1,
                 pos: i/2, 
-                p1: seedA ? seedA.id : 'BYE', 
-                p2: seedA ? seedA.id : 'BYE',
-                p3: seedB ? seedB.id : 'BYE', 
-                p4: seedB ? seedB.id : 'BYE',
+                p1: seedA ? seedA.pA.id : 'BYE', 
+                p2: seedA ? (seedA.isPair ? seedA.pB.id : seedA.pA.id) : 'BYE',
+                p3: seedB ? seedB.pA.id : 'BYE', 
+                p4: seedB ? (seedB.isPair ? seedB.pB.id : seedB.pA.id) : 'BYE',
                 s1:'', s2:'', saved: false, isBye: false
             };
             if (!seedA || !seedB) m.isBye = true;
@@ -896,7 +1053,6 @@
     window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
     window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
     
-    // V160: FUNÇÃO FORÇAR SALVAMENTO
     window.forceSave = () => { 
         recalc(); 
         save(); 
@@ -906,7 +1062,34 @@
 
     function save() { if(appRef) set(appRef, appState); }
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
-    window.addPlayer = () => { const n=document.getElementById('pName').value.trim(); if(!n)return; if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe!"); appState.players.push({id:'p'+Date.now(), name:n, groupId:'pool', games:0, wins:0, bal:0, pts:0}); if(curArenaId) { const safeKey = n.replace(/[.#$/[\]]/g, ""); update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); } document.getElementById('pName').value=''; document.getElementById('pName').focus(); save(); renderApp(); }
+    
+    window.addPlayer = () => { 
+        const n = document.getElementById('pName').value.trim(); 
+        const phone = document.getElementById('pPhone').value.trim().replace(/\D/g, ''); 
+        if(!n) return; 
+        
+        if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe neste torneio!"); 
+        
+        appState.players.push({
+            id: 'p'+Date.now(), 
+            name: n, 
+            phone: phone, 
+            groupId: 'pool', 
+            games: 0, wins: 0, bal: 0, pts: 0
+        }); 
+        
+        if(curArenaId) { 
+            const safeKey = n.replace(/[.#$/[\]]/g, ""); 
+            update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); 
+        } 
+        
+        document.getElementById('pName').value = ''; 
+        document.getElementById('pPhone').value = ''; 
+        document.getElementById('pName').focus(); 
+        
+        save(); 
+        renderApp(); 
+    }
     
     window.autoGroupsCBT = () => {
         const pool = appState.players.filter(p => p.groupId === 'pool');
@@ -1010,7 +1193,7 @@
 
         if(m.saved) {
             if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
-                m.saved = false; recalc(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { saved: false }); renderApp(); 
+                m.saved = false; recalc(); save(); renderApp(); 
             } return;
         }
 
@@ -1033,12 +1216,8 @@
 
         if(m.gid.includes('ko')) advanceWinner(mid, m, s1, s2);
         
+        save(); 
         renderApp(); 
-        
-        const savePromise = m.gid.includes('ko') 
-            ? update(ref(db, `tournaments_data/${curTourneyId}/matches`), appState.matches)
-            : update(ref(db, `tournaments_data/${curTourneyId}/matches/${matchIndex}`), { s1: s1, s2: s2, saved: true });
-        savePromise.catch(err => { alert("Erro de conexão ao salvar: " + err.message); });
     }
 
     function advanceWinner(mid, currentMatch, s1, s2) {
@@ -1054,7 +1233,7 @@
         const nextRound = currentRound + 1;
         const nextPos = Math.floor(currentPos / 2);
         
-        const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos);
+        const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos && !m.isThirdPlace);
         
         if(targetMatch) {
             const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
@@ -1064,13 +1243,13 @@
             }
         }
 
-        const matchesInNextRound = koMatches.filter(m => m.round === nextRound).length;
-        if(matchesInNextRound === 1) {
+        const regularMatchesInNextRound = koMatches.filter(m => m.round === nextRound && !m.isThirdPlace).length;
+        if(regularMatchesInNextRound === 1) {
             const thirdPlaceMatch = koMatches.find(m => m.isThirdPlace === true);
             if(thirdPlaceMatch) {
                 const tIdx = appState.matches.findIndex(m => m.mid === thirdPlaceMatch.mid);
                 if(tIdx > -1) {
-                    if(currentPos === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
+                    if(currentPos % 2 === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
                     else { appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2; }
                 }
             }
@@ -1080,7 +1259,7 @@
     window.editS = async (mid) => {
         if(!confirm("Editar placar?")) return;
         const mIdx = appState.matches.findIndex(x => x.mid === mid);
-        if(mIdx > -1) { appState.matches[mIdx].saved = false; renderApp(); await update(ref(db, `tournaments_data/${curTourneyId}/matches/${mIdx}`), {saved: false}); }
+        if(mIdx > -1) { appState.matches[mIdx].saved = false; save(); renderApp(); }
     }
 
     window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); renderApp(); } }
@@ -1235,25 +1414,34 @@
                             return name;
                         };
 
-                        let t1 = '';
+                        const formatAdmin = (pid, name, slot) => {
+                             if (!pid || pid === 'BYE') return name;
+                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
+                        };
+
+                        let t1 = '', t1_admin = '';
                         if (appState.mode === 'fixed') {
                             t1 = formatName(m.p1, p1Name);
+                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
                         } else {
                             t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
                         }
                         
-                        let t2 = '';
+                        let t2 = '', t2_admin = '';
                         if (appState.mode === 'fixed') {
                             t2 = formatName(m.p3, p3Name);
+                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
                         } else {
                             t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
                         }
                         
                         const isEditing = !m.saved && !m.isBye;
                         const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
                         
                         h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
+                            <div class="ko-player admin-only">${t1_admin}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             
                             ${isEditing && hasPlayers ? 
@@ -1266,7 +1454,7 @@
                                  <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
                             }
                             
-                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
+                            <div class="ko-player admin-only">${t2_admin}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             
                             ${isEditing && hasPlayers ? 
@@ -1297,25 +1485,34 @@
                             return name;
                         };
 
-                        let t1 = '';
+                        const formatAdmin = (pid, name, slot) => {
+                             if (!pid || pid === 'BYE') return name;
+                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
+                        };
+
+                        let t1 = '', t1_admin = '';
                         if (appState.mode === 'fixed') {
                             t1 = formatName(m.p1, p1Name);
+                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
                         } else {
                             t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
                         }
                         
-                        let t2 = '';
+                        let t2 = '', t2_admin = '';
                         if (appState.mode === 'fixed') {
                             t2 = formatName(m.p3, p3Name);
+                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
                         } else {
                             t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
                         }
 
                          const isEditing = !m.saved;
                          const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
 
                          h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p1')">${t1}</div>
+                            <div class="ko-player admin-only">${t1_admin}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
                             ${isEditing && hasPlayers ? 
                                 `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
@@ -1326,7 +1523,7 @@
                                  <div class="ko-vs">X</div>
                                  <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
                             }
-                            <div class="ko-player admin-only" onclick="openPlayerSelect('${m.mid}', 'p3')">${t2}</div>
+                            <div class="ko-player admin-only">${t2_admin}</div>
                             <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
                             ${isEditing && hasPlayers ? 
                                 `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
@@ -1414,6 +1611,13 @@
         }
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
+    }
+    
+    // REGISTRO DO MOTOR DO APLICATIVO (Service Worker)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log('Erro PWA:', err));
+        });
     }
 </script>
 </body>
