@@ -100,7 +100,6 @@
         .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
         .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         
-        /* CORREÇÃO DO REALCE AZUL NAS ABAS */
         .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; user-select: none; -webkit-user-select: none; }
         .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
         .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -315,18 +314,47 @@
 
 <div id="modal-finals"><div class="modal-box">
     <h3 class="modal-title">Encerrar & Pontuar</h3>
-    <label class="modal-label">🥇 1º Lugar (Campeão)</label><select id="sel-win-1" class="inp-std auth-input"></select>
-    <label class="modal-label">🥈 2º Lugar (Vice)</label><select id="sel-win-2" class="inp-std auth-input"></select>
-    <label class="modal-label">🥉 3º Lugar</label><select id="sel-win-3" class="inp-std auth-input"></select>
-    <label class="modal-label">🏅 4º Lugar</label><select id="sel-win-4" class="inp-std auth-input"></select>
-    <label class="modal-label">🎖️ Perdedores das Quartas (Selecione até 4)</label>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
-        <select id="sel-q-1" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-2" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-3" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-4" class="inp-std auth-input" style="margin:0;"></select>
+    
+    <label class="modal-label">🥇 1º Lugar (Campeões)</label>
+    <div style="display:flex; gap:5px;">
+        <select id="sel-win-1a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-win-1b" class="inp-std auth-input" style="margin:0;"></select>
     </div>
-    <div style="display:flex;gap:10px;margin-top:15px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div>
+    
+    <label class="modal-label" style="margin-top:10px;">🥈 2º Lugar (Vices)</label>
+    <div style="display:flex; gap:5px;">
+        <select id="sel-win-2a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-win-2b" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    
+    <label class="modal-label" style="margin-top:10px;">🥉 3º Lugar</label>
+    <div style="display:flex; gap:5px;">
+        <select id="sel-win-3a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-win-3b" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    
+    <label class="modal-label" style="margin-top:10px;">🏅 4º Lugar</label>
+    <div style="display:flex; gap:5px;">
+        <select id="sel-win-4a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-win-4b" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    
+    <label class="modal-label" style="margin-top:10px;">🎖️ Perdedores das Quartas (Até 8 pessoas)</label>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+        <select id="sel-q-1a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-1b" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-2a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-2b" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-3a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-3b" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-4a" class="inp-std auth-input" style="margin:0;"></select>
+        <select id="sel-q-4b" class="inp-std auth-input" style="margin:0;"></select>
+    </div>
+    
+    <div style="display:flex;gap:10px;margin-top:20px;">
+        <button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button>
+        <button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button>
+    </div>
 </div></div>
 
 <script type="module">
@@ -686,10 +714,14 @@
     window.openFinalsModal = () => { 
         document.getElementById('modal-finals').style.display = 'flex'; 
         const fills = [
-            document.getElementById('sel-win-1'), document.getElementById('sel-win-2'), 
-            document.getElementById('sel-win-3'), document.getElementById('sel-win-4'),
-            document.getElementById('sel-q-1'), document.getElementById('sel-q-2'),
-            document.getElementById('sel-q-3'), document.getElementById('sel-q-4')
+            document.getElementById('sel-win-1a'), document.getElementById('sel-win-1b'), 
+            document.getElementById('sel-win-2a'), document.getElementById('sel-win-2b'), 
+            document.getElementById('sel-win-3a'), document.getElementById('sel-win-3b'), 
+            document.getElementById('sel-win-4a'), document.getElementById('sel-win-4b'),
+            document.getElementById('sel-q-1a'), document.getElementById('sel-q-1b'),
+            document.getElementById('sel-q-2a'), document.getElementById('sel-q-2b'),
+            document.getElementById('sel-q-3a'), document.getElementById('sel-q-3b'),
+            document.getElementById('sel-q-4a'), document.getElementById('sel-q-4b')
         ]; 
         fills.forEach(s => { 
             s.innerHTML = '<option value="">Selecione...</option>'; 
@@ -700,16 +732,23 @@
     window.submitPoints = async () => { 
         if(!curCatData || !curCatData.points) return alert("Erro na configuração da categoria. Por favor, edite a categoria e insira os pontos."); 
         
-        const p1_id = document.getElementById('sel-win-1').value; 
-        const p2_id = document.getElementById('sel-win-2').value; 
-        const p3_id = document.getElementById('sel-win-3').value; 
-        const p4_id = document.getElementById('sel-win-4').value; 
-        const q1_id = document.getElementById('sel-q-1').value; 
-        const q2_id = document.getElementById('sel-q-2').value; 
-        const q3_id = document.getElementById('sel-q-3').value; 
-        const q4_id = document.getElementById('sel-q-4').value; 
+        const p1_id_a = document.getElementById('sel-win-1a').value; 
+        const p1_id_b = document.getElementById('sel-win-1b').value; 
+        const p2_id_a = document.getElementById('sel-win-2a').value; 
+        const p2_id_b = document.getElementById('sel-win-2b').value; 
+        const p3_id_a = document.getElementById('sel-win-3a').value; 
+        const p3_id_b = document.getElementById('sel-win-3b').value; 
+        const p4_id_a = document.getElementById('sel-win-4a').value; 
+        const p4_id_b = document.getElementById('sel-win-4b').value; 
         
-        if(!p1_id) return alert("Selecione pelo menos o campeão."); 
+        const q_ids = [
+            document.getElementById('sel-q-1a').value, document.getElementById('sel-q-1b').value,
+            document.getElementById('sel-q-2a').value, document.getElementById('sel-q-2b').value,
+            document.getElementById('sel-q-3a').value, document.getElementById('sel-q-3b').value,
+            document.getElementById('sel-q-4a').value, document.getElementById('sel-q-4b').value
+        ].filter(Boolean); // Filtra os vazios
+        
+        if(!p1_id_a && !p1_id_b) return alert("Selecione pelo menos um campeão."); 
         
         update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); 
         
@@ -722,11 +761,11 @@
             let pts = 0;
             let isChamp = false;
             
-            if(p.id === p1_id) { pts = curCatData.points.p1 || 0; isChamp = true; }
-            else if(p.id === p2_id) pts = curCatData.points.p2 || 0;
-            else if(p.id === p3_id) pts = curCatData.points.p3 || 0;
-            else if(p.id === p4_id) pts = curCatData.points.p4 || 0;
-            else if([q1_id, q2_id, q3_id, q4_id].includes(p.id)) pts = curCatData.points.quartas || 0;
+            if(p.id === p1_id_a || p.id === p1_id_b) { pts = curCatData.points.p1 || 0; isChamp = true; }
+            else if(p.id === p2_id_a || p.id === p2_id_b) pts = curCatData.points.p2 || 0;
+            else if(p.id === p3_id_a || p.id === p3_id_b) pts = curCatData.points.p3 || 0;
+            else if(p.id === p4_id_a || p.id === p4_id_b) pts = curCatData.points.p4 || 0;
+            else if(q_ids.includes(p.id)) pts = curCatData.points.quartas || 0;
             else pts = curCatData.points.part || 0;
 
             const localKey = p.name.replace(/[.#$/[\]]/g, ""); 
@@ -1185,7 +1224,6 @@
         savePromise.catch(err => { alert("Erro de conexão ao salvar: " + err.message); });
     }
 
-    // FUNÇÃO CORRIGIDA PARA O 3º LUGAR
     function advanceWinner(mid, currentMatch, s1, s2) {
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         if(!currentMatch.round) return; 
@@ -1199,7 +1237,6 @@
         const nextRound = currentRound + 1;
         const nextPos = Math.floor(currentPos / 2);
         
-        // Manda o vencedor para o próximo jogo principal
         const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos && !m.isThirdPlace);
         
         if(targetMatch) {
@@ -1210,7 +1247,6 @@
             }
         }
 
-        // Manda o perdedor para o jogo de 3º Lugar (Apenas se a próxima rodada for a Final)
         const regularMatchesInNextRound = koMatches.filter(m => m.round === nextRound && !m.isThirdPlace).length;
         if(regularMatchesInNextRound === 1) {
             const thirdPlaceMatch = koMatches.find(m => m.isThirdPlace === true);
