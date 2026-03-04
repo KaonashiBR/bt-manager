@@ -2,7 +2,7 @@
   "name": "BT Manager",
   "short_name": "BT Manager",
   "description": "Gerenciador Profissional de Torneios",
-  "start_url": "./teste.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f4f6f8",
   "theme_color": "#004e98",
