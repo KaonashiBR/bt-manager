@@ -932,7 +932,6 @@
         });
     }
 
-    // V171: BUG FIX - Limpar a tela quando excluir o Mata-Mata
     window.resetKnockout = () => {
         if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
@@ -1110,166 +1109,36 @@
         switchAppView('bracket');
     }
 
-    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
-
-    window.editGA = (pid, e) => {
-        e.stopPropagation();
-        if(document.body.classList.contains('viewer-mode')) return;
-        const p = appState.players.find(x => x.id === pid);
-        if(!p) return;
-        const current = p.manualGA !== undefined ? p.manualGA : (p.gameAvg || 0);
-        const input = prompt(`Editar GA de ${p.name}\n\nDigite o novo valor (ex: 1.50) ou deixe em branco para o sistema voltar a calcular automaticamente:`, current.toFixed(2));
-        
-        if(input === null) return;
-        
-        if(input.trim() === "") {
-            delete p.manualGA;
-        } else {
-            const parsed = parseFloat(input.replace(',', '.'));
-            if(!isNaN(parsed)) {
-                p.manualGA = parsed;
-            } else {
-                alert("Valor inválido. Use números e ponto/vírgula.");
-                return;
-            }
-        }
-        recalc();
-        save();
-        renderApp();
-    };
-
-    window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); renderApp(); } } }
-    window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); renderApp(); } } }
-    
-    window.removeFromGroup = (pid, e) => { 
-        e.stopPropagation(); 
-        if(confirm("Remover do grupo e voltar para a reserva?")) { 
-            const p = appState.players.find(x => x.id === pid); 
-            if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); renderApp(); } 
-        } 
-    }
-    
-    window.delPlayer = (pid) => { 
-        if(confirm("Excluir este jogador do torneio permanentemente?")) { 
-            appState.players = appState.players.filter(p=>p.id!==pid); 
-            save(); renderApp(); 
-        } 
-    }
-
-    window.openPlayerSelect = (mid, slot) => {
-        if(document.body.classList.contains('viewer-mode')) return;
-        selectingMatch = mid; selectingSlot = slot;
-        const m = appState.matches.find(x => x.mid === mid);
-        if(!m) return;
-        const isKO = m.gid.includes('ko');
-        const list = document.getElementById('select-list-container'); list.innerHTML = '';
-        const noneItem = document.createElement('div'); noneItem.className = 'select-item'; noneItem.innerText = '[ Vazio ]'; noneItem.onclick = () => confirmPlayerSelect(''); list.appendChild(noneItem);
-        let candidates = isKO ? appState.players : appState.players.filter(p => p.groupId === m.gid);
-        candidates.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => { const item = document.createElement('div'); item.className = 'select-item'; item.innerText = p.name; item.onclick = () => confirmPlayerSelect(p.id); list.appendChild(item); });
-        document.getElementById('modal-player-select').style.display = 'flex';
-    }
-
-    window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; save(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
-    
-    window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
-    
-    window.deleteItem = (type, id) => { 
-        if(type === 'arena') {
-            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
-            if(!isMaster) return alert("Apenas o administrador do sistema pode excluir Arenas.");
-        }
-        if(confirm("Apagar permanentemente?")) { 
-            if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} 
-            else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} 
-            else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} 
-        } 
-    }
-    
-    window.forceSave = () => { 
-        recalc(); 
-        save(); 
-        renderApp(); 
-        alert("💾 Torneio salvo com sucesso na nuvem!"); 
-    };
-
-    function save() { if(appRef) set(appRef, appState); }
-    const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
-    
-    window.addPlayer = () => { 
-        const n = document.getElementById('pName').value.trim(); 
-        const phone = document.getElementById('pPhone').value.trim().replace(/\D/g, ''); 
-        if(!n) return; 
-        
-        if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe neste torneio!"); 
-        
-        appState.players.push({
-            id: 'p'+Date.now(), 
-            name: n, 
-            phone: phone, 
-            groupId: 'pool', 
-            games: 0, wins: 0, bal: 0, pts: 0
-        }); 
-        
-        if(curArenaId) { 
-            const safeKey = n.replace(/[.#$/[\]]/g, ""); 
-            update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); 
-        } 
-        
-        document.getElementById('pName').value = ''; 
-        document.getElementById('pPhone').value = ''; 
-        document.getElementById('pName').focus(); 
-        
-        save(); 
-        renderApp(); 
-    }
-    
-    window.autoGroupsCBT = () => {
-        const pool = appState.players.filter(p => p.groupId === 'pool');
-        const N = pool.length;
-        const effectiveN = appState.mode === 'individual' ? N / 2 : N;
-        
-        if(effectiveN < 3) return alert("Inscritos insuficientes para gerar grupos. (Mínimo de 3 duplas).");
-        
-        let G = effectiveN <= 5 ? 1 : Math.floor(effectiveN / 3);
-        if(!confirm(`Regras CBT:\nPara a quantidade atual de inscritos, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
-        
-        let startIndex = appState.groups.length;
-        let newGroups = [];
-        for(let i=0; i<G; i++) {
-            const groupName = "GRUPO " + String.fromCharCode(64 + startIndex + i + 1);
-            let newG = { id: 'g' + Date.now() + i, name: groupName };
-            appState.groups.push(newG);
-            newGroups.push(newG);
-        }
-        pool.sort(()=>Math.random()-0.5); 
-        pool.forEach((p, index) => { p.groupId = newGroups[index % G].id; });
-        save(); renderApp();
-    }
-
-    window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now(), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
-
-    window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
-    window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; save(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro ao ler arquivo: " + err.message); } }; reader.readAsText(file); }
-    window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); renderApp(); }
-    window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); renderApp(); } }
-    window.toggleSel = (pid,e) => { if(document.body.classList.contains('viewer-mode'))return; e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
-    window.moveSel = (gid) => { if(!selectedPid)return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); save(); renderApp();} }
-    window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); save(); renderApp(); }
-    window.delGroup = (gid, e) => { e.stopPropagation(); if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); renderApp(); }}
-    
+    // V173: MATRIZ PERFEITA DE 6 JOGADORES + ALGORITMO DETERMINÍSTICO
     window.genMatches = (gid) => { 
         const existing = appState.matches.filter(m => m.gid === gid);
         if(existing.length > 0) return alert("Já existem jogos.");
         const ps=appState.players.filter(p=>p.groupId===gid); 
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
         let roundMatches = [];
-        if(appState.mode==='fixed') { for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } } 
-        else if(ps.length===4) { roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); }
-        else if(ps.length===5) { [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); } 
+        
+        if(appState.mode==='fixed') { 
+            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } 
+        } 
+        else if(ps.length===4) { 
+            roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); 
+            roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); 
+            roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); 
+        }
+        else if(ps.length===5) { 
+            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ 
+                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); 
+            }); 
+        } 
+        else if(ps.length===6) { 
+            [[0,1,2,3],[0,4,1,5],[2,4,3,5],[0,2,1,4],[0,5,3,4],[1,3,2,5]].forEach(r=>{ 
+                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); 
+            }); 
+        }
         else { 
             let pairs=[]; 
             for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
-            pairs.sort(()=>Math.random()-0.5); 
+            
             while(pairs.length) { 
                 let pA=pairs[0], found=false; 
                 for(let k=1; k<pairs.length; k++) { 
@@ -1283,6 +1152,8 @@
         save(); renderApp();
     }
     
+    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
+
     window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); renderApp(); }
     
     function getOptimizedMatchOrder(matches) {
@@ -1429,7 +1300,6 @@
             }
         });
 
-        // V171: BUG FIX - Limpar a tela quando excluir o Mata-Mata
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         const bc = document.getElementById('bracket-container'); if(bc) bc.innerHTML = '';
 
