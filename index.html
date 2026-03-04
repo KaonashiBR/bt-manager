@@ -7,11 +7,11 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BT Lab">
+    <meta name="apple-mobile-web-app-title" content="BT Manager">
     <link rel="apple-touch-icon" href="./icone.png">
     <link rel="manifest" href="manifest.json">
     
-    <title>BT Manager - AMBIENTE DE TESTE</title>
+    <title>BT Manager</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
         /* NAVBAR */
-        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #9c27b0; }
+        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #ff3b30; }
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
@@ -153,25 +153,27 @@
 <body class="viewer-mode">
 
 <div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-    <div style="font-size:3.5em;">🎾</div><b>Carregando Lab...</b>
+    <div style="font-size:3.5em;">🎾</div><b>Carregando...</b>
 </div>
 
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#9c27b0; font-size:0.7em; vertical-align:super;">LABORATÓRIO 🧪</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#ff3b30; font-size:0.7em; vertical-align:super;">BETA</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
     <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
 </div>
 
 <div id="screen-arenas" class="screen active">
     <div class="header-bar">
-        <h2 class="section-title">Arenas (Laboratório)</h2>
+        <h2 class="section-title">Arenas</h2>
         <button onclick="showGlobalRanking()" class="btn-std btn-dark" style="width: auto; margin:0; padding: 8px 12px; font-size: 0.85em;">🌍 Ranking Global</button>
     </div>
     
-    <div style="background: linear-gradient(135deg, #9c27b0 0%, #4a148c 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">🧪 AMBIENTE DE TESTES</div>
-        <div style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 12px;">Tudo criado aqui não afeta os clientes reais.</div>
+    <div style="background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">👑 Use o BT Manager na sua Arena</div>
+        <div style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 12px;">Destrave a criação de torneios, ligas e chaves automáticas.</div>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <button id="btn-install-app" onclick="installApp()" style="display: none; background: #000; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; align-items: center; gap: 5px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><span class="material-icons" style="font-size: 1.2em;">install_mobile</span> Instalar App Lab</button>
+            <a href="https://wa.me/5543999199481?text=Ola%20Lucas,%20quero%20usar%20o%20BT%20Manager!" target="_blank" style="background: #25D366; color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">chat</span> WhatsApp</a>
+            <a href="https://instagram.com/lsibie" target="_blank" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">photo_camera</span> Instagram</a>
+            <button id="btn-install-app" onclick="installApp()" style="display: none; background: #000; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; align-items: center; gap: 5px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><span class="material-icons" style="font-size: 1.2em;">install_mobile</span> Instalar App</button>
         </div>
     </div>
 
@@ -183,7 +185,7 @@
 <div id="screen-global-ranking" class="screen">
     <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Home</div>
     <div class="header-bar">
-        <div><h2 class="section-title">🌍 Ranking Global (Lab)</h2><div style="font-size:0.9em; color:#777;">Os melhores dos testes</div></div>
+        <div><h2 class="section-title">🌍 Ranking Global</h2><div style="font-size:0.9em; color:#777;">Os melhores de todas as arenas</div></div>
     </div>
     <div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         <table class="rank-table" id="table-global-ranking">
@@ -389,14 +391,14 @@
     const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
     const MASTER_PASS = "lucas10";
 
+    // V172: DE VOLTA PARA A PRODUÇÃO OFICIAL
     const firebaseConfig = {
-      apiKey: "AIzaSyCttgr7SLeDU92pcMs5wcNGvLc7joZvw00",
-      authDomain: "bt-manager-testes.firebaseapp.com",
-      databaseURL: "https://bt-manager-testes-default-rtdb.firebaseio.com",
-      projectId: "bt-manager-testes",
-      storageBucket: "bt-manager-testes.firebasestorage.app",
-      messagingSenderId: "145113677026",
-      appId: "1:145113677026:web:71c579fb817c81daf372bb"
+        apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
+        authDomain: "beach-tennis-manager-92f17.firebaseapp.com",
+        projectId: "beach-tennis-manager-92f17",
+        storageBucket: "beach-tennis-manager-92f17.firebasestorage.app",
+        messagingSenderId: "311372138486",
+        appId: "1:311372138486:web:50c9e403ad877ab094e9d7"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -932,7 +934,6 @@
         });
     }
 
-    // V171: BUG FIX - Limpar a tela quando excluir o Mata-Mata
     window.resetKnockout = () => {
         if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
@@ -1429,7 +1430,6 @@
             }
         });
 
-        // V171: BUG FIX - Limpar a tela quando excluir o Mata-Mata
         const gc = document.getElementById('groups-container'); gc.innerHTML='';
         const bc = document.getElementById('bracket-container'); if(bc) bc.innerHTML = '';
 
