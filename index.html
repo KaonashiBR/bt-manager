@@ -161,6 +161,7 @@
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
             <a href="https://wa.me/5543999199481?text=Ola%20Lucas,%20quero%20usar%20o%20BT%20Manager!" target="_blank" style="background: #25D366; color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">chat</span> WhatsApp</a>
             <a href="https://instagram.com/lsibie" target="_blank" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">photo_camera</span> Instagram</a>
+            <button id="btn-install-app" onclick="installApp()" style="display: none; background: #000; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; align-items: center; gap: 5px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><span class="material-icons" style="font-size: 1.2em;">install_mobile</span> Instalar App</button>
         </div>
     </div>
 
@@ -442,7 +443,7 @@
             document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : (user.email ? user.email.split('@')[0] : "Usuário");
             const isMaster = user.email && ADMIN_EMAILS.includes(user.email);
-            document.getElementById('btn-add-arena').style.display = (isMaster || localAdmin) ? 'flex' : 'none'; 
+            document.getElementById('btn-add-arena').style.display = isMaster ? 'flex' : 'none'; 
             document.getElementById('msg-login').style.display = 'none';
             onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
                 favorites = snap.val() || {};
@@ -451,7 +452,7 @@
         } else {
             document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
             document.getElementById('nav-username').innerText = localAdmin ? "Admin Local" : "Visitante";
-            document.getElementById('btn-add-arena').style.display = localAdmin ? 'flex' : 'none';
+            document.getElementById('btn-add-arena').style.display = 'none';
             document.getElementById('msg-login').style.display = localAdmin ? 'none' : 'block';
             favorites = {};
         }
@@ -526,6 +527,12 @@
     window.saveModal = async () => {
         if(!user && !localAdmin) return;
         const type = document.getElementById('modal-type').value;
+        
+        if(type === 'arena') {
+            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
+            if(!isMaster) return alert("Apenas o administrador do sistema pode criar ou editar Arenas.");
+        }
+
         const id = document.getElementById('modal-id').value;
         const name = document.getElementById('inp-name').value.trim();
         if(!name) return alert("Nome obrigatório");
@@ -608,11 +615,13 @@
         onValue(ref(db, 'arenas'), (snap) => {
             const list = document.getElementById('grid-arenas'); list.innerHTML = '';
             const data = snap.val(); if(!data) return; 
+            
+            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
             const keys = Object.keys(data).sort((a,b) => { const favA = favorites[a] ? 1 : 0; const favB = favorites[b] ? 1 : 0; return favB - favA; });
+            
             keys.forEach(key => { 
                 const d = data[key]; 
-                const isOwner = hasEditPermission(d.owner, d.managers); 
-                list.appendChild(createCard(key, d, d.img, isOwner, 'arena', () => enterArena(key, d))); 
+                list.appendChild(createCard(key, d, d.img, isMaster, 'arena', () => enterArena(key, d))); 
             });
         });
     }
@@ -894,12 +903,23 @@
         let finalSeeds = [];
         if (appState.mode === 'individual') {
             if (qualified.length % 2 !== 0) return alert("Para formar duplas no Mata-Mata Individual, o número total de classificados deve ser par (ex: 4, 8, 16).");
-            let numPairs = qualified.length / 2;
-            for (let i = 0; i < numPairs; i++) {
+            
+            let unpaired = [...qualified];
+            while (unpaired.length > 0) {
+                let pA = unpaired.shift(); 
+                
+                let bIndex = unpaired.findIndex(p => p.groupId !== pA.groupId);
+                
+                if (bIndex === -1) {
+                    bIndex = 0;
+                }
+                
+                let pB = unpaired.splice(bIndex, 1)[0]; 
+                
                 finalSeeds.push({
                     isPair: true,
-                    pA: qualified[i],
-                    pB: qualified[qualified.length - 1 - i]
+                    pA: pA,
+                    pB: pB
                 });
             }
         } else {
@@ -1017,6 +1037,33 @@
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
 
+    // V168: FUNÇÃO PARA EDITAR O GA MANUALMENTE
+    window.editGA = (pid, e) => {
+        e.stopPropagation();
+        if(document.body.classList.contains('viewer-mode')) return;
+        const p = appState.players.find(x => x.id === pid);
+        if(!p) return;
+        const current = p.manualGA !== undefined ? p.manualGA : (p.gameAvg || 0);
+        const input = prompt(`Editar GA de ${p.name}\n\nDigite o novo valor (ex: 1.50) ou deixe em branco para o sistema voltar a calcular automaticamente:`, current.toFixed(2));
+        
+        if(input === null) return;
+        
+        if(input.trim() === "") {
+            delete p.manualGA;
+        } else {
+            const parsed = parseFloat(input.replace(',', '.'));
+            if(!isNaN(parsed)) {
+                p.manualGA = parsed;
+            } else {
+                alert("Valor inválido. Use números e ponto/vírgula.");
+                return;
+            }
+        }
+        recalc();
+        save();
+        renderApp();
+    };
+
     window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); renderApp(); } } }
     window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); renderApp(); } } }
     
@@ -1051,7 +1098,18 @@
     window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; save(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
     
     window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
-    window.deleteItem = (type, id) => { if(confirm("Apagar?")) { if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} } }
+    
+    window.deleteItem = (type, id) => { 
+        if(type === 'arena') {
+            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
+            if(!isMaster) return alert("Apenas o administrador do sistema pode excluir Arenas.");
+        }
+        if(confirm("Apagar permanentemente?")) { 
+            if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} 
+            else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} 
+            else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} 
+        } 
+    }
     
     window.forceSave = () => { 
         recalc(); 
@@ -1276,7 +1334,10 @@
                 if(appState.mode === 'individual'){ run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); } 
             }
         }); 
-        appState.players.forEach(p => { p.gameAvg = p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0; });
+        // V168: Se existir um GA manual salvo, ele ignora a matemática e usa o manual.
+        appState.players.forEach(p => { 
+            p.gameAvg = p.manualGA !== undefined ? p.manualGA : (p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0); 
+        });
     }
     
     function renderApp() {
@@ -1556,7 +1617,7 @@
                 
                 if(ps.length) { 
                     h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`; 
-                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Game Average">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`); 
+                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`); 
                     h += `</table>`; 
                 }
             }
@@ -1600,7 +1661,7 @@
                         <td title="Jogos Disputados">${p.games}</td>
                         <td title="Vitórias">${p.wins}</td>
                         <td title="Saldo de Games">${p.bal}</td>
-                        <td title="Game Average">${(p.gameAvg||0).toFixed(2)}</td>
+                        <td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td>
                         <td style="font-weight:bold; color:var(--secondary)" title="Pontuação">${p.pts}</td>
                     </tr>`;
                 });
@@ -1613,13 +1674,32 @@
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
     
-    // REGISTRO DO MOTOR DO APLICATIVO (Service Worker)
+    // REGISTRO DO MOTOR DO APLICATIVO (PWA)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('Erro PWA:', err));
+            navigator.serviceWorker.register('sw.js');
         });
     }
+
+    // CAPTURA DO AVISO DE INSTALAÇÃO DO ANDROID/CHROME
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btnInstall = document.getElementById('btn-install-app');
+        if(btnInstall) btnInstall.style.display = 'flex';
+    });
+
+    window.installApp = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('btn-install-app').style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    };
 </script>
 </body>
 </html>
-
