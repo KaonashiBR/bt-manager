@@ -32,7 +32,7 @@
         @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.3em; } }
 
         /* SCREENS */
-        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
+        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 120px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; width: 100%; }
         
@@ -137,15 +137,16 @@
         .ko-vs { font-size: 0.8em; color: #999; margin: 0 10px; }
         .ko-score { width: 40px; text-align: center; font-weight: 900; color: var(--primary); }
 
-        /* ANIMAÇÃO DE EMPATE */
-        @keyframes pulse-tie { 
-            0% { color: inherit; } 
-            50% { color: #ff3b30; opacity: 0.4; } 
-            100% { color: inherit; } 
+        /* V170: ANIMAÇÃO DE EMPATE ABSOLUTO (Fundo Vermelho) */
+        @keyframes pulse-tie-bg { 
+            0% { background-color: transparent; } 
+            50% { background-color: rgba(255, 59, 48, 0.35); border-radius: 4px; } 
+            100% { background-color: transparent; } 
         }
-        .blink-tie { 
-            animation: pulse-tie 1.5s infinite; 
-            font-weight: bold; 
+        .blink-tie-bg { 
+            animation: pulse-tie-bg 1.5s infinite; 
+            padding: 3px 6px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -273,7 +274,7 @@
     </div>
     
     <div id="view-bracket" class="view-section">
-        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto;"></div>
+        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto 40px;"></div>
     </div>
 </div>
 
@@ -320,7 +321,20 @@
 </div>
 
 <div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
-<div id="modal-knockout"><div class="modal-box"><h3 class="modal-title">Configurar Mata-Mata</h3><p style="font-size:0.9em;color:#666;">Classificados por grupo:</p><div id="knockout-config-list" style="max-height:50vh;overflow-y:auto;margin-bottom:15px;"></div><div style="display:flex;gap:10px;"><button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button></div></div></div>
+
+<div id="modal-knockout"><div class="modal-box">
+    <h3 class="modal-title">Configurar Mata-Mata</h3>
+    <p style="font-size:0.9em;color:#666;">Classificados por grupo:</p>
+    <div id="knockout-config-list" style="max-height:40vh;overflow-y:auto;margin-bottom:10px;"></div>
+    
+    <div id="knockout-summary" style="background:#e3f2fd; color:#0d47a1; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold; font-size:0.9em;">
+        </div>
+    
+    <div style="display:flex;gap:10px;">
+        <button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button>
+        <button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button>
+    </div>
+</div></div>
 
 <div id="modal-finals"><div class="modal-box">
     <h3 class="modal-title">Encerrar & Pontuar</h3>
@@ -814,14 +828,66 @@
         document.getElementById('modal-finals').style.display = 'none'; 
     }
 
+    // V170: PREVIEW DINÂMICO DA CHAVE DO MATA-MATA
+    window.updateKnockoutSummary = () => {
+        let totalAdvancing = 0;
+        appState.groups.forEach(g => {
+            if(!g.id.includes('ko-')) {
+                const el = document.getElementById(`ko-n-${g.id}`);
+                if(el) totalAdvancing += (parseInt(el.value) || 0);
+            }
+        });
+        
+        let pairs = appState.mode === 'individual' ? totalAdvancing / 2 : totalAdvancing;
+        
+        const summaryDiv = document.getElementById('knockout-summary');
+        if(!summaryDiv) return;
+
+        if (appState.mode === 'individual' && totalAdvancing % 2 !== 0) {
+            summaryDiv.innerHTML = `⚠️ Aviso: No formato Individual, o total de classificados precisa ser PAR para formar as duplas. (Total atual: ${totalAdvancing} jogadores)`;
+            summaryDiv.style.background = "#ffebee";
+            summaryDiv.style.color = "#c62828";
+            return;
+        }
+
+        if (pairs < 2) {
+            summaryDiv.innerHTML = `⚠️ Poucos classificados. Mínimo de 2 duplas para haver Mata-Mata.`;
+            summaryDiv.style.background = "#fff3e0";
+            summaryDiv.style.color = "#e65100";
+            return;
+        }
+
+        let size = 2;
+        while(size < pairs) size *= 2;
+        
+        let phase = "";
+        if(size === 2) phase = "FINAL";
+        else if(size === 4) phase = "SEMIFINAL";
+        else if(size === 8) phase = "QUARTAS DE FINAL";
+        else if(size === 16) phase = "OITAVAS DE FINAL";
+        else phase = `CHAVE DE ${size}`;
+        
+        let byes = size - pairs;
+        let byeText = byes > 0 ? `<br><span style="font-size:0.8em; color:#666;">(Serão gerados ${byes} 'BYEs' / avanços diretos na primeira fase)</span>` : "";
+
+        summaryDiv.innerHTML = `📊 Total de Classificados: ${pairs} duplas<br>🏆 O mata-mata inicia na: <strong>${phase}</strong>${byeText}`;
+        summaryDiv.style.background = "#e3f2fd";
+        summaryDiv.style.color = "#0d47a1";
+    }
+
     window.openConfigKnockout = () => {
         const div = document.getElementById('knockout-config-list');
         div.innerHTML = '';
+        
+        // Sugestão de classificados (Duplas = 2 por grupo, Individual = 4 por grupo)
+        let suggestion = appState.mode === 'individual' ? 4 : 2; 
+
         appState.groups.forEach(g => {
             if(g.id.includes('ko')) return;
-            div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="2" min="0"></div>`;
+            div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="${suggestion}" min="0" oninput="updateKnockoutSummary()" onkeyup="updateKnockoutSummary()"></div>`;
         });
         document.getElementById('modal-knockout').style.display = 'flex';
+        updateKnockoutSummary();
     }
 
     function sortPlayersCBT(players, matches) {
@@ -1158,12 +1224,16 @@
         renderApp(); 
     }
     
+    // V170: MATEMÁTICA DE GRUPOS CORRIGIDA PARA MODO INDIVIDUAL
     window.autoGroupsCBT = () => {
         const pool = appState.players.filter(p => p.groupId === 'pool');
         const N = pool.length;
-        if(N < 3) return alert("Mínimo de 3 jogadores na reserva para gerar grupos.");
-        let G = N <= 5 ? 1 : Math.floor(N / 3);
-        if(!confirm(`Regras CBT:\nPara ${N} inscritos na reserva, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
+        const effectiveN = appState.mode === 'individual' ? N / 2 : N;
+        
+        if(effectiveN < 3) return alert("Inscritos insuficientes para gerar grupos. (Mínimo de 3 duplas).");
+        
+        let G = effectiveN <= 5 ? 1 : Math.floor(effectiveN / 3);
+        if(!confirm(`Regras CBT:\nPara a quantidade atual de inscritos, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
         
         let startIndex = appState.groups.length;
         let newGroups = [];
@@ -1626,8 +1696,9 @@
                 if(ps.length) { 
                     h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`; 
                     ps.forEach((p,ix) => {
-                        const isTied = p.pts > 0 && ps.filter(x => x.pts === p.pts).length > 1;
-                        const spanClass = isTied ? "blink-tie" : "";
+                        // V170: Condição de Empate Absoluto
+                        const isTied = p.pts > 0 && ps.filter(x => x.pts === p.pts && x.bal === p.bal && x.wins === p.wins && Math.abs((x.gameAvg||0) - (p.gameAvg||0)) < 0.001).length > 1;
+                        const spanClass = isTied ? "blink-tie-bg" : "";
                         h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span class="${spanClass}">${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`;
                     }); 
                     h += `</table>`; 
