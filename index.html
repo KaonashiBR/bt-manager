@@ -7,11 +7,11 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BT Manager">
+    <meta name="apple-mobile-web-app-title" content="BT Lab">
     <link rel="apple-touch-icon" href="./icone.png">
     <link rel="manifest" href="manifest.json">
     
-    <title>BT Manager - TESTE BETA</title>
+    <title>BT Manager - AMBIENTE DE TESTE</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
         /* NAVBAR */
-        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #ff3b30;}
+        .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #9c27b0; }
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
@@ -32,7 +32,7 @@
         @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.3em; } }
 
         /* SCREENS */
-        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 60px; box-sizing: border-box; }
+        .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 120px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; width: 100%; }
         
@@ -136,32 +136,42 @@
         .ko-player { flex: 1; text-align: center; font-weight: 600; cursor: pointer; }
         .ko-vs { font-size: 0.8em; color: #999; margin: 0 10px; }
         .ko-score { width: 40px; text-align: center; font-weight: 900; color: var(--primary); }
+
+        /* ANIMAÇÃO DE EMPATE ABSOLUTO */
+        @keyframes pulse-tie-bg { 
+            0% { background-color: transparent; } 
+            50% { background-color: rgba(255, 59, 48, 0.35); border-radius: 4px; } 
+            100% { background-color: transparent; } 
+        }
+        .blink-tie-bg { 
+            animation: pulse-tie-bg 1.5s infinite; 
+            padding: 3px 6px;
+            display: inline-block;
+        }
     </style>
 </head>
 <body class="viewer-mode">
 
 <div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-    <div style="font-size:3.5em;">🎾</div><b>Carregando BETA...</b>
+    <div style="font-size:3.5em;">🎾</div><b>Carregando Lab...</b>
 </div>
 
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#ff3b30; font-size:0.7em; vertical-align:super;">BETA</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#9c27b0; font-size:0.7em; vertical-align:super;">LABORATÓRIO 🧪</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
     <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
 </div>
 
 <div id="screen-arenas" class="screen active">
     <div class="header-bar">
-        <h2 class="section-title">Arenas (BETA)</h2>
+        <h2 class="section-title">Arenas (Laboratório)</h2>
         <button onclick="showGlobalRanking()" class="btn-std btn-dark" style="width: auto; margin:0; padding: 8px 12px; font-size: 0.85em;">🌍 Ranking Global</button>
     </div>
     
-    <div style="background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">👑 Use o BT Manager na sua Arena</div>
-        <div style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 12px;">Destrave a criação de torneios, ligas e chaves automáticas.</div>
+    <div style="background: linear-gradient(135deg, #9c27b0 0%, #4a148c 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+        <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">🧪 AMBIENTE DE TESTES</div>
+        <div style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 12px;">Tudo criado aqui não afeta os clientes reais.</div>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <a href="https://wa.me/5543999199481?text=Ola%20Lucas,%20quero%20usar%20o%20BT%20Manager!" target="_blank" style="background: #25D366; color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">chat</span> WhatsApp</a>
-            <a href="https://instagram.com/lsibie" target="_blank" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">photo_camera</span> Instagram</a>
-            <button id="btn-install-app" onclick="installApp()" style="display: none; background: #000; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; align-items: center; gap: 5px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><span class="material-icons" style="font-size: 1.2em;">install_mobile</span> Instalar App</button>
+            <button id="btn-install-app" onclick="installApp()" style="display: none; background: #000; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; align-items: center; gap: 5px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><span class="material-icons" style="font-size: 1.2em;">install_mobile</span> Instalar App Lab</button>
         </div>
     </div>
 
@@ -173,7 +183,7 @@
 <div id="screen-global-ranking" class="screen">
     <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Home</div>
     <div class="header-bar">
-        <div><h2 class="section-title">🌍 Ranking Global</h2><div style="font-size:0.9em; color:#777;">Os melhores de todas as arenas</div></div>
+        <div><h2 class="section-title">🌍 Ranking Global (Lab)</h2><div style="font-size:0.9em; color:#777;">Os melhores dos testes</div></div>
     </div>
     <div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         <table class="rank-table" id="table-global-ranking">
@@ -264,7 +274,7 @@
     </div>
     
     <div id="view-bracket" class="view-section">
-        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto;"></div>
+        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto 40px;"></div>
     </div>
 </div>
 
@@ -311,7 +321,20 @@
 </div>
 
 <div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
-<div id="modal-knockout"><div class="modal-box"><h3 class="modal-title">Configurar Mata-Mata</h3><p style="font-size:0.9em;color:#666;">Classificados por grupo:</p><div id="knockout-config-list" style="max-height:50vh;overflow-y:auto;margin-bottom:15px;"></div><div style="display:flex;gap:10px;"><button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button></div></div></div>
+
+<div id="modal-knockout"><div class="modal-box">
+    <h3 class="modal-title">Configurar Mata-Mata</h3>
+    <p style="font-size:0.9em;color:#666;">Classificados por grupo:</p>
+    <div id="knockout-config-list" style="max-height:40vh;overflow-y:auto;margin-bottom:10px;"></div>
+    
+    <div id="knockout-summary" style="background:#e3f2fd; color:#0d47a1; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold; font-size:0.9em;">
+    </div>
+    
+    <div style="display:flex;gap:10px;">
+        <button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button>
+        <button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button>
+    </div>
+</div></div>
 
 <div id="modal-finals"><div class="modal-box">
     <h3 class="modal-title">Encerrar & Pontuar</h3>
@@ -367,12 +390,13 @@
     const MASTER_PASS = "lucas10";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
-        authDomain: "beach-tennis-manager-92f17.firebaseapp.com",
-        projectId: "beach-tennis-manager-92f17",
-        storageBucket: "beach-tennis-manager-92f17.firebasestorage.app",
-        messagingSenderId: "311372138486",
-        appId: "1:311372138486:web:50c9e403ad877ab094e9d7"
+      apiKey: "AIzaSyCttgr7SLeDU92pcMs5wcNGvLc7joZvw00",
+      authDomain: "bt-manager-testes.firebaseapp.com",
+      databaseURL: "https://bt-manager-testes-default-rtdb.firebaseio.com",
+      projectId: "bt-manager-testes",
+      storageBucket: "bt-manager-testes.firebasestorage.app",
+      messagingSenderId: "145113677026",
+      appId: "1:145113677026:web:71c579fb817c81daf372bb"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -804,14 +828,64 @@
         document.getElementById('modal-finals').style.display = 'none'; 
     }
 
+    window.updateKnockoutSummary = () => {
+        let totalAdvancing = 0;
+        appState.groups.forEach(g => {
+            if(!g.id.includes('ko-')) {
+                const el = document.getElementById(`ko-n-${g.id}`);
+                if(el) totalAdvancing += (parseInt(el.value) || 0);
+            }
+        });
+        
+        let pairs = appState.mode === 'individual' ? totalAdvancing / 2 : totalAdvancing;
+        
+        const summaryDiv = document.getElementById('knockout-summary');
+        if(!summaryDiv) return;
+
+        if (appState.mode === 'individual' && totalAdvancing % 2 !== 0) {
+            summaryDiv.innerHTML = `⚠️ Aviso: No formato Individual, o total de classificados precisa ser PAR para formar as duplas. (Total atual: ${totalAdvancing} jogadores)`;
+            summaryDiv.style.background = "#ffebee";
+            summaryDiv.style.color = "#c62828";
+            return;
+        }
+
+        if (pairs < 2) {
+            summaryDiv.innerHTML = `⚠️ Poucos classificados. Mínimo de 2 duplas para haver Mata-Mata.`;
+            summaryDiv.style.background = "#fff3e0";
+            summaryDiv.style.color = "#e65100";
+            return;
+        }
+
+        let size = 2;
+        while(size < pairs) size *= 2;
+        
+        let phase = "";
+        if(size === 2) phase = "FINAL";
+        else if(size === 4) phase = "SEMIFINAL";
+        else if(size === 8) phase = "QUARTAS DE FINAL";
+        else if(size === 16) phase = "OITAVAS DE FINAL";
+        else phase = `CHAVE DE ${size}`;
+        
+        let byes = size - pairs;
+        let byeText = byes > 0 ? `<br><span style="font-size:0.8em; color:#666;">(Serão gerados ${byes} 'BYEs' / avanços diretos na primeira fase)</span>` : "";
+
+        summaryDiv.innerHTML = `📊 Total de Classificados: ${pairs} duplas<br>🏆 O mata-mata inicia na: <strong>${phase}</strong>${byeText}`;
+        summaryDiv.style.background = "#e3f2fd";
+        summaryDiv.style.color = "#0d47a1";
+    }
+
     window.openConfigKnockout = () => {
         const div = document.getElementById('knockout-config-list');
         div.innerHTML = '';
+        
+        let suggestion = appState.mode === 'individual' ? 4 : 2; 
+
         appState.groups.forEach(g => {
             if(g.id.includes('ko')) return;
-            div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="2" min="0"></div>`;
+            div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="${suggestion}" min="0" oninput="updateKnockoutSummary()" onkeyup="updateKnockoutSummary()"></div>`;
         });
         document.getElementById('modal-knockout').style.display = 'flex';
+        updateKnockoutSummary();
     }
 
     function sortPlayersCBT(players, matches) {
@@ -858,6 +932,7 @@
         });
     }
 
+    // V171: BUG FIX - Limpar a tela quando excluir o Mata-Mata
     window.resetKnockout = () => {
         if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
@@ -1037,7 +1112,6 @@
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
 
-    // V168: FUNÇÃO PARA EDITAR O GA MANUALMENTE
     window.editGA = (pid, e) => {
         e.stopPropagation();
         if(document.body.classList.contains('viewer-mode')) return;
@@ -1152,9 +1226,12 @@
     window.autoGroupsCBT = () => {
         const pool = appState.players.filter(p => p.groupId === 'pool');
         const N = pool.length;
-        if(N < 3) return alert("Mínimo de 3 jogadores na reserva para gerar grupos.");
-        let G = N <= 5 ? 1 : Math.floor(N / 3);
-        if(!confirm(`Regras CBT:\nPara ${N} inscritos na reserva, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
+        const effectiveN = appState.mode === 'individual' ? N / 2 : N;
+        
+        if(effectiveN < 3) return alert("Inscritos insuficientes para gerar grupos. (Mínimo de 3 duplas).");
+        
+        let G = effectiveN <= 5 ? 1 : Math.floor(effectiveN / 3);
+        if(!confirm(`Regras CBT:\nPara a quantidade atual de inscritos, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
         
         let startIndex = appState.groups.length;
         let newGroups = [];
@@ -1334,7 +1411,6 @@
                 if(appState.mode === 'individual'){ run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); } 
             }
         }); 
-        // V168: Se existir um GA manual salvo, ele ignora a matemática e usa o manual.
         appState.players.forEach(p => { 
             p.gameAvg = p.manualGA !== undefined ? p.manualGA : (p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0); 
         });
@@ -1352,6 +1428,10 @@
                 });
             }
         });
+
+        // V171: BUG FIX - Limpar a tela quando excluir o Mata-Mata
+        const gc = document.getElementById('groups-container'); gc.innerHTML='';
+        const bc = document.getElementById('bracket-container'); if(bc) bc.innerHTML = '';
 
         const focusedId = document.activeElement ? document.activeElement.id : null;
         document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
@@ -1420,7 +1500,6 @@
             }
         }
         
-        const gc = document.getElementById('groups-container'); gc.innerHTML='';
         let h = ''; 
 
         appState.groups.forEach((g,i) => {
@@ -1617,7 +1696,11 @@
                 
                 if(ps.length) { 
                     h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`; 
-                    ps.forEach((p,ix) => h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span>${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`); 
+                    ps.forEach((p,ix) => {
+                        const isTied = p.pts > 0 && ps.filter(x => x.pts === p.pts && x.bal === p.bal && x.wins === p.wins && Math.abs((x.gameAvg||0) - (p.gameAvg||0)) < 0.001).length > 1;
+                        const spanClass = isTied ? "blink-tie-bg" : "";
+                        h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span class="${spanClass}">${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`;
+                    }); 
                     h += `</table>`; 
                 }
             }
