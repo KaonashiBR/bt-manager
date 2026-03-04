@@ -932,11 +932,14 @@
         });
     }
 
+    // V174: DETECTOR DE ERROS E PROTEÇÃO ANTI-BLOQUEIO
     window.resetKnockout = () => {
-        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
-        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-        save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
+        try {
+            if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
+            appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
+            appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
+            save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
+        } catch(e) { alert("Erro ao excluir mata-mata: " + e.message); }
     }
 
     window.execKnockout = () => {
@@ -1109,7 +1112,6 @@
         switchAppView('bracket');
     }
 
-    // V173: MATRIZ PERFEITA DE 6 JOGADORES + ALGORITMO DETERMINÍSTICO
     window.genMatches = (gid) => { 
         const existing = appState.matches.filter(m => m.gid === gid);
         if(existing.length > 0) return alert("Já existem jogos.");
@@ -1268,7 +1270,17 @@
         if(mIdx > -1) { appState.matches[mIdx].saved = false; save(); renderApp(); }
     }
 
-    window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); renderApp(); } }
+    // V174: Try/Catch nas exclusões
+    window.delM = (mid) => { 
+        try {
+            if(confirm("Excluir Jogo?")) { 
+                appState.matches=appState.matches.filter(m=>m.mid!==mid); 
+                recalc(); 
+                save(); 
+                renderApp(); 
+            } 
+        } catch(e) { alert("Erro ao apagar jogo: " + e.message); }
+    }
     
     function recalc() { 
         appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
@@ -1625,6 +1637,36 @@
         }
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
+    }
+
+    // V174: Try/Catch e Alertas no Banco
+    window.delGroup = (gid, e) => { 
+        try {
+            e.stopPropagation(); 
+            if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { 
+                appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); 
+                appState.groups=appState.groups.filter(g=>g.id!==gid); 
+                appState.matches=appState.matches.filter(m=>m.gid!==gid); 
+                save(); 
+                renderApp(); 
+            }
+        } catch(err) { alert("Erro ao excluir grupo: " + err.message); }
+    };
+
+    window.delPlayer = (pid) => { 
+        try {
+            if(confirm("Excluir este jogador do torneio permanentemente?")) { 
+                appState.players = appState.players.filter(p=>p.id!==pid); 
+                save(); 
+                renderApp(); 
+            } 
+        } catch(err) { alert("Erro ao excluir jogador: " + err.message); }
+    };
+
+    function save() { 
+        if(appRef) {
+            set(appRef, appState).catch(err => alert("Atenção: Falha de conexão com o banco de dados. " + err.message)); 
+        } 
     }
     
     // REGISTRO DO MOTOR DO APLICATIVO (PWA)
