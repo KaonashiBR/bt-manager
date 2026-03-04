@@ -326,10 +326,7 @@
     <h3 class="modal-title">Configurar Mata-Mata</h3>
     <p style="font-size:0.9em;color:#666;">Classificados por grupo:</p>
     <div id="knockout-config-list" style="max-height:40vh;overflow-y:auto;margin-bottom:10px;"></div>
-    
-    <div id="knockout-summary" style="background:#e3f2fd; color:#0d47a1; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold; font-size:0.9em;">
-    </div>
-    
+    <div id="knockout-summary" style="background:#e3f2fd; color:#0d47a1; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold; font-size:0.9em;"></div>
     <div style="display:flex;gap:10px;">
         <button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button>
         <button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button>
@@ -425,6 +422,10 @@
         return false;
     }
 
+    const saveDB = () => { 
+        if(appRef) set(appRef, appState).catch(err => alert("Erro ao conectar no banco: " + err.message)); 
+    }
+
     window.goHome = () => { 
         curArenaId = null; curArenaData = null; curCatId = null; curTourneyId = null; 
         history.pushState("", document.title, window.location.pathname + window.location.search); 
@@ -514,7 +515,7 @@
     }
 
     window.toggleFavorite = (id, e) => {
-        e.stopPropagation();
+        if(e) e.stopPropagation();
         if(!user) return alert("Faça login para favoritar.");
         const isFav = favorites[id] ? null : true; 
         update(ref(db, `users/${user.uid}/favorites`), { [id]: isFav });
@@ -888,60 +889,6 @@
         updateKnockoutSummary();
     }
 
-    function sortPlayersCBT(players, matches) {
-        return [...players].sort((a, b) => {
-            if (b.pts !== a.pts) return b.pts - a.pts;
-
-            const tiedPoints = players.filter(p => p.pts === a.pts);
-            if (tiedPoints.length === 2) {
-                const match = matches.find(m => 
-                    m.saved && !m.isBye &&
-                    (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
-                    (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
-                );
-                if (match) {
-                    let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
-                    let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
-                    if (aScore !== bScore) return bScore - aScore;
-                }
-            }
-
-            if (b.bal !== a.bal) return b.bal - a.bal;
-
-            const tiedBal = tiedPoints.filter(p => p.bal === a.bal);
-            if (tiedBal.length === 2) {
-                 const match = matches.find(m => 
-                    m.saved && !m.isBye &&
-                    (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
-                    (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
-                );
-                if (match) {
-                    let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
-                    let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
-                    if (aScore !== bScore) return bScore - aScore;
-                }
-            }
-
-            const aGA = a.gameAvg || 0;
-            const bGA = b.gameAvg || 0;
-            if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-
-            if (b.wins !== a.wins) return b.wins - a.wins;
-
-            return a.name.localeCompare(b.name);
-        });
-    }
-
-    // V174: DETECTOR DE ERROS E PROTEÇÃO ANTI-BLOQUEIO
-    window.resetKnockout = () => {
-        try {
-            if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
-            appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-            appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-            save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
-        } catch(e) { alert("Erro ao excluir mata-mata: " + e.message); }
-    }
-
     window.execKnockout = () => {
         let qualified = [];
         
@@ -950,7 +897,18 @@
             const n = parseInt(document.getElementById(`ko-n-${g.id}`).value) || 0;
             if(n > 0) {
                 const ps = appState.players.filter(p=>p.groupId===g.id);
-                const sortedPs = sortPlayersCBT(ps, appState.matches);
+                
+                // Sort internal rules
+                const sortedPs = [...ps].sort((a, b) => {
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    if (b.bal !== a.bal) return b.bal - a.bal;
+                    const aGA = a.gameAvg || 0;
+                    const bGA = b.gameAvg || 0;
+                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+                    if (b.wins !== a.wins) return b.wins - a.wins;
+                    return a.name.localeCompare(b.name);
+                });
+                
                 qualified.push(...sortedPs.slice(0, n));
             }
         });
@@ -984,20 +942,11 @@
             let unpaired = [...qualified];
             while (unpaired.length > 0) {
                 let pA = unpaired.shift(); 
-                
                 let bIndex = unpaired.findIndex(p => p.groupId !== pA.groupId);
-                
-                if (bIndex === -1) {
-                    bIndex = 0;
-                }
-                
+                if (bIndex === -1) bIndex = 0;
                 let pB = unpaired.splice(bIndex, 1)[0]; 
                 
-                finalSeeds.push({
-                    isPair: true,
-                    pA: pA,
-                    pB: pB
-                });
+                finalSeeds.push({ isPair: true, pA: pA, pB: pB });
             }
         } else {
             finalSeeds = qualified.map(q => ({ isPair: false, pA: q, pB: null }));
@@ -1027,89 +976,94 @@
             
             let m = {
                 mid: 'm' + Date.now() + Math.random().toString().substr(2, 3) + i, 
-                gid: gid, 
-                round: 1,
-                pos: i/2, 
-                p1: seedA ? seedA.pA.id : 'BYE', 
-                p2: seedA ? (seedA.isPair ? seedA.pB.id : seedA.pA.id) : 'BYE',
-                p3: seedB ? seedB.pA.id : 'BYE', 
-                p4: seedB ? (seedB.isPair ? seedB.pB.id : seedB.pA.id) : 'BYE',
-                s1:'', s2:'', saved: false, isBye: false
+                gid: gid, round: 1, pos: i/2, 
+                p1: seedA ? seedA.pA.id : 'BYE', p2: seedA ? (seedA.isPair ? seedA.pB.id : seedA.pA.id) : 'BYE',
+                p3: seedB ? seedB.pA.id : 'BYE', p4: seedB ? (seedB.isPair ? seedB.pB.id : seedB.pA.id) : 'BYE',
+                s1:'', s2:'', saved: false, isBye: (!seedA || !seedB)
             };
-            if (!seedA || !seedB) m.isBye = true;
             koMatches.push(m);
-        }
-
-        for(let i=0; i<koMatches.length; i++) {
-            let m = koMatches[i];
-            if(m.round === 1 && m.p1 !== 'BYE' && m.p3 !== 'BYE') {
-                let pA = appState.players.find(x=>x.id===m.p1);
-                let pB = appState.players.find(x=>x.id===m.p3);
-                if(pA && pB && pA.groupId === pB.groupId) {
-                    for(let j=0; j<koMatches.length; j++) {
-                        if(i === j) continue;
-                        let m2 = koMatches[j];
-                        if(m2.round === 1 && m2.p3 !== 'BYE') {
-                            let pC = appState.players.find(x=>x.id===m2.p1);
-                            let pD = appState.players.find(x=>x.id===m2.p3);
-                            
-                            let valid1 = !pD || pA.groupId !== pD.groupId;
-                            let valid2 = !pC || pB.groupId !== pC.groupId;
-                            
-                            if(valid1 && valid2) {
-                                let temp1 = m.p3; let temp2 = m.p4;
-                                m.p3 = m2.p3; m.p4 = m2.p4;
-                                m2.p3 = temp1; m2.p4 = temp2;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         let matchesInRound = size / 2;
         for(let r=2; r<=totalRounds; r++) {
             matchesInRound /= 2;
             for(let i=0; i<matchesInRound; i++) {
-                koMatches.push({
-                    mid: 'm-r' + r + '-' + i + '-' + Date.now(), 
-                    gid: gid, 
-                    round: r,
-                    pos: i,
-                    p1: '', p2: '', p3: '', p4: '',
-                    s1:'', s2:'', saved: false, isBye: false
-                });
+                koMatches.push({ mid: 'm-r' + r + '-' + i + '-' + Date.now(), gid: gid, round: r, pos: i, p1: '', p2: '', p3: '', p4: '', s1:'', s2:'', saved: false, isBye: false });
             }
         }
         
-        koMatches.push({
-            mid: 'm-3rd-' + Date.now(),
-            gid: gid,
-            round: totalRounds,
-            isThirdPlace: true,
-            p1: '', p2: '', p3: '', p4: '',
-            s1:'', s2:'', saved: false, isBye: false
-        });
+        koMatches.push({ mid: 'm-3rd-' + Date.now(), gid: gid, round: totalRounds, isThirdPlace: true, p1: '', p2: '', p3: '', p4: '', s1:'', s2:'', saved: false, isBye: false });
 
         appState.matches.push(...koMatches);
 
         koMatches.forEach(m => {
             if (m.isBye) {
-                if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
-                    m.s1 = 6; m.s2 = 0; m.saved = true;
-                    advanceWinner(m.mid, m, 6, 0);
-                } else if (m.p1 === 'BYE' && m.p3 !== 'BYE') {
-                    m.s1 = 0; m.s2 = 6; m.saved = true;
-                    advanceWinner(m.mid, m, 0, 6);
-                }
+                if (m.p3 === 'BYE' && m.p1 !== 'BYE') { m.s1 = 6; m.s2 = 0; m.saved = true; advanceWinner(m.mid, m, 6, 0); } 
+                else if (m.p1 === 'BYE' && m.p3 !== 'BYE') { m.s1 = 0; m.s2 = 6; m.saved = true; advanceWinner(m.mid, m, 0, 6); }
             }
         });
         
         document.getElementById('modal-knockout').style.display = 'none';
-        save();
+        saveDB();
         alert("Chave Gerada!");
         switchAppView('bracket');
+    }
+
+    // -----------------------
+    // CORE TOURNAMENT ACTIONS
+    // -----------------------
+
+    window.addPlayer = () => { 
+        const n = document.getElementById('pName').value.trim(); 
+        const phone = document.getElementById('pPhone').value.trim().replace(/\D/g, ''); 
+        if(!n) return; 
+        if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe neste torneio!"); 
+        
+        appState.players.push({ id: 'p'+Date.now(), name: n, phone: phone, groupId: 'pool', games: 0, wins: 0, bal: 0, pts: 0 }); 
+        
+        if(curArenaId) { update(ref(db, `arena_players/${curArenaId}`), { [n.replace(/[.#$/[\]]/g, "")]: true }); } 
+        
+        document.getElementById('pName').value = ''; document.getElementById('pPhone').value = ''; document.getElementById('pName').focus(); 
+        saveDB(); renderApp(); 
+    }
+
+    window.delPlayer = (pid, e) => { 
+        if(e) e.stopPropagation();
+        if(confirm("Excluir este jogador permanentemente?")) { 
+            appState.players = appState.players.filter(p=>p.id!==pid); 
+            saveDB(); renderApp(); 
+        } 
+    };
+
+    window.toggleSel = (pid, e) => { if(document.body.classList.contains('viewer-mode')) return; if(e) e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
+    window.moveSel = (gid) => { if(!selectedPid) return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); saveDB(); renderApp();} }
+    window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); saveDB(); renderApp(); }
+
+    window.addGroup = () => { const nextNum = appState.groups.length + 1; appState.groups.push({ id: 'g' + Date.now(), name: "GRUPO " + String.fromCharCode(64 + nextNum) }); saveDB(); renderApp(); }
+    
+    window.delGroup = (gid, e) => { 
+        if(e) e.stopPropagation(); 
+        if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { 
+            appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); 
+            appState.groups=appState.groups.filter(g=>g.id!==gid); 
+            appState.matches=appState.matches.filter(m=>m.gid!==gid); 
+            saveDB(); renderApp(); 
+        }
+    };
+
+    window.renameGroup = (gid, e) => { if(e) e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome:", g.name); if(newName) { g.name = newName; saveDB(); renderApp(); } } }
+    
+    window.autoGroupsCBT = () => {
+        const pool = appState.players.filter(p => p.groupId === 'pool');
+        const N = pool.length;
+        const effectiveN = appState.mode === 'individual' ? N / 2 : N;
+        if(effectiveN < 3) return alert("Mínimo de 3 duplas na reserva.");
+        let G = effectiveN <= 5 ? 1 : Math.floor(effectiveN / 3);
+        if(!confirm(`Regras CBT: Formar ${G} grupo(s)?`)) return;
+        let startIndex = appState.groups.length; let newGroups = [];
+        for(let i=0; i<G; i++) { let newG = { id: 'g' + Date.now() + i, name: "GRUPO " + String.fromCharCode(64 + startIndex + i + 1) }; appState.groups.push(newG); newGroups.push(newG); }
+        pool.sort(()=>Math.random()-0.5); pool.forEach((p, i) => { p.groupId = newGroups[i % G].id; });
+        saveDB(); renderApp();
     }
 
     window.genMatches = (gid) => { 
@@ -1118,29 +1072,18 @@
         const ps=appState.players.filter(p=>p.groupId===gid); 
         if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
         let roundMatches = [];
-        
         if(appState.mode==='fixed') { 
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } 
-        } 
-        else if(ps.length===4) { 
+            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); 
+        } else if(ps.length===4) { 
             roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); 
             roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); 
             roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); 
-        }
-        else if(ps.length===5) { 
-            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ 
-                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); 
-            }); 
-        } 
-        else if(ps.length===6) { 
-            [[0,1,2,3],[0,4,1,5],[2,4,3,5],[0,2,1,4],[0,5,3,4],[1,3,2,5]].forEach(r=>{ 
-                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); 
-            }); 
-        }
-        else { 
-            let pairs=[]; 
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
-            
+        } else if(ps.length===5) { 
+            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=> roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id})); 
+        } else if(ps.length===6) { 
+            [[0,1,2,3],[0,4,1,5],[2,4,3,5],[0,2,1,4],[0,5,3,4],[1,3,2,5]].forEach(r=> roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id})); 
+        } else { 
+            let pairs=[]; for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) pairs.push({p1:ps[i].id, p2:ps[j].id}); 
             while(pairs.length) { 
                 let pA=pairs[0], found=false; 
                 for(let k=1; k<pairs.length; k++) { 
@@ -1150,60 +1093,26 @@
                 if(!found) pairs.splice(0,1); 
             } 
         } 
-        roundMatches.forEach(m => { addMatch(gid, m.p1, m.p2, m.p3, m.p4, false); });
-        save(); renderApp();
+        roundMatches.forEach(m => { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1:m.p1, p2:m.p2, p3:m.p3, p4:m.p4, s1:'', s2:'', saved:false, isBye:false }); });
+        saveDB(); renderApp();
     }
     
-    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
+    window.addManual = (gid) => { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1:'', p2:'', p3:'', p4:'', s1:'', s2:'', saved:false, isBye:false }); saveDB(); renderApp(); }
 
-    window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); renderApp(); }
-    
-    function getOptimizedMatchOrder(matches) {
-        let groupMatches = matches.filter(m => !m.gid.includes('ko') && !m.isBye);
-        let pending = groupMatches.map((m, originalIndex) => ({ m, originalIndex }));
-        let scheduled = [];
-        let lastPlayed = {}; 
-
-        while(pending.length > 0) {
-            let bestIdx = -1;
-            let maxScore = -Infinity;
-
-            for(let i = 0; i < pending.length; i++) {
-                let item = pending[i];
-                let m = item.m;
-                let p = [m.p1, m.p2, m.p3, m.p4].filter(x => x && x !== 'd');
-                
-                let minWait = Infinity;
-                for(let pid of p) {
-                    let last = lastPlayed[pid] !== undefined ? lastPlayed[pid] : -100;
-                    let wait = scheduled.length - last;
-                    if(wait < minWait) minWait = wait;
-                }
-
-                let score = minWait * 1000 - item.originalIndex;
-                if(score > maxScore) {
-                    maxScore = score;
-                    bestIdx = i;
-                }
-            }
-            let selected = pending.splice(bestIdx, 1)[0];
-            scheduled.push(selected.m);
-            let p = [selected.m.p1, selected.m.p2, selected.m.p3, selected.m.p4].filter(x => x && x !== 'd');
-            for(let pid of p) { lastPlayed[pid] = scheduled.length - 1; }
-        }
-        return scheduled;
-    }
+    window.delM = (mid, e) => { 
+        if(e) e.stopPropagation();
+        if(confirm("Excluir este Jogo?")) { 
+            appState.matches = appState.matches.filter(m=>m.mid!==mid); 
+            recalc(); saveDB(); renderApp(); 
+        } 
+    };
 
     window.saveScore = async (mid, type, btnElement) => { 
         const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
         if(matchIndex === -1) return;
         const m = appState.matches[matchIndex];
 
-        if(m.saved) {
-            if(confirm("Deseja alterar o placar deste jogo já finalizado?")) {
-                m.saved = false; recalc(); save(); renderApp(); 
-            } return;
-        }
+        if(m.saved) { if(confirm("Alterar placar?")) { m.saved = false; recalc(); saveDB(); renderApp(); } return; }
 
         let container = btnElement.parentElement;
         if (btnElement.closest('tr')) container = btnElement.closest('tr');
@@ -1211,76 +1120,46 @@
         if (btnElement.closest('.queue-match-item')) container = btnElement.closest('.queue-match-item');
         
         let inputs = container.querySelectorAll('input[type="tel"]');
-        let val1 = inputs[0] ? inputs[0].value : '';
-        let val2 = inputs[1] ? inputs[1].value : '';
-
+        let val1 = inputs[0] ? inputs[0].value : ''; let val2 = inputs[1] ? inputs[1].value : '';
         if(val1 === '' || val2 === '') { alert(`Preencha o placar.`); return; }
         
         let s1 = parseInt(val1); let s2 = parseInt(val2);
         if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
         
         m.s1 = s1; m.s2 = s2; m.saved = true;
-        recalc();
-
-        if(m.gid.includes('ko')) advanceWinner(mid, m, s1, s2);
-        
-        save(); 
-        renderApp(); 
+        recalc(); if(m.gid.includes('ko')) advanceWinner(mid, m, s1, s2); saveDB(); renderApp(); 
     }
 
     function advanceWinner(mid, currentMatch, s1, s2) {
         const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
         if(!currentMatch.round) return; 
-        
         let w1, w2, l1, l2;
         if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; l1 = currentMatch.p3; l2 = currentMatch.p4; } 
         else { w1 = currentMatch.p3; w2 = currentMatch.p4; l1 = currentMatch.p1; l2 = currentMatch.p2; }
-        
-        const currentRound = currentMatch.round;
-        const currentPos = currentMatch.pos; 
-        const nextRound = currentRound + 1;
-        const nextPos = Math.floor(currentPos / 2);
+        const nextRound = currentMatch.round + 1; const nextPos = Math.floor(currentMatch.pos / 2);
         
         const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos && !m.isThirdPlace);
-        
         if(targetMatch) {
             const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
             if(globalTargetIndex > -1) {
-                if(currentPos % 2 === 0) { appState.matches[globalTargetIndex].p1 = w1; appState.matches[globalTargetIndex].p2 = w2; } 
+                if(currentMatch.pos % 2 === 0) { appState.matches[globalTargetIndex].p1 = w1; appState.matches[globalTargetIndex].p2 = w2; } 
                 else { appState.matches[globalTargetIndex].p3 = w1; appState.matches[globalTargetIndex].p4 = w2; }
             }
         }
 
-        const regularMatchesInNextRound = koMatches.filter(m => m.round === nextRound && !m.isThirdPlace).length;
-        if(regularMatchesInNextRound === 1) {
+        if(koMatches.filter(m => m.round === nextRound && !m.isThirdPlace).length === 1) {
             const thirdPlaceMatch = koMatches.find(m => m.isThirdPlace === true);
             if(thirdPlaceMatch) {
                 const tIdx = appState.matches.findIndex(m => m.mid === thirdPlaceMatch.mid);
                 if(tIdx > -1) {
-                    if(currentPos % 2 === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
+                    if(currentMatch.pos % 2 === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
                     else { appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2; }
                 }
             }
         }
     }
 
-    window.editS = async (mid) => {
-        if(!confirm("Editar placar?")) return;
-        const mIdx = appState.matches.findIndex(x => x.mid === mid);
-        if(mIdx > -1) { appState.matches[mIdx].saved = false; save(); renderApp(); }
-    }
-
-    // V174: Try/Catch nas exclusões
-    window.delM = (mid) => { 
-        try {
-            if(confirm("Excluir Jogo?")) { 
-                appState.matches=appState.matches.filter(m=>m.mid!==mid); 
-                recalc(); 
-                save(); 
-                renderApp(); 
-            } 
-        } catch(e) { alert("Erro ao apagar jogo: " + e.message); }
-    }
+    window.editS = async (mid) => { if(!confirm("Editar placar?")) return; const mIdx = appState.matches.findIndex(x => x.mid === mid); if(mIdx > -1) { appState.matches[mIdx].saved = false; saveDB(); renderApp(); } }
     
     function recalc() { 
         appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
@@ -1294,21 +1173,69 @@
                 if(appState.mode === 'individual'){ run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); } 
             }
         }); 
-        appState.players.forEach(p => { 
-            p.gameAvg = p.manualGA !== undefined ? p.manualGA : (p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0); 
-        });
+        appState.players.forEach(p => { p.gameAvg = p.manualGA !== undefined ? p.manualGA : (p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0); });
     }
+
+    window.resetKnockout = () => { if(confirm("Excluir Mata-Mata?")) { appState.groups = appState.groups.filter(g => !g.id.includes('ko')); appState.matches = appState.matches.filter(m => !m.gid.includes('ko')); saveDB(); renderApp(); switchAppView('groups'); } }
     
+    window.editGA = (pid, e) => {
+        if(e) e.stopPropagation();
+        if(document.body.classList.contains('viewer-mode')) return;
+        const p = appState.players.find(x => x.id === pid); if(!p) return;
+        const current = p.manualGA !== undefined ? p.manualGA : (p.gameAvg || 0);
+        const input = prompt(`Editar GA de ${p.name}\nDeixe em branco para Automático:`, current.toFixed(2));
+        if(input === null) return;
+        if(input.trim() === "") { delete p.manualGA; } else { const parsed = parseFloat(input.replace(',', '.')); if(!isNaN(parsed)) p.manualGA = parsed; else return alert("Inválido."); }
+        recalc(); saveDB(); renderApp();
+    };
+
+    window.editName = (pid, oldName, e) => { if(e) e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; saveDB(); renderApp(); } } }
+    window.removeFromGroup = (pid, e) => { if(e) e.stopPropagation(); if(confirm("Voltar para reserva?")) { const p = appState.players.find(x => x.id === pid); if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; saveDB(); renderApp(); } } }
+    window.openPlayerSelect = (mid, slot) => { if(document.body.classList.contains('viewer-mode')) return; selectingMatch = mid; selectingSlot = slot; const m = appState.matches.find(x => x.mid === mid); if(!m) return; const isKO = m.gid.includes('ko'); const list = document.getElementById('select-list-container'); list.innerHTML = ''; const noneItem = document.createElement('div'); noneItem.className = 'select-item'; noneItem.innerText = '[ Vazio ]'; noneItem.onclick = () => confirmPlayerSelect(''); list.appendChild(noneItem); let candidates = isKO ? appState.players : appState.players.filter(p => p.groupId === m.gid); candidates.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => { const item = document.createElement('div'); item.className = 'select-item'; item.innerText = p.name; item.onclick = () => confirmPlayerSelect(p.id); list.appendChild(item); }); document.getElementById('modal-player-select').style.display = 'flex'; }
+    window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; saveDB(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
+    
+    // UTILS
+    window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
+    window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; saveDB(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro: " + err.message); } }; reader.readAsText(file); }
+    window.setMode = (m) => { if(appState.players.length && !confirm("Mudar formato?"))return; appState.mode=m; saveDB(); renderApp(); }
+    window.resetT = () => { if(confirm("Zerar Torneio?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; saveDB(); renderApp(); } }
+    window.forceSave = () => { recalc(); saveDB(); renderApp(); alert("💾 Salvo na nuvem!"); };
+    const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
+
+    function getOptimizedMatchOrder(matches) {
+        let groupMatches = matches.filter(m => !m.gid.includes('ko') && !m.isBye);
+        let pending = groupMatches.map((m, originalIndex) => ({ m, originalIndex }));
+        let scheduled = []; let lastPlayed = {}; 
+        while(pending.length > 0) {
+            let bestIdx = -1; let maxScore = -Infinity;
+            for(let i = 0; i < pending.length; i++) {
+                let item = pending[i]; let m = item.m; let p = [m.p1, m.p2, m.p3, m.p4].filter(x => x && x !== 'd');
+                let minWait = Infinity;
+                for(let pid of p) { let last = lastPlayed[pid] !== undefined ? lastPlayed[pid] : -100; let wait = scheduled.length - last; if(wait < minWait) minWait = wait; }
+                let score = minWait * 1000 - item.originalIndex;
+                if(score > maxScore) { maxScore = score; bestIdx = i; }
+            }
+            let selected = pending.splice(bestIdx, 1)[0]; scheduled.push(selected.m);
+            let p = [selected.m.p1, selected.m.p2, selected.m.p3, selected.m.p4].filter(x => x && x !== 'd');
+            for(let pid of p) { lastPlayed[pid] = scheduled.length - 1; }
+        }
+        return scheduled;
+    }
+
     function renderApp() {
         appState.players.forEach(p => { p.tempGroupRank = null; p.tempGroupName = null; });
         appState.groups.forEach(g => {
             if (!g.id.includes('ko-')) {
                 let ps = appState.players.filter(p=>p.groupId===g.id);
-                ps = sortPlayersCBT(ps, appState.matches);
-                ps.forEach((p, ix) => {
-                    p.tempGroupRank = ix + 1;
-                    p.tempGroupName = g.name;
+                ps = [...ps].sort((a, b) => {
+                    if (b.pts !== a.pts) return b.pts - a.pts;
+                    if (b.bal !== a.bal) return b.bal - a.bal;
+                    const aGA = a.gameAvg || 0; const bGA = b.gameAvg || 0;
+                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+                    if (b.wins !== a.wins) return b.wins - a.wins;
+                    return a.name.localeCompare(b.name);
                 });
+                ps.forEach((p, ix) => { p.tempGroupRank = ix + 1; p.tempGroupName = g.name; });
             }
         });
 
@@ -1324,7 +1251,7 @@
             const d = document.createElement('div'); 
             d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
             d.onclick=(e)=>window.toggleSel(p.id,e);
-            d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer;" title="Excluir do Torneio">✕</span></div>`; 
+            d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="delPlayer('${p.id}', event)" style="color:red; cursor:pointer;" title="Excluir do Torneio">✕</span></div>`; 
             pl.appendChild(d); 
         });
 
@@ -1386,104 +1313,45 @@
 
         appState.groups.forEach((g,i) => {
             let ps = appState.players.filter(p=>p.groupId===g.id);
-            ps = sortPlayersCBT(ps, appState.matches);
+            ps = [...ps].sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                if (b.bal !== a.bal) return b.bal - a.bal;
+                const aGA = a.gameAvg || 0; const bGA = b.gameAvg || 0;
+                if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                return a.name.localeCompare(b.name);
+            });
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); col.className='group-box'; 
             
             if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:15px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Chave">✕</span></div></div>`;
                 
                 h += `<div class="ko-list">`;
-                
                 const rounds = {};
-                ms.forEach(m => {
-                    if(m.isThirdPlace) {
-                        if(!rounds['3rd']) rounds['3rd'] = [];
-                        rounds['3rd'].push(m);
-                    } else {
-                        if(!rounds[m.round]) rounds[m.round] = [];
-                        rounds[m.round].push(m);
-                    }
-                });
-                
+                ms.forEach(m => { if(m.isThirdPlace) { if(!rounds['3rd']) rounds['3rd'] = []; rounds['3rd'].push(m); } else { if(!rounds[m.round]) rounds[m.round] = []; rounds[m.round].push(m); } });
                 let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
-                
                 roundKeys.forEach(rNum => {
-                    let rName = 'Fase ' + rNum;
-                    const count = rounds[rNum].length;
-                    if(count === 8) rName = 'OITAVAS DE FINAL';
-                    if(count === 4) rName = 'QUARTAS DE FINAL';
-                    if(count === 2) rName = 'SEMI-FINAL';
-                    if(count === 1) rName = 'FINAL';
-
+                    let rName = 'Fase ' + rNum; const count = rounds[rNum].length;
+                    if(count === 8) rName = 'OITAVAS DE FINAL'; if(count === 4) rName = 'QUARTAS DE FINAL'; if(count === 2) rName = 'SEMI-FINAL'; if(count === 1) rName = 'FINAL';
                     h += `<div class="ko-round-header">${rName}</div>`;
-                    
                     rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        
-                        const formatName = (pid, name) => {
-                            if (!pid || pid === 'BYE') return name;
-                            const p = appState.players.find(x => x.id === pid);
-                            if(p && p.tempGroupRank && p.tempGroupName) {
-                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
-                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
-                            }
-                            return name;
-                        };
+                        const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...'); const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...'); const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const formatName = (pid, name) => { if (!pid || pid === 'BYE') return name; const p = appState.players.find(x => x.id === pid); if(p && p.tempGroupRank && p.tempGroupName) { const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`; return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`; } return name; };
+                        const formatAdmin = (pid, name, slot) => { if (!pid || pid === 'BYE') return name; return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`; };
 
-                        const formatAdmin = (pid, name, slot) => {
-                             if (!pid || pid === 'BYE') return name;
-                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
-                        };
-
-                        let t1 = '', t1_admin = '';
-                        if (appState.mode === 'fixed') {
-                            t1 = formatName(m.p1, p1Name);
-                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
-                        } else {
-                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
-                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
-                        }
+                        let t1 = '', t1_admin = ''; if (appState.mode === 'fixed') { t1 = formatName(m.p1, p1Name); t1_admin = formatAdmin(m.p1, p1Name, 'p1'); } else { t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`; t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`; }
+                        let t2 = '', t2_admin = ''; if (appState.mode === 'fixed') { t2 = formatName(m.p3, p3Name); t2_admin = formatAdmin(m.p3, p3Name, 'p3'); } else { t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`; t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`; }
                         
-                        let t2 = '', t2_admin = '';
-                        if (appState.mode === 'fixed') {
-                            t2 = formatName(m.p3, p3Name);
-                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
-                        } else {
-                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
-                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
-                        }
-                        
-                        const isEditing = !m.saved && !m.isBye;
-                        const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
-                        
+                        const isEditing = !m.saved && !m.isBye; const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
                         h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only">${t1_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                            
-                            ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                 <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
-                                : 
-                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
-                                 <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
-                            }
-                            
-                            <div class="ko-player admin-only">${t2_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                            
-                            ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
-                                : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
-                            }
+                            <div class="ko-player admin-only">${t1_admin}</div><div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
+                            ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0"><span class="ko-vs">X</span><input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` : `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div><div class="ko-vs">X</div><div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`}
+                            <div class="ko-player admin-only">${t2_admin}</div><div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
+                            ${isEditing && hasPlayers ? `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` : (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')}
                         </div>`;
                     });
                 });
@@ -1491,76 +1359,29 @@
                 if(rounds['3rd']) {
                     h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
                     rounds['3rd'].forEach(m => {
-                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...';
-                        const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
-                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
-                        const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
-                        
-                        const formatName = (pid, name) => {
-                            if (!pid || pid === 'BYE') return name;
-                            const p = appState.players.find(x => x.id === pid);
-                            if(p && p.tempGroupRank && p.tempGroupName) {
-                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
-                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
-                            }
-                            return name;
-                        };
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...'; const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
+                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...'; const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
+                        const formatName = (pid, name) => { if (!pid || pid === 'BYE') return name; const p = appState.players.find(x => x.id === pid); if(p && p.tempGroupRank && p.tempGroupName) { const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`; return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`; } return name; };
+                        const formatAdmin = (pid, name, slot) => { if (!pid || pid === 'BYE') return name; return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`; };
 
-                        const formatAdmin = (pid, name, slot) => {
-                             if (!pid || pid === 'BYE') return name;
-                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
-                        };
+                        let t1 = '', t1_admin = ''; if (appState.mode === 'fixed') { t1 = formatName(m.p1, p1Name); t1_admin = formatAdmin(m.p1, p1Name, 'p1'); } else { t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`; t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`; }
+                        let t2 = '', t2_admin = ''; if (appState.mode === 'fixed') { t2 = formatName(m.p3, p3Name); t2_admin = formatAdmin(m.p3, p3Name, 'p3'); } else { t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`; t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`; }
 
-                        let t1 = '', t1_admin = '';
-                        if (appState.mode === 'fixed') {
-                            t1 = formatName(m.p1, p1Name);
-                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
-                        } else {
-                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
-                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
-                        }
-                        
-                        let t2 = '', t2_admin = '';
-                        if (appState.mode === 'fixed') {
-                            t2 = formatName(m.p3, p3Name);
-                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
-                        } else {
-                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
-                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
-                        }
-
-                         const isEditing = !m.saved;
-                         const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
-
-                         h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only">${t1_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                            ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                 <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
-                                : 
-                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
-                                 <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
-                            }
-                            <div class="ko-player admin-only">${t2_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                            ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
-                                : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
-                            }
+                        const isEditing = !m.saved; const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
+                        h += `<div class="ko-match-item">
+                            <div class="ko-player admin-only">${t1_admin}</div><div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
+                            ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0"><span class="ko-vs">X</span><input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` : `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div><div class="ko-vs">X</div><div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`}
+                            <div class="ko-player admin-only">${t2_admin}</div><div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
+                            ${isEditing && hasPlayers ? `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` : (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')}
                         </div>`;
                     });
                 }
-                
                 h += `</div>`;
-                document.getElementById('bracket-container').innerHTML = h;
+                if(bc) bc.innerHTML = h;
                 
             } else {
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:15px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
                 
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
@@ -1571,7 +1392,7 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer; text-align:center; font-weight:bold; margin-top:5px;" onclick="delM('${m.mid}')" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer; text-align:center; font-weight:bold; margin-top:5px; padding:5px;" onclick="delM('${m.mid}', event)" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
@@ -1638,45 +1459,14 @@
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
-
-    // V174: Try/Catch e Alertas no Banco
-    window.delGroup = (gid, e) => { 
-        try {
-            e.stopPropagation(); 
-            if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { 
-                appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); 
-                appState.groups=appState.groups.filter(g=>g.id!==gid); 
-                appState.matches=appState.matches.filter(m=>m.gid!==gid); 
-                save(); 
-                renderApp(); 
-            }
-        } catch(err) { alert("Erro ao excluir grupo: " + err.message); }
-    };
-
-    window.delPlayer = (pid) => { 
-        try {
-            if(confirm("Excluir este jogador do torneio permanentemente?")) { 
-                appState.players = appState.players.filter(p=>p.id!==pid); 
-                save(); 
-                renderApp(); 
-            } 
-        } catch(err) { alert("Erro ao excluir jogador: " + err.message); }
-    };
-
-    function save() { 
-        if(appRef) {
-            set(appRef, appState).catch(err => alert("Atenção: Falha de conexão com o banco de dados. " + err.message)); 
-        } 
-    }
     
-    // REGISTRO DO MOTOR DO APLICATIVO (PWA)
+    // REGISTRO DO PWA
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js');
         });
     }
 
-    // CAPTURA DO AVISO DE INSTALAÇÃO DO ANDROID/CHROME
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
