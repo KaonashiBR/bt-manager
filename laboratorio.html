@@ -4,13 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#9c27b0">
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BT Lab">
     <link rel="apple-touch-icon" href="./icone.png">
     <link rel="manifest" href="manifest.json">
-    
     <title>BT Manager - AMBIENTE DE TESTE</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -24,7 +22,7 @@
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
-        /* NAVBAR DO LAB */
+        /* NAVBAR LAB ROXO */
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #9c27b0; }
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
@@ -138,7 +136,19 @@
         .ko-vs { font-size: 0.8em; color: #999; margin: 0 10px; }
         .ko-score { width: 40px; text-align: center; font-weight: 900; color: var(--primary); }
 
-        /* MODAL ROLETA */
+        /* ANIMAÇÃO DE EMPATE ABSOLUTO */
+        @keyframes pulse-tie-bg { 
+            0% { background-color: transparent; } 
+            50% { background-color: rgba(255, 59, 48, 0.35); border-radius: 4px; } 
+            100% { background-color: transparent; } 
+        }
+        .blink-tie-bg { 
+            animation: pulse-tie-bg 1.5s infinite; 
+            padding: 3px 6px;
+            display: inline-block;
+        }
+
+        /* MODAL ROLETA DE SORTEIO */
         #modal-sorteio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 4000; display: none; justify-content: center; align-items: center; flex-direction: column; color: white; text-align: center; }
         .spinner-container { margin-bottom: 20px; font-size: 5em; animation: bounce 0.5s infinite alternate; }
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
@@ -147,7 +157,7 @@
 <body class="viewer-mode">
 
 <div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-    <div style="font-size:3.5em;" id="loading-icon">🎾</div><b id="loading-text">Carregando Lab...</b>
+    <div style="font-size:3.5em;" id="loading-icon">🎾</div><b id="loading-text">Carregando...</b>
 </div>
 
 <div id="modal-sorteio">
@@ -157,7 +167,7 @@
 </div>
 
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#9c27b0; font-size:0.7em; vertical-align:super;">LAB 🧪</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#9c27b0; font-size:0.7em; vertical-align:super;">LABORATÓRIO 🧪</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
     <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
 </div>
 
@@ -222,13 +232,11 @@
     <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
     
     <div class="admin-only" style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;">
-        
         <div style="display:flex; gap:5px; margin-bottom:5px;">
             <input type="tel" id="pPhone" class="inp-std auth-input" style="margin:0; width:45%; font-size:0.9em;" placeholder="Celular (Opcional)" autocomplete="off">
             <input type="text" id="pName" class="inp-std auth-input" style="margin:0; width:55%;" placeholder="Nome da dupla/atleta..." autocomplete="off">
             <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
         </div>
-        
         <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:10px;">
             <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
             <button class="btn-std btn-green" style="width:auto;" onclick="autoGroupsCBT()">⚡ Grupos CBT</button>
@@ -260,7 +268,8 @@
 
     <div id="view-groups" class="view-section active">
         <div class="admin-only" style="display:flex; gap:5px; margin-bottom:15px;">
-            <button class="btn-std btn-dark" style="font-size:0.85em; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="exportWhatsApp('groups-container', 'Todos_Os_Grupos')"><span class="material-icons" style="font-size:1.2em;">photo_camera</span> Todos Grupos (Print)</button>
+            <button class="btn-std btn-dark" style="font-size:0.85em; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="exportWhatsApp('groups-container', 'Todos_Os_Grupos')"><span class="material-icons" style="font-size:1.2em;">content_copy</span> Copiar Todos Grupos</button>
+            <button class="btn-std btn-dark" style="font-size:0.85em; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="exportWhatsApp('general-ranking-container', 'Ranking_Geral')"><span class="material-icons" style="font-size:1.2em;">content_copy</span> Copiar Ranking Geral</button>
         </div>
 
         <div class="board">
@@ -271,6 +280,7 @@
                 </div>
                 <div id="pool-list" style="padding:5px; display:flex; flex-direction:column; gap:2px;"></div>
             </div>
+            
             <div id="groups-container"></div>
         </div>
         
@@ -278,8 +288,9 @@
     </div>
     
     <div id="view-bracket" class="view-section">
-        <button class="admin-only btn-std btn-dark" onclick="exportWhatsApp('bracket-container', 'Chaveamento')" style="margin-bottom:15px; display:flex; justify-content:center; align-items:center; gap:8px;"><span class="material-icons">photo_camera</span> Compartilhar Chaves (Print)</button>
-        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto 40px; padding:5px;"></div>
+        <button class="admin-only btn-std btn-dark" onclick="exportWhatsApp('bracket-container', 'Chaveamento')" style="margin-bottom:15px; display:flex; justify-content:center; align-items:center; gap:8px;"><span class="material-icons">content_copy</span> Copiar Chaves</button>
+
+        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto 40px; padding:5px; border-radius:8px;"></div>
     </div>
 </div>
 
@@ -343,862 +354,19 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;"><select id="sel-q-1a" class="inp-std auth-input" style="margin:0;"></select><select id="sel-q-1b" class="inp-std auth-input" style="margin:0;"></select><select id="sel-q-2a" class="inp-std auth-input" style="margin:0;"></select><select id="sel-q-2b" class="inp-std auth-input" style="margin:0;"></select><select id="sel-q-3a" class="inp-std auth-input" style="margin:0;"></select><select id="sel-q-3b" class="inp-std auth-input" style="margin:0;"></select><select id="sel-q-4a" class="inp-std auth-input" style="margin:0;"></select><select id="sel-q-4b" class="inp-std auth-input" style="margin:0;"></select></div>
     <div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button></div>
 </div></div>
+<script type="module">
 
-
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
-    const MASTER_PASS = "lucas10";
-
-    // CHAVES DO LABORATÓRIO 🧪
-    const firebaseConfig = {
-      apiKey: "AIzaSyCttgr7SLeDU92pcMs5wcNGvLc7joZvw00",
-      authDomain: "bt-manager-testes.firebaseapp.com",
-      databaseURL: "https://bt-manager-testes-default-rtdb.firebaseio.com",
-      projectId: "bt-manager-testes",
-      storageBucket: "bt-manager-testes.firebasestorage.app",
-      messagingSenderId: "145113677026",
-      appId: "1:145113677026:web:71c579fb817c81daf372bb"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const googleProvider = new GoogleAuthProvider();
-
-    let user = null;
-    let localAdmin = false;
-    let curArenaId = null; let curArenaData = null; let curCatId = null; let curCatData = null; let curTourneyId = null; let appRef = null;
-    let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
-    let selectedPid = null;
-    let favorites = {}; 
-    let selectingMatch = null; 
-    let selectingSlot = null;
-
-    window.hasEditPermission = (ownerUid, managersString) => {
-        if (localAdmin) return true;
-        if (!user) return false;
-        if (ADMIN_EMAILS.includes(user.email)) return true;
-        if (ownerUid === user.uid) return true;
-        if (managersString && user.email) {
-            const emails = managersString.split(',').map(e => e.trim().toLowerCase());
-            if (emails.includes(user.email.toLowerCase())) return true;
-        }
-        return false;
-    }
-
-    window.goHome = () => { 
-        curArenaId = null; curArenaData = null; curCatId = null; curTourneyId = null; 
-        history.pushState("", document.title, window.location.pathname + window.location.search); 
-        showScreen('screen-arenas'); loadArenas(); 
-    }
-
-    window.onload = () => {
-        const hash = window.location.hash.substring(1);
-        if(hash && hash.includes('/')) {
-            const [a, c, t] = hash.split('/');
-            curArenaId = a; curCatId = c; curTourneyId = t;
-            
-            get(ref(db, `arenas/${a}`)).then(s => { 
-                if(s.exists()) {
-                    curArenaData = s.val();
-                    document.getElementById('title-arena').innerText = curArenaData.name;
-                }
-                get(ref(db, `categories/${a}/${c}`)).then(sc => { 
-                    if(sc.exists()) { 
-                        document.getElementById('title-cat').innerText = sc.val().name; 
-                        curCatData = sc.val(); 
-                    }
-                    get(ref(db, `tournaments_meta/${c}/${t}`)).then(st => { 
-                        if(st.exists()) enterApp(t, st.val().name, st.val().pwd, st.val().owner); 
-                    });
-                });
-            });
-        }
-    }
-
-    onAuthStateChanged(auth, (u) => {
-        document.getElementById('loading').style.display = 'none';
-        user = u;
-        updateUserUI();
-        loadArenas(); 
-    });
-
-    function updateUserUI() {
-        if(user) {
-            document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-            document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : (user.email ? user.email.split('@')[0] : "Usuário");
-            const isMaster = user.email && ADMIN_EMAILS.includes(user.email);
-            document.getElementById('btn-add-arena').style.display = isMaster ? 'flex' : 'none'; 
-            document.getElementById('msg-login').style.display = 'none';
-            onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
-                favorites = snap.val() || {};
-                if(document.getElementById('screen-arenas').classList.contains('active')) loadArenas();
-            });
-        } else {
-            document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-            document.getElementById('nav-username').innerText = localAdmin ? "Admin Local" : "Visitante";
-            document.getElementById('btn-add-arena').style.display = 'none';
-            document.getElementById('msg-login').style.display = localAdmin ? 'none' : 'block';
-            favorites = {};
-        }
-    }
-
-    window.openLoginModal = () => { if(user) { if(confirm("Sair da conta?")) signOut(auth); } else { document.getElementById('modal-login').style.display = 'flex'; } }
-    window.closeLoginModal = () => { document.getElementById('modal-login').style.display = 'none'; }
-    window.doGoogleLogin = async () => { try { await signInWithPopup(auth, googleProvider); closeLoginModal(); } catch(e) { alert("Erro Google: " + e.message); } }
-    
-    window.doEmailLogin = async () => {
-        const email = document.getElementById('login-email').value.trim();
-        const pwd = document.getElementById('login-pwd').value;
-        if(!email || !pwd) return alert("Preencha e-mail e senha!");
-        try {
-            await signInWithEmailAndPassword(auth, email, pwd);
-            closeLoginModal();
-        } catch(e) {
-            alert("Erro ao entrar. Verifique se o e-mail e a senha estão corretos.");
-        }
-    }
-
-    window.doEmailSignUp = async () => {
-        const email = document.getElementById('login-email').value.trim();
-        const pwd = document.getElementById('login-pwd').value;
-        if(!email || !pwd) return alert("Preencha e-mail e senha!");
-        if(pwd.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
-        try {
-            await createUserWithEmailAndPassword(auth, email, pwd);
-            alert("Conta criada com sucesso!");
-            closeLoginModal();
-        } catch(e) {
-            if(e.code === 'auth/email-already-in-use') return alert("Este e-mail já está cadastrado. Clique em Entrar.");
-            alert("Erro ao criar conta: " + e.message);
-        }
-    }
-
-    window.toggleFavorite = (id, e) => {
-        e.stopPropagation();
-        if(!user) return alert("Faça login para favoritar.");
-        const isFav = favorites[id] ? null : true; 
-        update(ref(db, `users/${user.uid}/favorites`), { [id]: isFav });
-        e.target.classList.toggle('active');
-        e.target.innerText = isFav ? 'favorite' : 'favorite_border';
-    }
-
-    function fixDriveLink(url) { if (url && url.includes('drive.google.com') && url.includes('/file/d/')) { const id = url.match(/\/d\/(.*?)\//)[1]; return `https://drive.google.com/uc?export=view&id=${id}`; } return url; }
-
-    window.openModal = (type, id='', name='', extra1='', extra2='') => {
-        const titleMap = { 'arena': 'Arena', 'category': 'Categoria', 'tournament': 'Torneio' };
-        document.getElementById('modal-h3').innerText = (id ? 'Editar ' : 'Nova ') + titleMap[type];
-        document.getElementById('modal-overlay').style.display = 'flex';
-        document.getElementById('modal-type').value = type;
-        document.getElementById('modal-id').value = id;
-        document.getElementById('inp-name').value = name;
-        document.getElementById('field-arena').style.display = 'none';
-        document.getElementById('field-category').style.display = 'none';
-        document.getElementById('field-pwd').style.display = 'none';
-        
-        if(type === 'arena') { 
-            document.getElementById('field-arena').style.display = 'block'; 
-            document.getElementById('inp-url').value = extra1; 
-            document.getElementById('img-preview').src = extra1 || 'https://via.placeholder.com/150'; 
-            document.getElementById('inp-arena-managers').value = extra2 || '';
-        } 
-        else if(type === 'category') { document.getElementById('field-category').style.display = 'block'; } 
-        else if(type === 'tournament') { document.getElementById('field-pwd').style.display = 'block'; document.getElementById('inp-pwd').value = extra1 || "1234"; }
-    }
-    window.closeModal = () => { document.getElementById('modal-overlay').style.display = 'none'; }
-    window.updatePreview = (url) => { document.getElementById('img-preview').src = fixDriveLink(url); }
-    window.handleFileSelect = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d'); const scale = 500 / img.width; cvs.width = 500; cvs.height = img.height * scale; ctx.drawImage(img, 0, 0, cvs.width, cvs.height); const data = cvs.toDataURL('image/jpeg', 0.7); document.getElementById('inp-url').value = data; updatePreview(data); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
-
-    window.saveModal = async () => {
-        if(!user && !localAdmin) return;
-        const type = document.getElementById('modal-type').value;
-        
-        if(type === 'arena') {
-            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
-            if(!isMaster) return alert("Apenas o administrador do sistema pode criar ou editar Arenas.");
-        }
-
-        const id = document.getElementById('modal-id').value;
-        const name = document.getElementById('inp-name').value.trim();
-        if(!name) return alert("Nome obrigatório");
-        let path = ''; let data = { name, owner: user ? user.uid : 'local' };
-        
-        if (type === 'arena') { 
-            path = 'arenas'; 
-            data.img = document.getElementById('inp-url').value; 
-            data.managers = document.getElementById('inp-arena-managers').value.trim();
-        } 
-        else if (type === 'category') { 
-            path = `categories/${curArenaId}`; 
-            data.type = document.getElementById('inp-cat-type').value; 
-            data.short = document.getElementById('inp-cat-short').value.toUpperCase(); 
-            data.points = { 
-                p1: parseInt(document.getElementById('pts-1').value)||0, 
-                p2: parseInt(document.getElementById('pts-2').value)||0, 
-                p3: parseInt(document.getElementById('pts-3').value)||0, 
-                p4: parseInt(document.getElementById('pts-4').value)||0, 
-                quartas: parseInt(document.getElementById('pts-quartas').value)||0, 
-                part: parseInt(document.getElementById('pts-part').value)||0 
-            }; 
-        } 
-        else if (type === 'tournament') { path = `tournaments_meta/${curCatId}`; data.pwd = document.getElementById('inp-pwd').value || "1234"; data.date = Date.now(); }
-
-        try {
-            if (id) { await update(ref(db, `${path}/${id}`), data); } 
-            else {
-                data.createdAt = Date.now();
-                const newRef = push(ref(db, path), data);
-                if(type === 'tournament') { await set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user?user.uid:'local' }); }
-            }
-            closeModal();
-        } catch(e) { console.error(e); alert("Erro ao salvar: " + e.message); }
-    }
-
-    window.showGlobalRanking = () => {
-        showScreen('screen-global-ranking');
-        const table = document.getElementById('table-global-ranking');
-        table.innerHTML = '<tr><td style="padding:20px;">Carregando dados da nuvem...</td></tr>';
-        
-        get(ref(db, 'global_players')).then((snap) => {
-            table.innerHTML = '<tr><th title="Posição Global">#</th><th title="Nome do Jogador">Nome</th><th title="Pontuação Total">Pts</th><th title="Torneios Jogados">J</th><th title="Títulos de Campeão">Títulos</th></tr>';
-            const data = snap.val();
-            if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking global ainda.</td></tr>'; return; }
-            
-            const rankArr = Object.values(data).sort((a,b) => (b.points - a.points) || (b.wins - a.wins));
-            rankArr.forEach((p, i) => { 
-                const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; 
-                tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left; font-weight:bold;">${p.name}</td><td style="color:var(--primary); font-size:1.1em; font-weight:bold;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; 
-                table.appendChild(tr); 
-            });
-        }).catch(err => {
-            table.innerHTML = `<tr><td style="padding:20px; color:red;">Erro ao carregar: ${err.message}</td></tr>`;
-        });
-    }
-
-    window.switchTab = (tabName) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if(tabName === 'tournaments') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-tournaments').classList.add('active'); } else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-ranking').classList.add('active'); loadRanking(); } }
-    window.showScreen = (id) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-
-    window.switchAppView = (view) => {
-        document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        
-        if(view === 'queue') { 
-            document.querySelectorAll('.app-tab')[0].classList.add('active'); 
-            document.getElementById('view-queue').classList.add('active'); 
-        }
-        else if(view === 'groups') { 
-            document.querySelectorAll('.app-tab')[1].classList.add('active'); 
-            document.getElementById('view-groups').classList.add('active'); 
-        }
-        else if(view === 'bracket') { 
-            document.querySelectorAll('.app-tab')[2].classList.add('active'); 
-            document.getElementById('view-bracket').classList.add('active'); 
-        }
-    }
-
-    function loadArenas() {
-        onValue(ref(db, 'arenas'), (snap) => {
-            const list = document.getElementById('grid-arenas'); list.innerHTML = '';
-            const data = snap.val(); if(!data) return; 
-            
-            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
-            const keys = Object.keys(data).sort((a,b) => { const favA = favorites[a] ? 1 : 0; const favB = favorites[b] ? 1 : 0; return favB - favA; });
-            
-            keys.forEach(key => { 
-                const d = data[key]; 
-                list.appendChild(createCard(key, d, d.img, isMaster, 'arena', () => enterArena(key, d))); 
-            });
-        });
-    }
-
-    function createCard(id, d, imgOrClass, isOwner, type, onClick, subtitle='') {
-        const name = d.name;
-        const div = document.createElement('div'); div.className = 'std-card'; let content = '';
-        if(type === 'category') { const bgClass = `bg-${imgOrClass.type}`; content = `<div class="cat-card-content ${bgClass}">${imgOrClass.short}</div>`; } 
-        else if (type === 'tournament') { content = `<div class="cat-card-content bg-tourney"><span class="material-icons">emoji_events</span></div>`; } 
-        else { content = `<img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">`; }
-        const isFav = favorites[id]; const heartIcon = isFav ? 'favorite' : 'favorite_border'; const heartClass = isFav ? 'card-fav active' : 'card-fav'; const heartHTML = (type === 'arena') ? `<span class="material-icons ${heartClass}" onclick="toggleFavorite('${id}', event)">${heartIcon}</span>` : '';
-        const managersSafe = d.managers ? d.managers.replace(/'/g,"\\'") : '';
-        
-        div.innerHTML = `${content}${heartHTML}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}', '${managersSafe}'); event.stopPropagation()" title="Editar">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()" title="Excluir">✕</div></div>` : ''}`;
-        div.onclick = onClick; return div;
-    }
-
-    window.enterArena = (id, data) => { 
-        curArenaId = id; 
-        curArenaData = data;
-        document.getElementById('title-arena').innerText = data.name; 
-        document.getElementById('btn-add-cat').style.display = hasEditPermission(data.owner, data.managers) ? 'flex' : 'none'; 
-        showScreen('screen-categories'); 
-        loadCategories(id); 
-    }
-    
-    function loadCategories(arenaId) { 
-        onValue(ref(db, `categories/${arenaId}`), (snap) => { 
-            const list = document.getElementById('grid-categories'); list.innerHTML = ''; 
-            const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; } 
-            Object.keys(data).forEach(key => { 
-                const d = data[key]; 
-                const isOwner = hasEditPermission(curArenaData?.owner, curArenaData?.managers); 
-                list.appendChild(createCard(key, d, {type: d.type, short: d.short}, isOwner, 'category', () => enterCategory(key, d))); 
-            }); 
-        }); 
-    }
-    
-    window.enterCategory = (id, data) => { 
-        curCatId = id; 
-        curCatData = data; 
-        document.getElementById('title-cat').innerText = data.name; 
-        document.getElementById('btn-add-tourney').style.display = hasEditPermission(curArenaData?.owner, curArenaData?.managers) ? 'flex' : 'none'; 
-        switchTab('tournaments'); 
-        showScreen('screen-tournaments'); 
-        loadTournaments(id); 
-    }
-    
-    function loadTournaments(catId) { 
-        onValue(ref(db, `tournaments_meta/${catId}`), (snap) => { 
-            const list = document.getElementById('grid-tournaments'); list.innerHTML = ''; 
-            const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; } 
-            Object.keys(data).forEach(key => { 
-                const d = data[key]; 
-                const isOwner = hasEditPermission(curArenaData?.owner, curArenaData?.managers); 
-                const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : ''); 
-                list.appendChild(createCard(key, d, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub)); 
-            }); 
-        }); 
-    }
-    
-    function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th title="Posição Geral">#</th><th title="Nome do Jogador">Nome</th><th title="Pontuação Total">Pts</th><th title="Jogos Disputados">J</th><th title="Vitórias">V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-size:1.1em; font-weight:bold;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
-
-    window.enterApp = (tId, name, pwd, ownerId) => {
-        curTourneyId = tId; document.getElementById('t-title-header').innerText = name; showScreen('screen-app');
-        
-        const isOwner = hasEditPermission(curArenaData ? curArenaData.owner : ownerId, curArenaData ? curArenaData.managers : '');
-        if(isOwner) { 
-            document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; 
-        } else { 
-            document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
-        }
-        switchAppView('groups'); 
-        
-        if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
-        
-        onValue(appRef, (snap) => {
-            document.getElementById('loading').style.display = 'none'; const d = snap.val();
-            if(d) { 
-                appState = d; 
-                ['players','groups','matches'].forEach(k => {
-                    if(!appState[k]) appState[k]=[];
-                    else if(!Array.isArray(appState[k])) appState[k] = Object.values(appState[k]);
-                });
-            } else { 
-                appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
-            }
-            if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
-                appState.groupCount = appState.groups ? appState.groups.length : 0;
-            }
-            recalc(); 
-            renderApp();
-        });
-    }
-
-    window.exitApp = () => { if(appRef) off(appRef); showScreen('screen-tournaments'); }
-    window.shareLink = () => { const url = `${window.location.origin}${window.location.pathname}#${curArenaId}/${curCatId}/${curTourneyId}`; navigator.clipboard.writeText(url).then(() => alert("Link copiado!")); }
-    
-    // NOVA FUNÇÃO DE FOTO PRO WHATSAPP
-    window.exportWhatsApp = async (containerId, fileName) => {
-        const el = document.getElementById(containerId);
-        if(!el || el.innerHTML.trim() === '') return alert("Nada gerado para exportar.");
-
-        document.body.classList.add('viewer-mode'); 
-        const originalBg = el.style.background;
-        el.style.background = '#f4f6f8'; 
-        el.style.padding = '10px';
-
-        try {
-            document.getElementById('loading').style.display = 'flex';
-            const loadText = document.getElementById('loading-text');
-            const origText = loadText ? loadText.innerText : '';
-            if(loadText) loadText.innerText = 'Gerando Imagem...';
-
-            const canvas = await html2canvas(el, { scale: 2, useCORS: true });
-            
-            document.body.classList.remove('viewer-mode');
-            el.style.background = originalBg;
-            el.style.padding = '0';
-            document.getElementById('loading').style.display = 'none';
-            if(loadText) loadText.innerText = origText;
-
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], `${fileName}.png`, { type: 'image/png' });
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            title: 'BT Manager',
-                            text: 'Segue a tabela atualizada do nosso torneio! 🎾',
-                            files: [file]
-                        });
-                    } catch (e) { console.log('Compartilhamento cancelado.'); }
-                } else {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url; a.download = `${fileName}.png`; a.click();
-                    URL.revokeObjectURL(url);
-                    alert("Imagem salva! Agora basta enviar no WhatsApp.");
-                }
-            }, 'image/png');
-        } catch (e) {
-            document.body.classList.remove('viewer-mode');
-            document.getElementById('loading').style.display = 'none';
-            alert("Erro ao criar imagem: " + e.message);
-        }
-    };
-
-    window.openFinalsModal = () => { 
-        document.getElementById('modal-finals').style.display = 'flex'; 
-        const fills = [
-            document.getElementById('sel-win-1a'), document.getElementById('sel-win-1b'), 
-            document.getElementById('sel-win-2a'), document.getElementById('sel-win-2b'), 
-            document.getElementById('sel-win-3a'), document.getElementById('sel-win-3b'), 
-            document.getElementById('sel-win-4a'), document.getElementById('sel-win-4b'),
-            document.getElementById('sel-q-1a'), document.getElementById('sel-q-1b'),
-            document.getElementById('sel-q-2a'), document.getElementById('sel-q-2b'),
-            document.getElementById('sel-q-3a'), document.getElementById('sel-q-3b'),
-            document.getElementById('sel-q-4a'), document.getElementById('sel-q-4b')
-        ]; 
-        fills.forEach(s => { 
-            s.innerHTML = '<option value="">Selecione...</option>'; 
-            appState.players.forEach(p => s.innerHTML += `<option value="${p.id}">${p.name}</option>`); 
-        }); 
-    }
-    
-    window.submitPoints = async () => { 
-        if(!curCatData || !curCatData.points) return alert("Erro na configuração da categoria. Por favor, edite a categoria e insira os pontos."); 
-        
-        const p1_id_a = document.getElementById('sel-win-1a').value; 
-        const p1_id_b = document.getElementById('sel-win-1b').value; 
-        const p2_id_a = document.getElementById('sel-win-2a').value; 
-        const p2_id_b = document.getElementById('sel-win-2b').value; 
-        const p3_id_a = document.getElementById('sel-win-3a').value; 
-        const p3_id_b = document.getElementById('sel-win-3b').value; 
-        const p4_id_a = document.getElementById('sel-win-4a').value; 
-        const p4_id_b = document.getElementById('sel-win-4b').value; 
-        
-        const q_ids = [
-            document.getElementById('sel-q-1a').value, document.getElementById('sel-q-1b').value,
-            document.getElementById('sel-q-2a').value, document.getElementById('sel-q-2b').value,
-            document.getElementById('sel-q-3a').value, document.getElementById('sel-q-3b').value,
-            document.getElementById('sel-q-4a').value, document.getElementById('sel-q-4b').value
-        ].filter(Boolean);
-        
-        if(!p1_id_a && !p1_id_b) return alert("Selecione pelo menos um campeão."); 
-        
-        update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); 
-        
-        const rankRef = ref(db, `rankings/${curCatId}`); 
-        const snap = await get(rankRef); 
-        let localRanking = snap.val() || {}; 
-        let globalUpdates = {};
-        
-        for (let p of appState.players) {
-            let pts = 0;
-            let isChamp = false;
-            
-            if(p.id === p1_id_a || p.id === p1_id_b) { pts = curCatData.points.p1 || 0; isChamp = true; }
-            else if(p.id === p2_id_a || p.id === p2_id_b) pts = curCatData.points.p2 || 0;
-            else if(p.id === p3_id_a || p.id === p3_id_b) pts = curCatData.points.p3 || 0;
-            else if(p.id === p4_id_a || p.id === p4_id_b) pts = curCatData.points.p4 || 0;
-            else if(q_ids.includes(p.id)) pts = curCatData.points.quartas || 0;
-            else pts = curCatData.points.part || 0;
-
-            const localKey = p.name.replace(/[.#$/[\]]/g, ""); 
-            if(!localRanking[localKey]) localRanking[localKey] = { name: p.name, points: 0, tournaments: 0, wins: 0 }; 
-            localRanking[localKey].points += pts; 
-            localRanking[localKey].tournaments += 1; 
-            if(isChamp) localRanking[localKey].wins += 1; 
-
-            if(p.phone && p.phone.length >= 10) {
-                const gSnap = await get(ref(db, `global_players/${p.phone}`));
-                let gData = gSnap.val() || { name: p.name, points: 0, tournaments: 0, wins: 0 };
-                gData.points += pts;
-                gData.tournaments += 1;
-                if(isChamp) gData.wins += 1;
-                gData.name = p.name; 
-                globalUpdates[`global_players/${p.phone}`] = gData;
-            }
-        }
-        
-        await set(rankRef, localRanking); 
-        
-        if(Object.keys(globalUpdates).length > 0) {
-            await update(ref(db), globalUpdates);
-        }
-        
-        alert("🏆 Torneio encerrado! Ranking Local e Global atualizados com sucesso."); 
-        document.getElementById('modal-finals').style.display = 'none'; 
-    }
-
-    window.openConfigKnockout = () => {
-        const div = document.getElementById('knockout-config-list');
-        div.innerHTML = '';
-        appState.groups.forEach(g => {
-            if(g.id.includes('ko')) return;
-            div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="2" min="0"></div>`;
-        });
-        document.getElementById('modal-knockout').style.display = 'flex';
-    }
-
-    window.resetKnockout = () => {
-        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
-        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-        save(); renderApp(); switchAppView('groups');
-    }
-
-    window.execKnockout = () => {
-        let qualified = [];
-        
-        appState.groups.forEach(g => {
-            if(g.id.includes('ko')) return;
-            const n = parseInt(document.getElementById(`ko-n-${g.id}`).value) || 0;
-            if(n > 0) {
-                const ps = appState.players.filter(p=>p.groupId===g.id);
-                
-                const sortedPs = [...ps].sort((a, b) => {
-                    if (b.pts !== a.pts) return b.pts - a.pts;
-                    if (b.bal !== a.bal) return b.bal - a.bal;
-                    const aGA = a.gameAvg || 0;
-                    const bGA = b.gameAvg || 0;
-                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-                    if (b.wins !== a.wins) return b.wins - a.wins;
-                    return a.name.localeCompare(b.name);
-                });
-                
-                qualified.push(...sortedPs.slice(0, n));
-            }
-        });
-
-        if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
-
-        const regularGroups = appState.groups.filter(g => !g.id.includes('ko'));
-        const groupSizes = new Set(regularGroups.map(g => appState.players.filter(p => p.groupId === g.id).length));
-        const diffSizes = groupSizes.size > 1;
-
-        if (diffSizes) {
-            qualified.sort((a,b) => {
-                const aWinPct = a.games > 0 ? a.wins / a.games : 0;
-                const bWinPct = b.games > 0 ? b.wins / b.games : 0;
-                if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
-                const aGA = a.gameAvg || 0;
-                const bGA = b.gameAvg || 0;
-                return bGA - aGA;
-            });
-        } else {
-            qualified.sort((a,b) => b.pts - a.pts || b.bal - a.bal || b.wins - a.wins);
-        }
-
-        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-
-        let finalSeeds = [];
-        if (appState.mode === 'individual') {
-            if (qualified.length % 2 !== 0) return alert("Para formar duplas no Mata-Mata Individual, o número total de classificados deve ser par (ex: 4, 8, 16).");
-            
-            let pool = [...qualified];
-            while (pool.length > 0) {
-                let pA = pool.shift(); 
-                let bIndex = pool.findIndex(p => p.groupId !== pA.groupId); 
-                if (bIndex === -1) bIndex = 0; 
-                let pB = pool.splice(bIndex, 1)[0]; 
-                finalSeeds.push({ isPair: true, pA: pA, pB: pB });
-            }
-        } else {
-            finalSeeds = qualified.map(q => ({ isPair: false, pA: q, pB: null }));
-        }
-
-        let size = 2;
-        while(size < finalSeeds.length) size *= 2;
-        
-        const gid = `g-ko-${Date.now()}`;
-        appState.groups.push({ id: gid, name: `MATA-MATA (Chave de ${size})` });
-
-        let seeds = new Array(size).fill(null);
-        for(let i=0; i<finalSeeds.length; i++) seeds[i] = finalSeeds[i];
-
-        let pairingOrder = [];
-        if(size === 2) pairingOrder = [0, 1];
-        else if(size === 4) pairingOrder = [0, 3, 1, 2]; 
-        else if(size === 8) pairingOrder = [0, 7, 3, 4, 2, 5, 1, 6]; 
-        else if(size === 16) pairingOrder = [0, 15, 7, 8, 4, 11, 3, 12, 2, 13, 5, 10, 6, 9, 1, 14];
-
-        let koMatches = [];
-        let totalRounds = Math.log2(size);
-        
-        for(let i=0; i<pairingOrder.length; i+=2) {
-            const seedA = seeds[pairingOrder[i]];
-            const seedB = seeds[pairingOrder[i+1]];
-            
-            let m = {
-                mid: 'm' + Date.now() + Math.random().toString().substr(2, 3) + i, 
-                gid: gid, round: 1, pos: i/2, 
-                p1: seedA ? seedA.pA.id : 'BYE', p2: seedA ? (seedA.isPair ? seedA.pB.id : seedA.pA.id) : 'BYE',
-                p3: seedB ? seedB.pA.id : 'BYE', p4: seedB ? (seedB.isPair ? seedB.pB.id : seedB.pA.id) : 'BYE',
-                s1:'', s2:'', saved: false, isBye: (!seedA || !seedB)
-            };
-            koMatches.push(m);
-        }
-
-        let matchesInRound = size / 2;
-        for(let r=2; r<=totalRounds; r++) {
-            matchesInRound /= 2;
-            for(let i=0; i<matchesInRound; i++) {
-                koMatches.push({ mid: 'm-r' + r + '-' + i + '-' + Date.now(), gid: gid, round: r, pos: i, p1: '', p2: '', p3: '', p4: '', s1:'', s2:'', saved: false, isBye: false });
-            }
-        }
-        
-        koMatches.push({ mid: 'm-3rd-' + Date.now(), gid: gid, round: totalRounds, isThirdPlace: true, p1: '', p2: '', p3: '', p4: '', s1:'', s2:'', saved: false, isBye: false });
-
-        appState.matches.push(...koMatches);
-
-        koMatches.forEach(m => {
-            if (m.isBye) {
-                if (m.p3 === 'BYE' && m.p1 !== 'BYE') { m.s1 = 6; m.s2 = 0; m.saved = true; advanceWinner(m.mid, m, 6, 0); } 
-                else if (m.p1 === 'BYE' && m.p3 !== 'BYE') { m.s1 = 0; m.s2 = 6; m.saved = true; advanceWinner(m.mid, m, 0, 6); }
-            }
-        });
-        
-        document.getElementById('modal-knockout').style.display = 'none';
-        save();
-        alert("Chave Gerada!");
-        switchAppView('bracket');
-    }
-
-    window.genMatches = (gid) => { 
-        const existing = appState.matches.filter(m => m.gid === gid);
-        if(existing.length > 0) return alert("Já existem jogos.");
-        const ps=appState.players.filter(p=>p.groupId===gid); 
-        if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
-        let roundMatches = [];
-        
-        if(appState.mode==='fixed') { 
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } 
-        } 
-        else if(ps.length===4) { 
-            roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); 
-            roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); 
-            roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); 
-        }
-        else if(ps.length===5) { 
-            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ 
-                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); 
-            }); 
-        } 
-        else if(ps.length===6) { 
-            [[0,1,2,3], [0,4,1,5], [2,4,3,5], [0,2,1,4], [0,5,3,4], [1,3,2,5], [0,3,1,2], [4,5,0,1]].forEach(r=>{ 
-                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); 
-            }); 
-        }
-        else if(ps.length===7) {
-            [[0,1,2,3], [0,2,1,4], [0,3,1,5], [0,4,2,5], [0,5,3,4], [0,6,1,2], [1,3,4,6], [1,6,2,4], [2,6,3,5], [3,6,4,5], [5,6,0,1]].forEach(r=>{ 
-                roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); 
-            });
-        }
-        else { 
-            let pairs = [];
-            for (let i = 0; i < ps.length; i++) {
-                for (let j = i + 1; j < ps.length; j++) {
-                    pairs.push({ p1: ps[i].id, p2: ps[j].id });
-                }
-            }
-            let used = new Array(pairs.length).fill(false);
-            for (let i = 0; i < pairs.length; i++) {
-                if (used[i]) continue;
-                let pA = pairs[i];
-                used[i] = true;
-                let found = false;
-                for (let j = i + 1; j < pairs.length; j++) {
-                    if (!used[j]) {
-                        let pB = pairs[j];
-                        if (pA.p1 !== pB.p1 && pA.p1 !== pB.p2 && pA.p2 !== pB.p1 && pA.p2 !== pB.p2) {
-                            roundMatches.push({ p1: pA.p1, p2: pA.p2, p3: pB.p1, p4: pB.p2 });
-                            used[j] = true;
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                if (!found) {
-                    for (let j = 0; j < pairs.length; j++) {
-                        if (j !== i) {
-                            let pB = pairs[j];
-                            if (pA.p1 !== pB.p1 && pA.p1 !== pB.p2 && pA.p2 !== pB.p1 && pA.p2 !== pB.p2) {
-                                roundMatches.push({ p1: pA.p1, p2: pA.p2, p3: pB.p1, p4: pB.p2 });
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        } 
-        
-        roundMatches.forEach(m => { addMatch(gid, m.p1, m.p2, m.p3, m.p4, false); });
-        save(); renderApp();
-    }
-    
-    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
-
-    window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); renderApp(); }
-    
-    function getOptimizedMatchOrder(matches) {
-        let groupMatches = matches.filter(m => !m.gid.includes('ko') && !m.isBye);
-        let pending = groupMatches.map((m, originalIndex) => ({ m, originalIndex }));
-        let scheduled = []; let lastPlayed = {}; 
-        while(pending.length > 0) {
-            let bestIdx = -1; let maxScore = -Infinity;
-            for(let i = 0; i < pending.length; i++) {
-                let item = pending[i]; let m = item.m; let p = [m.p1, m.p2, m.p3, m.p4].filter(x => x && x !== 'd');
-                let minWait = Infinity;
-                for(let pid of p) { let last = lastPlayed[pid] !== undefined ? lastPlayed[pid] : -100; let wait = scheduled.length - last; if(wait < minWait) minWait = wait; }
-                let score = minWait * 1000 - item.originalIndex;
-                if(score > maxScore) { maxScore = score; bestIdx = i; }
-            }
-            let selected = pending.splice(bestIdx, 1)[0]; scheduled.push(selected.m);
-            let p = [selected.m.p1, selected.m.p2, selected.m.p3, selected.m.p4].filter(x => x && x !== 'd');
-            for(let pid of p) { lastPlayed[pid] = scheduled.length - 1; }
-        }
-        return scheduled;
-    }
-
-    window.saveScore = async (mid, type, btnElement) => { 
-        const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
-        if(matchIndex === -1) return;
-        const m = appState.matches[matchIndex];
-
-        if(m.saved) { if(confirm("Deseja alterar o placar deste jogo já finalizado?")) { m.saved = false; recalc(); save(); renderApp(); } return; }
-
-        let container = btnElement.parentElement;
-        if (btnElement.closest('tr')) container = btnElement.closest('tr');
-        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
-        if (btnElement.closest('.queue-match-item')) container = btnElement.closest('.queue-match-item');
-        
-        let inputs = container.querySelectorAll('input[type="tel"]');
-        let val1 = inputs[0] ? inputs[0].value : ''; let val2 = inputs[1] ? inputs[1].value : '';
-        if(val1 === '' || val2 === '') { alert(`Preencha o placar.`); return; }
-        
-        let s1 = parseInt(val1); let s2 = parseInt(val2);
-        if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
-        
-        m.s1 = s1; m.s2 = s2; m.saved = true;
-        recalc(); if(m.gid.includes('ko')) advanceWinner(mid, m, s1, s2); save(); renderApp(); 
-    }
-
-    function advanceWinner(mid, currentMatch, s1, s2) {
-        const koMatches = appState.matches.filter(m => m.gid === currentMatch.gid);
-        if(!currentMatch.round) return; 
-        let w1, w2, l1, l2;
-        if(s1 > s2) { w1 = currentMatch.p1; w2 = currentMatch.p2; l1 = currentMatch.p3; l2 = currentMatch.p4; } 
-        else { w1 = currentMatch.p3; w2 = currentMatch.p4; l1 = currentMatch.p1; l2 = currentMatch.p2; }
-        const nextRound = currentMatch.round + 1; const nextPos = Math.floor(currentMatch.pos / 2);
-        
-        const targetMatch = koMatches.find(m => m.round === nextRound && m.pos === nextPos && !m.isThirdPlace);
-        if(targetMatch) {
-            const globalTargetIndex = appState.matches.findIndex(m => m.mid === targetMatch.mid);
-            if(globalTargetIndex > -1) {
-                if(currentMatch.pos % 2 === 0) { appState.matches[globalTargetIndex].p1 = w1; appState.matches[globalTargetIndex].p2 = w2; } 
-                else { appState.matches[globalTargetIndex].p3 = w1; appState.matches[globalTargetIndex].p4 = w2; }
-            }
-        }
-
-        const regularMatchesInNextRound = koMatches.filter(m => m.round === nextRound && !m.isThirdPlace).length;
-        if(regularMatchesInNextRound === 1) {
-            const thirdPlaceMatch = koMatches.find(m => m.isThirdPlace === true);
-            if(thirdPlaceMatch) {
-                const tIdx = appState.matches.findIndex(m => m.mid === thirdPlaceMatch.mid);
-                if(tIdx > -1) {
-                    if(currentMatch.pos % 2 === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
-                    else { appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2; }
-                }
-            }
-        }
-    }
-
-    window.editS = async (mid) => { if(!confirm("Editar placar?")) return; const mIdx = appState.matches.findIndex(x => x.mid === mid); if(mIdx > -1) { appState.matches[mIdx].saved = false; save(); renderApp(); } }
-    
-    window.delM = (mid, e) => { 
-        try {
-            if(e) e.stopPropagation();
-            if(confirm("Excluir Jogo?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); renderApp(); } 
-        } catch(err) { alert("Erro ao apagar jogo: " + err.message); }
-    }
-    
-    function recalc() { 
-        appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
-        appState.matches.forEach(m => { 
-            if(m.saved && !m.isBye && !m.gid.includes('ko')) { 
-                const run = (id, my, op) => { 
-                    const pl = appState.players.find(x => x.id === id); 
-                    if(pl) { pl.games++; pl.bal += my - op; pl.gamesWon += my; pl.gamesPlayed += (my + op); if(my > op) { pl.wins++; pl.pts += 3; } } 
-                }; 
-                run(m.p1, m.s1, m.s2); run(m.p3, m.s2, m.s1); 
-                if(appState.mode === 'individual'){ run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); } 
-            }
-        }); 
-        appState.players.forEach(p => { p.gameAvg = p.manualGA !== undefined ? p.manualGA : (p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0); });
-    }
-    
-    // V182: A ROLETA AGORA FUNCIONA NESTE BOTÃO "DISTRIBUIR"
-    window.distribute = () => { 
-        const pool=appState.players.filter(p=>p.groupId==='pool'); 
-        if(!pool.length) return alert("Não há reservas para distribuir.");
-        if(!appState.groups.length) return alert("Crie pelo menos 1 grupo primeiro.");
-        if(!confirm("Efetuar sorteio e distribuir jogadores nos grupos?")) return;
-
-        const modal = document.getElementById('modal-sorteio');
-        const text = document.getElementById('sorteio-text');
-        
-        if (modal && text) {
-            modal.style.display = 'flex';
-            let ticks = 0; const speed = 100;
-            
-            const interval = setInterval(() => {
-                text.innerText = pool[Math.floor(Math.random() * pool.length)].name;
-                ticks++;
-                if (ticks > 25) { 
-                    clearInterval(interval);
-                    modal.style.display = 'none';
-                    
-                    pool.forEach(p=>{ 
-                        appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); 
-                        if(appState.groups.length) p.groupId=appState.groups[0].id; 
-                    }); 
-                    save(); renderApp(); 
-                }
-            }, speed);
-        } else {
-            pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); 
-            save(); renderApp(); 
-        }
-    }
 
     function renderApp() {
         appState.players.forEach(p => { p.tempGroupRank = null; p.tempGroupName = null; });
         appState.groups.forEach(g => {
             if (!g.id.includes('ko-')) {
                 let ps = appState.players.filter(p=>p.groupId===g.id);
-                ps = [...ps].sort((a, b) => {
-                    if (b.pts !== a.pts) return b.pts - a.pts;
-                    if (b.bal !== a.bal) return b.bal - a.bal;
-                    const aGA = a.gameAvg || 0; const bGA = b.gameAvg || 0;
-                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-                    if (b.wins !== a.wins) return b.wins - a.wins;
-                    return a.name.localeCompare(b.name);
+                ps = sortPlayersCBT(ps, appState.matches);
+                ps.forEach((p, ix) => {
+                    p.tempGroupRank = ix + 1;
+                    p.tempGroupName = g.name;
                 });
-                ps.forEach((p, ix) => { p.tempGroupRank = ix + 1; p.tempGroupName = g.name; });
             }
         });
 
@@ -1276,14 +444,7 @@
 
         appState.groups.forEach((g,i) => {
             let ps = appState.players.filter(p=>p.groupId===g.id);
-            ps = [...ps].sort((a, b) => {
-                if (b.pts !== a.pts) return b.pts - a.pts;
-                if (b.bal !== a.bal) return b.bal - a.bal;
-                const aGA = a.gameAvg || 0; const bGA = b.gameAvg || 0;
-                if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return a.name.localeCompare(b.name);
-            });
+            ps = sortPlayersCBT(ps, appState.matches);
             const ms = appState.matches.filter(m=>m.gid===g.id);
             const col = document.createElement('div'); 
             col.className='group-box'; 
@@ -1291,7 +452,7 @@
             
             if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:15px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Chave">✕</span></div></div>`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Chave">✕</span></div></div>`;
                 
                 h += `<div class="ko-list">`;
                 
@@ -1456,7 +617,7 @@
                 }
                 
                 h += `</div>`;
-                if(bc) bc.innerHTML = h;
+                document.getElementById('bracket-container').innerHTML = h;
                 
             } else {
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="exportWhatsApp('${g.id}', '${g.name.replace(/ /g, '_')}')" style="cursor:pointer; margin-right:15px; padding:5px;" title="Tirar Print deste Grupo">📸</span><span onclick="renameGroup('${g.id}', event)" style="margin-right:15px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
@@ -1514,7 +675,7 @@
                 genCol.style.width = '100%';
                 
                 let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:space-between; display:flex;">
-                    <span>🏆 CLASSIFICAÇÃO GERAL</span>
+                    <span>🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</span>
                     <span class="admin-only" style="cursor:pointer; padding: 0 5px;" onclick="exportWhatsApp('general-ranking-container-box', 'Ranking_Geral')" title="Tirar Print">📸</span>
                 </div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
@@ -1535,7 +696,13 @@
                 });
                 thHtml += `</table>`;
                 genCol.innerHTML = thHtml;
-                gc.appendChild(genCol);
+                
+                const grc = document.getElementById('general-ranking-container');
+                if (grc) {
+                    grc.replaceWith(genCol);
+                } else {
+                    gc.appendChild(genCol);
+                }
             }
         }
 
