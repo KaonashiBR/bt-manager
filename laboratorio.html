@@ -3,389 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#004e98">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BT Lab">
+    <meta name="theme-color" content="#9c27b0">
+    <title>BT Manager - LABORATÓRIO 🧪</title>
     <link rel="apple-touch-icon" href="./icone.png">
     <link rel="manifest" href="manifest.json">
-    
-    <title>BT Manager - AMBIENTE DE TESTE</title>
-    
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
-        /* BASE & VARS */
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
-        
-        /* NAVBAR */
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #9c27b0; }
-        .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-        .nav-logo span { font-size: 1.4em; }
+        .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .nav-user { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 4px; border-radius: 20px; }
         .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #ddd; object-fit: cover; }
         .user-name { font-size: 0.9em; font-weight: 600; color: #555; display: none; }
-        @media(min-width: 600px) { .user-name { display: block; } .nav-logo { font-size: 1.3em; } }
-
-        /* SCREENS */
+        @media(min-width: 600px) { .user-name { display: block; } }
         .screen { display: none; flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 120px; box-sizing: border-box; }
         .screen.active { display: flex; flex-direction: column; }
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; width: 100%; }
-        
-        /* CARDS */
-        .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s; }
-        .std-card:active { transform: scale(0.97); }
-        .std-card.selected { border: 3px solid var(--primary); transform: scale(0.95); background: #fff3e0; }
-        .card-img { width: 100%; height: 100%; object-fit: cover; }
+        .std-card { background: white; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; }
         .card-overlay { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); padding: 30px 10px 10px; color: white; }
-        .card-title { font-weight: 700; font-size: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); line-height: 1.2; }
-        .card-subtitle { font-size: 0.9em; opacity: 0.8; margin-top: 2px; }
-        .cat-card-content { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; color: white; font-weight: 900; font-size: 4.5em; text-shadow: 2px 2px 5px rgba(0,0,0,0.3); }
-        .bg-masc { background: var(--blue-masc); } .bg-fem { background: var(--pink-fem); } .bg-mista { background: linear-gradient(135deg, var(--blue-masc) 50%, var(--pink-fem) 50%); }
-        .bg-tourney { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); display: flex; justify-content: center; align-items: center; }
-        .bg-tourney .material-icons { font-size: 4.5em; color: white; opacity: 0.3; }
-        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 5px; z-index: 10; }
-        .btn-icon-circle { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.95); color: #333; display: flex; justify-content: center; align-items: center; font-size: 1.1em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; border: 1px solid #ddd; }
-        .card-fav { position: absolute; top: 10px; left: 10px; z-index: 10; color: rgba(255,255,255,0.7); text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.6em; transition: transform 0.2s; }
-        .card-fav.active { color: var(--fav-color); transform: scale(1.1); text-shadow: 0 0 10px rgba(255,0,0,0.5); }
-
-        /* UI */
+        .card-title { font-weight: 700; font-size: 1.2em; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .section-title { font-size: 1.5em; font-weight: 800; color: #222; margin: 0; }
-        .back-btn { display: flex; align-items: center; gap: 5px; color: #666; cursor: pointer; font-weight: 600; font-size: 1em; margin-bottom: 15px;}
         .status-bar { background: #333; color: white; padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.9em; font-weight: bold; }
-        button.btn-std { border: none; border-radius: 4px; padding: 12px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; font-size: 0.95em; width: 100%; margin-bottom: 5px; }
+        button.btn-std { border: none; border-radius: 4px; padding: 12px 15px; font-weight: 700; text-transform: uppercase; color: white; cursor: pointer; width: 100%; margin-bottom: 5px; }
         .btn-org { background: var(--primary); } .btn-blue { background: var(--secondary); } .btn-red { background: #d32f2f; } .btn-green { background: #2e7d32; } .btn-gold { background: #FFD700; color: black; } .btn-dark { background: #444; }
-        input.inp-std, select.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
-        .btn-add-float { position: fixed; bottom: 60px; right: 20px; width: 64px; height: 64px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5em; box-shadow: 0 4px 10px rgba(255, 107, 0, 0.4); border: none; cursor: pointer; z-index: 900; }
-        
-        /* TABLES & LISTS */
-        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
-        .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
-        .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
-        .bt-table tr:nth-child(even) { background: #f9f9f9; }
-        .bt-table th[title], .bt-table td[title] { cursor: help; }
-        
-        .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; background: white; color: black; }
-        .tbl-input:disabled { border: none; background: transparent; color: #555; }
-        
-        .pool-card { background: white; border-radius: 4px; border: 1px solid #ddd; padding: 8px 10px; font-size: 0.9em; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.1s; margin-bottom: 4px; }
-        .pool-card:hover { border-color: var(--primary); }
-        .pool-card.selected { border: 2px solid var(--primary); background: #fff3e0; }
-
-        /* GROUP BOX */
-        .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
-        .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 1em; }
-        .group-header:hover { opacity: 0.9; }
-
-        /* LAYOUT BOARD */
-        .board { display: grid; grid-template-columns: 1fr; gap: 15px; }
-        #col-pool { background:white; border-radius:8px; border:1px solid #ccc; padding-bottom:5px; width: 100%; max-height: 300px; overflow-y: auto; }
-        #groups-container { display: flex; flex-direction: column; gap: 15px; }
-
-        @media(min-width: 1100px) { 
-            .board { grid-template-columns: 200px 1fr; align-items: start; } 
-            #col-pool { position: sticky; top: 75px; max-height: 85vh; }
-            #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
-            .group-box { flex: unset; width: 100%; }
-        }
-
-        .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
-        .match-main-content { padding: 0 10px; }
-        .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
-        
-        .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; user-select: none; -webkit-user-select: none; }
-        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; font-size: 0.9em; border-radius: 4px; color: #666; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
-        .app-tab.active { background: white; color: var(--secondary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        
-        .view-section { display: none; } .view-section.active { display: block; }
+        input.inp-std { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px; font-size: 1em; }
+        .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: white; margin-bottom: 5px;}
+        .bt-table th, .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; font-weight: 700; }
+        .tbl-input { width: 42px; height: 42px; font-size: 1.3em; text-align: center; font-weight: 800; border: 1px solid #aaa; border-radius: 4px; }
+        .group-box { background: white; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; margin-bottom: 15px; }
+        .group-header { padding: 10px; font-weight: 800; text-align: center; color: white; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .app-tabs { display: flex; background: #ddd; margin-bottom: 10px; border-radius: 6px; padding: 4px; }
+        .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 700; border-radius: 4px; color: #666; }
+        .app-tab.active { background: white; color: var(--secondary); }
+        .admin-only { display: block; }
         .viewer-mode .admin-only { display: none !important; }
-        .viewer-mode input:not(.auth-input) { pointer-events: none; border:none; background: transparent; }
-        .player-link { cursor: pointer; border-bottom: 1px dashed #999; transition:0.2s; }
-        .player-link:hover { color: var(--primary); border-bottom-color: var(--primary); font-weight:bold; }
-        .player-link.empty { color: #999; font-style: italic; }
-        .viewer-mode .player-link { cursor: default; border-bottom: none; pointer-events: none; }
-        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 8px; font-size: 0.8em; font-weight: 500; border-top: 1px solid #333; z-index: 1000; line-height: 1.4; }
-        .app-footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+        .app-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; color: #888; text-align: center; padding: 8px; font-size: 0.8em; z-index: 1000; }
+        @keyframes pulse-tie-bg { 0% { background-color: transparent; } 50% { background-color: rgba(255, 59, 48, 0.35); border-radius: 4px; } 100% { background-color: transparent; } }
+        .blink-tie-bg { animation: pulse-tie-bg 1.5s infinite; padding: 3px 6px; display: inline-block; }
+        .ko-round-header { background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; text-align: center; }
+        .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; background: white; }
         
-        #modal-overlay, #modal-login, #modal-knockout, #modal-finals, #modal-player-select { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-        .modal-box { background: white; width: 100%; max-width: 440px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; text-align: center; }
-        .btn-login-opt { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; color: white; font-size: 1.1em; }
-        .btn-google { background: #db4437; } .btn-logout { background: #555; }
-        .rank-table { width: 100%; border-collapse: collapse; background: white; }
-        .rank-table th { background: #333; color: white; padding: 6px; font-size: 0.8em; }
-        .rank-table td { padding: 6px; border-bottom: 1px solid #eee; text-align: center; font-weight: bold; font-size: 0.9em; }
-        .rank-pos { width: 26px; height: 26px; background: #eee; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-size: 1em; }
-        .rank-1 .rank-pos { background: #FFD700; color: #000; } .rank-2 .rank-pos { background: #C0C0C0; color: #000; } .rank-3 .rank-pos { background: #CD7F32; color: #fff; }
-        
-        .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
-        .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
-        .select-item:hover { background: #e0e0e0; }
-
-        /* KNOCKOUT LIST VIEW */
-        .ko-round-header { background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; }
-        .ko-list { background: white; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
-        .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
-        .ko-match-item:last-child { border-bottom: none; }
-        .ko-player { flex: 1; text-align: center; font-weight: 600; cursor: pointer; }
-        .ko-vs { font-size: 0.8em; color: #999; margin: 0 10px; }
-        .ko-score { width: 40px; text-align: center; font-weight: 900; color: var(--primary); }
-
-        /* ANIMAÇÃO DE EMPATE ABSOLUTO */
-        @keyframes pulse-tie-bg { 
-            0% { background-color: transparent; } 
-            50% { background-color: rgba(255, 59, 48, 0.35); border-radius: 4px; } 
-            100% { background-color: transparent; } 
-        }
-        .blink-tie-bg { 
-            animation: pulse-tie-bg 1.5s infinite; 
-            padding: 3px 6px;
-            display: inline-block;
-        }
+        /* Modal Roleta */
+        #modal-sorteio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 4000; display: none; justify-content: center; align-items: center; flex-direction: column; color: white; text-align: center; }
+        .spinner-container { margin-bottom: 20px; font-size:5em; animation: bounce 0.5s infinite alternate; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
     </style>
 </head>
 <body class="viewer-mode">
 
 <div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-    <div style="font-size:3.5em;">🎾</div><b>Carregando Lab...</b>
+    <div style="font-size:3.5em;">🎾</div><b id="loading-text">Carregando Lab...</b>
+</div>
+
+<div id="modal-sorteio">
+    <div class="spinner-container">🎲</div>
+    <h2 style="color:var(--primary); margin:0 0 15px 0;">Sorteando Vagas...</h2>
+    <div id="sorteio-text" style="font-size:2em; font-weight:900; color:white;">Preparando</div>
 </div>
 
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#9c27b0; font-size:0.7em; vertical-align:super;">LABORATÓRIO 🧪</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#9c27b0; font-size:0.7em;">LAB 🧪</span></div></div>
     <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
 </div>
 
 <div id="screen-arenas" class="screen active">
-    <div class="header-bar">
-        <h2 class="section-title">Arenas (Laboratório)</h2>
-        <button onclick="showGlobalRanking()" class="btn-std btn-dark" style="width: auto; margin:0; padding: 8px 12px; font-size: 0.85em;">🌍 Ranking Global</button>
-    </div>
-    
-    <div style="background: linear-gradient(135deg, #9c27b0 0%, #4a148c 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">🧪 AMBIENTE DE TESTES</div>
-        <div style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 12px;">Tudo criado aqui não afeta os clientes reais.</div>
-        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <button id="btn-install-app" onclick="installApp()" style="display: none; background: #000; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; align-items: center; gap: 5px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><span class="material-icons" style="font-size: 1.2em;">install_mobile</span> Instalar App Lab</button>
-        </div>
-    </div>
-
+    <div class="header-bar"><h2 class="section-title">Arenas (Lab)</h2></div>
     <div id="grid-arenas" class="grid-container"></div>
-    <button id="btn-add-arena" class="btn-add-float" onclick="openModal('arena')" style="display:none;">+</button>
-    <div style="text-align:center; margin-top:55px; color:#999; font-size:0.9em;" id="msg-login">Clique no bonequinho para Login e ver as arenas completas.</div>
+    <button class="btn-std btn-dark" onclick="showGlobalRanking()" style="margin-top:20px;">🌍 Ranking Global</button>
 </div>
 
 <div id="screen-global-ranking" class="screen">
-    <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Home</div>
-    <div class="header-bar">
-        <div><h2 class="section-title">🌍 Ranking Global (Lab)</h2><div style="font-size:0.9em; color:#777;">Os melhores dos testes</div></div>
-    </div>
-    <div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-        <table class="rank-table" id="table-global-ranking">
-            <tr><td style="padding:20px;">Carregando...</td></tr>
-        </table>
-    </div>
+    <div class="back-btn" onclick="showScreen('screen-arenas')">← Voltar</div>
+    <div class="header-bar"><h2 class="section-title">🌍 Ranking Global</h2></div>
+    <table class="bt-table" id="table-global-ranking"><tr><td>Carregando...</td></tr></table>
 </div>
 
 <div id="screen-categories" class="screen">
-    <div class="back-btn" onclick="showScreen('screen-arenas')"><span class="material-icons">arrow_back</span> Voltar para Arenas</div>
-    <div class="header-bar"><div><h2 class="section-title" id="title-arena">Nome Arena</h2><div style="font-size:0.9em; color:#777;">Categorias</div></div></div>
+    <div class="back-btn" onclick="showScreen('screen-arenas')">← Voltar</div>
+    <div class="header-bar"><h2 class="section-title" id="title-arena">Arena</h2></div>
     <div id="grid-categories" class="grid-container"></div>
-    <button id="btn-add-cat" class="btn-add-cat-float btn-add-float" onclick="openModal('category')" style="display:none;">+</button>
 </div>
 
 <div id="screen-tournaments" class="screen">
-    <div class="back-btn" onclick="showScreen('screen-categories')"><span class="material-icons">arrow_back</span> Voltar para Categorias</div>
-    <div class="header-bar"><div><h2 class="section-title" id="title-cat">Categoria</h2></div></div>
-    <div class="tabs"><div class="tab active" onclick="switchTab('tournaments')">TORNEIOS</div><div class="tab" onclick="switchTab('ranking')">RANKING</div></div>
-    <div id="tab-tournaments" class="tab-content active">
-        <div id="grid-tournaments" class="grid-container"></div>
-        <button id="btn-add-tourney" class="btn-add-tourney-float btn-add-float" onclick="openModal('tournament')" style="display:none;">+</button>
-    </div>
-    <div id="tab-ranking" class="tab-content"><div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd;"><table class="rank-table" id="table-ranking"></table></div></div>
+    <div class="back-btn" onclick="showScreen('screen-categories')">← Voltar</div>
+    <div class="header-bar"><h2 class="section-title" id="title-cat">Categoria</h2></div>
+    <div class="tabs" style="display:flex;gap:10px;margin-bottom:15px;"><button class="btn-std btn-blue" onclick="switchTab('tournaments')">Torneios</button><button class="btn-std btn-dark" onclick="switchTab('ranking')">Ranking</button></div>
+    <div id="tab-tournaments" class="tab-content active"><div id="grid-tournaments" class="grid-container"></div></div>
+    <div id="tab-ranking" class="tab-content" style="display:none;"><table class="bt-table" id="table-ranking"></table></div>
 </div>
 
 <div id="screen-app" class="screen">
     <div class="status-bar">
-        <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.2em;">arrow_back</span> Sair</div>
-        <div style="display:flex; align-items:center; gap:5px;">
-            <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
-            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Compartilhar Link"><span class="material-icons">link</span></button>
-            <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;" title="Acesso Admin">🔒</button>
-        </div>
+        <div onclick="exitApp()" style="cursor:pointer;">← Sair</div>
+        <div><span id="app-status">ONLINE</span> <span onclick="tryAdmin()">🔒</span></div>
     </div>
-    <h2 id="t-title-header" style="text-align:center; margin:10px 0; text-transform:uppercase;">Torneio</h2>
     
-    <div class="admin-only" style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;">
-        
+    <div class="admin-only" style="background:white; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #ddd;">
         <div style="display:flex; gap:5px; margin-bottom:5px;">
-            <input type="tel" id="pPhone" class="inp-std auth-input" style="margin:0; width:45%; font-size:0.9em;" placeholder="Celular (Opcional)" autocomplete="off">
-            <input type="text" id="pName" class="inp-std auth-input" style="margin:0; width:55%;" placeholder="Nome da dupla/atleta..." autocomplete="off">
-            <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
+            <input type="tel" id="pPhone" class="inp-std" style="width:45%; margin:0" placeholder="Celular">
+            <input type="text" id="pName" class="inp-std" style="width:55%; margin:0" placeholder="Atleta">
+            <button class="btn-std btn-org" style="width:auto" onclick="addPlayer()">Add</button>
         </div>
-        
         <div style="display:flex; gap:5px; flex-wrap:wrap; margin-top:10px;">
             <button class="btn-std btn-blue" style="width:auto;" onclick="addGroup()">+ Grupo</button>
             <button class="btn-std btn-green" style="width:auto;" onclick="autoGroupsCBT()">⚡ Grupos CBT</button>
             <button onclick="setMode('individual')" id="btn-mod-ind" class="btn-std" style="width:auto;">Individual</button>
             <button onclick="setMode('fixed')" id="btn-mod-fix" class="btn-std" style="width:auto;">Fixas</button>
             <button onclick="openConfigKnockout()" class="btn-std btn-org" style="width:auto;">⚔️ Mata-Mata</button>
-            <button onclick="resetKnockout()" class="btn-std btn-red" style="width:auto;">❌ Excluir Mata-Mata</button>
+            <button onclick="resetKnockout()" class="btn-std btn-red" style="width:auto;">❌ Limpar MM</button>
             <button onclick="openFinalsModal()" class="btn-std btn-gold" style="width:auto;">🏆 Encerrar</button>
-            <button onclick="resetT()" class="btn-std btn-red" style="width:auto;">Reset</button>
-            <button onclick="exportData()" class="btn-std btn-dark" style="width:auto;">💾 Backup</button>
-            <button onclick="document.getElementById('import-file').click()" class="btn-std btn-dark" style="width:auto;">📂 Restaurar</button>
-            <button onclick="forceSave()" class="btn-std btn-green" style="width:auto;">✅ Salvar Tudo</button>
-            <input type="file" id="import-file" style="display:none;" accept=".json" onchange="importData(this)">
+            <button onclick="forceSave()" class="btn-std btn-green" style="width:auto;">✅ Salvar</button>
         </div>
     </div>
 
     <div class="app-tabs">
-        <div class="app-tab" onclick="switchAppView('queue')">FILA DE JOGOS</div>
+        <div class="app-tab" onclick="switchAppView('queue')">FILA</div>
         <div class="app-tab active" onclick="switchAppView('groups')">GRUPOS</div>
         <div class="app-tab" onclick="switchAppView('bracket')">MATA-MATA</div>
     </div>
 
-    <div id="view-queue" class="view-section">
-        <div class="group-box" style="border-color:var(--primary); max-width:800px; margin:0 auto;">
-            <div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🎾 FILA DA FASE DE GRUPOS</div>
-            <div id="queue-container" style="padding: 10px; background: white; border-radius: 0 0 8px 8px;"></div>
-        </div>
-    </div>
-
     <div id="view-groups" class="view-section active">
-        <div class="board">
-            <div class="column" id="col-pool">
-                <div style="background:var(--secondary); color:white; padding:8px; font-weight:bold; display:flex; justify-content:space-between; font-size:0.9em; border-radius: 8px 8px 0 0;">
-                    <span>RESERVAS (<span id="pool-cnt">0</span>)</span>
-                    <button class="admin-only btn-std" style="background:white; color:var(--secondary); width:auto; padding:0px 5px; margin:0; font-size:1em;" onclick="distribute()">Distribuir</button>
-                </div>
-                <div id="pool-list" style="padding:5px; display:flex; flex-direction:column; gap:2px;"></div>
-            </div>
-            <div id="groups-container"></div>
+        <div class="admin-only" style="display:flex; gap:5px; margin-bottom:15px;">
+            <button class="btn-std btn-dark" style="font-size:0.85em;" onclick="exportWhatsApp('groups-container', 'Todos_Os_Grupos')"><span class="material-icons" style="font-size:1.2em; vertical-align:middle">photo_camera</span> Todos Grupos</button>
+            <button class="btn-std btn-dark" style="font-size:0.85em;" onclick="exportWhatsApp('general-ranking-container', 'Ranking_Geral')"><span class="material-icons" style="font-size:1.2em; vertical-align:middle">photo_camera</span> Ranking Geral</button>
         </div>
         
-        <div id="general-ranking-container" style="margin-top: 20px; width: 100%;"></div>
+        <div style="background:var(--secondary); color:white; padding:8px; display:flex; justify-content:space-between; border-radius:8px 8px 0 0;">
+            <span>RESERVAS</span><button class="admin-only" style="color:black; padding:2px 10px; font-weight:bold; cursor:pointer;" onclick="distribute()">Sorteio</button>
+        </div>
+        <div id="pool-list" style="background:white; padding:10px; border:1px solid #ccc; border-top:none; border-radius:0 0 8px 8px; margin-bottom:15px;"></div>
+        
+        <div id="groups-container"></div>
+        <div id="general-ranking-container" style="margin-top:20px;"></div>
     </div>
+    
+    <div id="view-queue" class="view-section"><div id="queue-container"></div></div>
     
     <div id="view-bracket" class="view-section">
-        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto 40px;"></div>
+        <button class="admin-only btn-std btn-dark" onclick="exportWhatsApp('bracket-container', 'Chaveamento')" style="margin-bottom:15px; display:flex; justify-content:center; align-items:center; gap:8px;"><span class="material-icons">photo_camera</span> Compartilhar Chaves</button>
+
+        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto; background:var(--bg-body); padding:5px;"></div>
     </div>
 </div>
 
-<div class="app-footer">Todos os direitos reservados © 2026<br>Desenvolvido por <a href="https://instagram.com/lsibie" target="_blank">@LSIBIE</a></div>
-
-<div id="modal-login">
-    <div class="modal-box">
-        <h3 class="modal-title">Entrar no Sistema</h3>
-        
-        <input type="email" id="login-email" class="inp-std auth-input" placeholder="Seu e-mail" style="margin-bottom: 10px;">
-        <input type="password" id="login-pwd" class="inp-std auth-input" placeholder="Sua senha" style="margin-bottom: 15px;">
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button class="btn-std btn-blue" onclick="doEmailLogin()">Entrar</button>
-            <button class="btn-std btn-green" onclick="doEmailSignUp()">Criar Conta</button>
-        </div>
-        
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-        
-        <button class="btn-login-opt btn-google" onclick="doGoogleLogin()">Ou entre com o Google (Gmail)</button>
-        <button class="btn-login-opt btn-logout" onclick="closeLoginModal()" style="margin-top: 5px;">Cancelar</button>
+<div id="modal-login" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;justify-content:center;align-items:center;">
+    <div style="background:white;padding:20px;border-radius:12px;width:90%;max-width:400px;text-align:center;">
+        <h3>Login</h3><button class="btn-std btn-google" onclick="doGoogleLogin()">Google</button><button class="btn-std btn-red" onclick="closeLoginModal()">Cancelar</button>
     </div>
 </div>
-
-<div id="modal-player-select"><div class="modal-box"><h3 class="modal-title">Selecionar Jogador</h3><div id="select-list-container" class="select-list"></div><button class="btn-std btn-red" onclick="document.getElementById('modal-player-select').style.display='none'" style="margin-top:10px;">Cancelar</button></div></div>
-
-<div id="modal-overlay"><div class="modal-box"><h3 class="modal-title" id="modal-h3">Criar</h3><input type="hidden" id="modal-type"><input type="hidden" id="modal-id"><div id="field-common"><label class="modal-label">Nome</label><input type="text" id="inp-name" class="inp-std auth-input"></div><div id="field-arena" style="display:none;"><label class="modal-label">Imagem de Capa</label><img id="img-preview" class="preview-img" src=""><div style="display:flex;gap:10px;margin-bottom:10px;"><button class="btn-std btn-blue" onclick="document.getElementById('file-upload').click()">📂 Upload</button><input type="file" id="file-upload" accept="image/*" style="display:none" onchange="handleFileSelect(this)"></div><input type="text" id="inp-url" class="inp-std auth-input" placeholder="Ou cole o link..." oninput="updatePreview(this.value)"><label class="modal-label" style="margin-top:10px;">Administradores (E-mails separados por vírgula)</label><input type="text" id="inp-arena-managers" class="inp-std auth-input" placeholder="email@gmail.com, parceiro@gmail.com"></div>
-
-<div id="field-category" style="display:none;">
-    <label class="modal-label">Estilo</label>
-    <select id="inp-cat-type" class="inp-std auth-input"><option value="masc">Masculino (Azul)</option><option value="fem">Feminino (Rosa)</option><option value="mista">Mista (Diagonal)</option></select>
-    <label class="modal-label">Sigla</label>
-    <input type="text" id="inp-cat-short" class="inp-std auth-input">
-    
-    <label class="modal-label">Pontuação Ranking</label>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <input type="number" id="pts-1" class="inp-std auth-input" placeholder="1º (Campeão)">
-        <input type="number" id="pts-2" class="inp-std auth-input" placeholder="2º (Vice)">
-        <input type="number" id="pts-3" class="inp-std auth-input" placeholder="3º Lugar">
-        <input type="number" id="pts-4" class="inp-std auth-input" placeholder="4º Lugar">
-        <input type="number" id="pts-quartas" class="inp-std auth-input" placeholder="Quartas (5º a 8º)">
-        <input type="number" id="pts-part" class="inp-std auth-input" placeholder="Participação">
+<div id="modal-player-select" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;justify-content:center;align-items:center;">
+    <div style="background:white;padding:20px;border-radius:12px;width:90%;max-width:400px;">
+        <h3>Selecionar Atleta</h3><div id="select-list-container" style="max-height:300px;overflow-y:auto;"></div><button class="btn-std btn-red" onclick="document.getElementById('modal-player-select').style.display='none'">Cancelar</button>
     </div>
 </div>
-
-<div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
-
-<div id="modal-knockout"><div class="modal-box">
-    <h3 class="modal-title">Configurar Mata-Mata</h3>
-    <p style="font-size:0.9em;color:#666;">Classificados por grupo:</p>
-    <div id="knockout-config-list" style="max-height:40vh;overflow-y:auto;margin-bottom:10px;"></div>
-    <div id="knockout-summary" style="background:#e3f2fd; color:#0d47a1; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold; font-size:0.9em;"></div>
-    <div style="display:flex;gap:10px;">
-        <button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button>
-        <button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button>
+<div id="modal-knockout" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;justify-content:center;align-items:center;">
+    <div style="background:white;padding:20px;border-radius:12px;width:90%;max-width:400px;">
+        <h3>Configurar Mata-Mata</h3><div id="knockout-config-list" style="max-height:40vh;overflow-y:auto;"></div>
+        <div id="knockout-summary" style="padding:10px;background:#e3f2fd;margin:10px 0;font-size:0.9em;font-weight:bold;"></div>
+        <button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button><button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button>
     </div>
-</div></div>
-
-<div id="modal-finals"><div class="modal-box">
-    <h3 class="modal-title">Encerrar & Pontuar</h3>
-    
-    <label class="modal-label">🥇 1º Lugar (Campeões)</label>
-    <div style="display:flex; gap:5px;">
-        <select id="sel-win-1a" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-win-1b" class="inp-std auth-input" style="margin:0;"></select>
+</div>
+<div id="modal-finals" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;justify-content:center;align-items:center;">
+    <div style="background:white;padding:20px;border-radius:12px;width:90%;max-width:400px;max-height:90vh;overflow-y:auto;">
+        <h3>Encerrar & Pontuar</h3>
+        <label>🥇 1º Lugar</label><div style="display:flex;gap:5px;"><select id="sel-win-1a" class="inp-std"></select><select id="sel-win-1b" class="inp-std"></select></div>
+        <label>🥈 2º Lugar</label><div style="display:flex;gap:5px;"><select id="sel-win-2a" class="inp-std"></select><select id="sel-win-2b" class="inp-std"></select></div>
+        <label>🥉 3º Lugar</label><div style="display:flex;gap:5px;"><select id="sel-win-3a" class="inp-std"></select><select id="sel-win-3b" class="inp-std"></select></div>
+        <label>🏅 4º Lugar</label><div style="display:flex;gap:5px;"><select id="sel-win-4a" class="inp-std"></select><select id="sel-win-4b" class="inp-std"></select></div>
+        <button class="btn-std btn-gold" style="margin-top:15px;" onclick="submitPoints()">Confirmar Fim</button><button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button>
     </div>
-    
-    <label class="modal-label" style="margin-top:10px;">🥈 2º Lugar (Vices)</label>
-    <div style="display:flex; gap:5px;">
-        <select id="sel-win-2a" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-win-2b" class="inp-std auth-input" style="margin:0;"></select>
-    </div>
-    
-    <label class="modal-label" style="margin-top:10px;">🥉 3º Lugar</label>
-    <div style="display:flex; gap:5px;">
-        <select id="sel-win-3a" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-win-3b" class="inp-std auth-input" style="margin:0;"></select>
-    </div>
-    
-    <label class="modal-label" style="margin-top:10px;">🏅 4º Lugar</label>
-    <div style="display:flex; gap:5px;">
-        <select id="sel-win-4a" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-win-4b" class="inp-std auth-input" style="margin:0;"></select>
-    </div>
-    
-    <label class="modal-label" style="margin-top:10px;">🎖️ Perdedores das Quartas (Até 8 pessoas)</label>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
-        <select id="sel-q-1a" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-1b" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-2a" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-2b" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-3a" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-3b" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-4a" class="inp-std auth-input" style="margin:0;"></select>
-        <select id="sel-q-4b" class="inp-std auth-input" style="margin:0;"></select>
-    </div>
-    
-    <div style="display:flex;gap:10px;margin-top:20px;">
-        <button class="btn-std btn-gold" onclick="submitPoints()">Confirmar</button>
-        <button class="btn-std btn-red" onclick="document.getElementById('modal-finals').style.display='none'">Cancelar</button>
-    </div>
-</div></div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set, push, onValue, off, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
-    const MASTER_PASS = "lucas10";
-
+    // V181 LAB DB KEYS
     const firebaseConfig = {
       apiKey: "AIzaSyCttgr7SLeDU92pcMs5wcNGvLc7joZvw00",
       authDomain: "bt-manager-testes.firebaseapp.com",
@@ -396,738 +196,193 @@
       appId: "1:145113677026:web:71c579fb817c81daf372bb"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-    const googleProvider = new GoogleAuthProvider();
+    const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getDatabase(app); const provider = new GoogleAuthProvider();
+    let user = null, appRef = null, appState = { players:[], groups:[], matches:[], mode:'individual' }, selectedPid = null;
 
-    let user = null;
-    let localAdmin = false;
-    let curArenaId = null; let curArenaData = null; let curCatId = null; let curCatData = null; let curTourneyId = null; let appRef = null;
-    let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
-    let selectedPid = null;
-    let favorites = {}; 
-    let selectingMatch = null; 
-    let selectingSlot = null;
+    onAuthStateChanged(auth, u => { user = u; document.getElementById('loading').style.display='none'; document.getElementById('nav-username').innerText = u ? u.displayName.split(' ')[0] : 'Visitante'; document.getElementById('nav-avatar').src = u ? u.photoURL : 'https://cdn-icons-png.flaticon.com/512/847/847969.png'; loadTourneys(); });
+    window.openLoginModal = () => user ? (confirm("Sair?") && signOut(auth)) : signInWithPopup(auth, provider);
+    window.showScreen = id => { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    window.switchAppView = v => { document.querySelectorAll('.app-tab').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.view-section').forEach(s=>s.classList.remove('active')); event.target.classList.add('active'); document.getElementById('view-'+v).classList.add('active'); }
 
-    window.hasEditPermission = (ownerUid, managersString) => {
-        if (localAdmin) return true;
-        if (!user) return false;
-        if (ADMIN_EMAILS.includes(user.email)) return true;
-        if (ownerUid === user.uid) return true;
-        if (managersString && user.email) {
-            const emails = managersString.split(',').map(e => e.trim().toLowerCase());
-            if (emails.includes(user.email.toLowerCase())) return true;
-        }
-        return false;
+    function loadTourneys() {
+        showScreen('screen-app');
+        appRef = ref(db, `tournaments_data/lab-test`);
+        onValue(appRef, snap => {
+            if(snap.exists()) { appState = snap.val(); if(!appState.players) appState.players=[]; if(!appState.groups) appState.groups=[]; if(!appState.matches) appState.matches=[]; }
+            recalc(); renderApp();
+        });
+        document.body.classList.remove('viewer-mode'); 
     }
 
-    const saveDB = () => { 
-        if(appRef) set(appRef, appState).catch(err => alert("Erro ao conectar no banco: " + err.message)); 
-    }
+    const saveDB = () => { if(appRef) set(appRef, appState); }
+    window.forceSave = () => { recalc(); saveDB(); renderApp(); alert("Salvo!"); };
+    window.resetT = () => { if(confirm("Zerar tudo?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; saveDB(); } }
 
-    window.goHome = () => { 
-        curArenaId = null; curArenaData = null; curCatId = null; curTourneyId = null; 
-        history.pushState("", document.title, window.location.pathname + window.location.search); 
-        showScreen('screen-arenas'); loadArenas(); 
-    }
+    window.addPlayer = () => { const n = document.getElementById('pName').value.trim(); if(!n) return; appState.players.push({ id: 'p'+Date.now(), name: n, groupId: 'pool', games:0, wins:0, bal:0, pts:0 }); document.getElementById('pName').value=''; saveDB(); }
+    window.addGroup = () => { appState.groups.push({ id: 'g'+Date.now(), name: "GRUPO " + String.fromCharCode(65 + appState.groups.length) }); saveDB(); }
+    window.delPlayer = (pid) => { appState.players = appState.players.filter(p=>p.id!==pid); saveDB(); };
+    window.delGroup = (gid) => { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups = appState.groups.filter(x=>x.id!==gid); appState.matches = appState.matches.filter(x=>x.gid!==gid); saveDB(); }
+    window.toggleSel = (pid) => { selectedPid = selectedPid===pid ? null : pid; renderApp(); }
+    window.moveSel = (gid) => { if(selectedPid){ const p = appState.players.find(x=>x.id===selectedPid); if(p) p.groupId=gid; selectedPid=null; saveDB(); } }
+    window.setMode = (m) => { appState.mode = m; saveDB(); }
 
-    window.onload = () => {
-        const hash = window.location.hash.substring(1);
-        if(hash && hash.includes('/')) {
-            const [a, c, t] = hash.split('/');
-            curArenaId = a; curCatId = c; curTourneyId = t;
+    // V181: EXPORTAR PARA WHATSAPP (Aprimorado)
+    window.exportWhatsApp = async (containerId, fileName) => {
+        const el = document.getElementById(containerId);
+        if(!el || el.innerHTML.trim() === '') return alert("Nada gerado para exportar.");
+
+        // Adiciona classe que esconde botões (lápis, lixeiras, etc) na hora do print
+        document.body.classList.add('viewer-mode'); 
+        const originalBg = el.style.background;
+        el.style.background = '#f4f6f8'; 
+        el.style.padding = '10px';
+
+        try {
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading-text').innerText = 'Gerando Imagem...';
+
+            const canvas = await html2canvas(el, { scale: 2, useCORS: true });
             
-            get(ref(db, `arenas/${a}`)).then(s => { 
-                if(s.exists()) {
-                    curArenaData = s.val();
-                    document.getElementById('title-arena').innerText = curArenaData.name;
+            document.body.classList.remove('viewer-mode');
+            el.style.background = originalBg;
+            el.style.padding = '0';
+            document.getElementById('loading').style.display = 'none';
+
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], `${fileName}.png`, { type: 'image/png' });
+                
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            title: 'BT Manager',
+                            text: 'Segue a tabela atualizada do nosso torneio! 🎾',
+                            files: [file]
+                        });
+                    } catch (e) { console.log('Compartilhamento cancelado.'); }
+                } else {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = `${fileName}.png`; a.click();
+                    URL.revokeObjectURL(url);
+                    alert("Imagem salva! Basta enviar.");
                 }
-                get(ref(db, `categories/${a}/${c}`)).then(sc => { 
-                    if(sc.exists()) { 
-                        document.getElementById('title-cat').innerText = sc.val().name; 
-                        curCatData = sc.val(); 
-                    }
-                    get(ref(db, `tournaments_meta/${c}/${t}`)).then(st => { 
-                        if(st.exists()) enterApp(t, st.val().name, st.val().pwd, st.val().owner); 
-                    });
-                });
-            });
+            }, 'image/png');
+        } catch (e) {
+            document.body.classList.remove('viewer-mode');
+            document.getElementById('loading').style.display = 'none';
+            alert("Erro ao criar imagem: " + e.message);
         }
-    }
+    };
 
-    onAuthStateChanged(auth, (u) => {
-        document.getElementById('loading').style.display = 'none';
-        user = u;
-        updateUserUI();
-        loadArenas(); 
-    });
+    window.distribute = () => { 
+        const pool = appState.players.filter(p=>p.groupId==='pool'); 
+        if(!pool.length) return alert("Não há reservas para distribuir.");
+        if(!appState.groups.length) return alert("Crie pelo menos 1 grupo primeiro.");
+        if(!confirm("Efetuar sorteio e distribuir jogadores nos grupos?")) return;
 
-    function updateUserUI() {
-        if(user) {
-            document.getElementById('nav-avatar').src = user.photoURL || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-            document.getElementById('nav-username').innerText = user.displayName ? user.displayName.split(' ')[0] : (user.email ? user.email.split('@')[0] : "Usuário");
-            const isMaster = user.email && ADMIN_EMAILS.includes(user.email);
-            document.getElementById('btn-add-arena').style.display = isMaster ? 'flex' : 'none'; 
-            document.getElementById('msg-login').style.display = 'none';
-            onValue(ref(db, `users/${user.uid}/favorites`), (snap) => {
-                favorites = snap.val() || {};
-                if(document.getElementById('screen-arenas').classList.contains('active')) loadArenas();
-            });
-        } else {
-            document.getElementById('nav-avatar').src = "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-            document.getElementById('nav-username').innerText = localAdmin ? "Admin Local" : "Visitante";
-            document.getElementById('btn-add-arena').style.display = 'none';
-            document.getElementById('msg-login').style.display = localAdmin ? 'none' : 'block';
-            favorites = {};
-        }
-    }
+        const modal = document.getElementById('modal-sorteio');
+        const text = document.getElementById('sorteio-text');
+        modal.style.display = 'flex';
 
-    window.openLoginModal = () => { if(user) { if(confirm("Sair da conta?")) signOut(auth); } else { document.getElementById('modal-login').style.display = 'flex'; } }
-    window.closeLoginModal = () => { document.getElementById('modal-login').style.display = 'none'; }
-    window.doGoogleLogin = async () => { try { await signInWithPopup(auth, googleProvider); closeLoginModal(); } catch(e) { alert("Erro Google: " + e.message); } }
-    
-    window.doEmailLogin = async () => {
-        const email = document.getElementById('login-email').value.trim();
-        const pwd = document.getElementById('login-pwd').value;
-        if(!email || !pwd) return alert("Preencha e-mail e senha!");
-        try {
-            await signInWithEmailAndPassword(auth, email, pwd);
-            closeLoginModal();
-        } catch(e) {
-            alert("Erro ao entrar. Verifique se o e-mail e a senha estão corretos.");
-        }
-    }
-
-    window.doEmailSignUp = async () => {
-        const email = document.getElementById('login-email').value.trim();
-        const pwd = document.getElementById('login-pwd').value;
-        if(!email || !pwd) return alert("Preencha e-mail e senha!");
-        if(pwd.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
-        try {
-            await createUserWithEmailAndPassword(auth, email, pwd);
-            alert("Conta criada com sucesso!");
-            closeLoginModal();
-        } catch(e) {
-            if(e.code === 'auth/email-already-in-use') return alert("Este e-mail já está cadastrado. Clique em Entrar.");
-            alert("Erro ao criar conta: " + e.message);
-        }
-    }
-
-    window.toggleFavorite = (id, e) => {
-        if(e) e.stopPropagation();
-        if(!user) return alert("Faça login para favoritar.");
-        const isFav = favorites[id] ? null : true; 
-        update(ref(db, `users/${user.uid}/favorites`), { [id]: isFav });
-        e.target.classList.toggle('active');
-        e.target.innerText = isFav ? 'favorite' : 'favorite_border';
-    }
-
-    function fixDriveLink(url) { if (url && url.includes('drive.google.com') && url.includes('/file/d/')) { const id = url.match(/\/d\/(.*?)\//)[1]; return `https://drive.google.com/uc?export=view&id=${id}`; } return url; }
-
-    window.openModal = (type, id='', name='', extra1='', extra2='') => {
-        const titleMap = { 'arena': 'Arena', 'category': 'Categoria', 'tournament': 'Torneio' };
-        document.getElementById('modal-h3').innerText = (id ? 'Editar ' : 'Nova ') + titleMap[type];
-        document.getElementById('modal-overlay').style.display = 'flex';
-        document.getElementById('modal-type').value = type;
-        document.getElementById('modal-id').value = id;
-        document.getElementById('inp-name').value = name;
-        document.getElementById('field-arena').style.display = 'none';
-        document.getElementById('field-category').style.display = 'none';
-        document.getElementById('field-pwd').style.display = 'none';
+        let ticks = 0; const speed = 100;
         
-        if(type === 'arena') { 
-            document.getElementById('field-arena').style.display = 'block'; 
-            document.getElementById('inp-url').value = extra1; 
-            document.getElementById('img-preview').src = extra1 || 'https://via.placeholder.com/150'; 
-            document.getElementById('inp-arena-managers').value = extra2 || '';
-        } 
-        else if(type === 'category') { document.getElementById('field-category').style.display = 'block'; } 
-        else if(type === 'tournament') { document.getElementById('field-pwd').style.display = 'block'; document.getElementById('inp-pwd').value = extra1 || "1234"; }
-    }
-    window.closeModal = () => { document.getElementById('modal-overlay').style.display = 'none'; }
-    window.updatePreview = (url) => { document.getElementById('img-preview').src = fixDriveLink(url); }
-    window.handleFileSelect = (input) => { const file = input.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (e) => { const img = new Image(); img.onload = () => { const cvs = document.createElement('canvas'); const ctx = cvs.getContext('2d'); const scale = 500 / img.width; cvs.width = 500; cvs.height = img.height * scale; ctx.drawImage(img, 0, 0, cvs.width, cvs.height); const data = cvs.toDataURL('image/jpeg', 0.7); document.getElementById('inp-url').value = data; updatePreview(data); }; img.src = e.target.result; }; reader.readAsDataURL(file); }
-
-    window.saveModal = async () => {
-        if(!user && !localAdmin) return;
-        const type = document.getElementById('modal-type').value;
-        
-        if(type === 'arena') {
-            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
-            if(!isMaster) return alert("Apenas o administrador do sistema pode criar ou editar Arenas.");
-        }
-
-        const id = document.getElementById('modal-id').value;
-        const name = document.getElementById('inp-name').value.trim();
-        if(!name) return alert("Nome obrigatório");
-        let path = ''; let data = { name, owner: user ? user.uid : 'local' };
-        
-        if (type === 'arena') { 
-            path = 'arenas'; 
-            data.img = document.getElementById('inp-url').value; 
-            data.managers = document.getElementById('inp-arena-managers').value.trim();
-        } 
-        else if (type === 'category') { 
-            path = `categories/${curArenaId}`; 
-            data.type = document.getElementById('inp-cat-type').value; 
-            data.short = document.getElementById('inp-cat-short').value.toUpperCase(); 
-            data.points = { 
-                p1: parseInt(document.getElementById('pts-1').value)||0, 
-                p2: parseInt(document.getElementById('pts-2').value)||0, 
-                p3: parseInt(document.getElementById('pts-3').value)||0, 
-                p4: parseInt(document.getElementById('pts-4').value)||0, 
-                quartas: parseInt(document.getElementById('pts-quartas').value)||0, 
-                part: parseInt(document.getElementById('pts-part').value)||0 
-            }; 
-        } 
-        else if (type === 'tournament') { path = `tournaments_meta/${curCatId}`; data.pwd = document.getElementById('inp-pwd').value || "1234"; data.date = Date.now(); }
-
-        try {
-            if (id) { await update(ref(db, `${path}/${id}`), data); } 
-            else {
-                data.createdAt = Date.now();
-                const newRef = push(ref(db, path), data);
-                if(type === 'tournament') { await set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user?user.uid:'local' }); }
-            }
-            closeModal();
-        } catch(e) { console.error(e); alert("Erro ao salvar: " + e.message); }
-    }
-
-    window.showGlobalRanking = () => {
-        showScreen('screen-global-ranking');
-        const table = document.getElementById('table-global-ranking');
-        table.innerHTML = '<tr><td style="padding:20px;">Carregando dados da nuvem...</td></tr>';
-        
-        get(ref(db, 'global_players')).then((snap) => {
-            table.innerHTML = '<tr><th title="Posição Global">#</th><th title="Nome do Jogador">Nome</th><th title="Pontuação Total">Pts</th><th title="Torneios Jogados">J</th><th title="Títulos de Campeão">Títulos</th></tr>';
-            const data = snap.val();
-            if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking global ainda.</td></tr>'; return; }
+        const interval = setInterval(() => {
+            text.innerText = pool[Math.floor(Math.random() * pool.length)].name;
+            ticks++;
             
-            const rankArr = Object.values(data).sort((a,b) => (b.points - a.points) || (b.wins - a.wins));
-            rankArr.forEach((p, i) => { 
-                const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; 
-                tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left; font-weight:bold;">${p.name}</td><td style="color:var(--primary); font-size:1.1em; font-weight:bold;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; 
-                table.appendChild(tr); 
-            });
-        }).catch(err => {
-            table.innerHTML = `<tr><td style="padding:20px; color:red;">Erro ao carregar: ${err.message}</td></tr>`;
-        });
-    }
-
-    window.switchTab = (tabName) => { document.querySelectorAll('.tab').forEach(t => t.classList.remove('active')); document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active')); if(tabName === 'tournaments') { document.querySelectorAll('.tab')[0].classList.add('active'); document.getElementById('tab-tournaments').classList.add('active'); } else { document.querySelectorAll('.tab')[1].classList.add('active'); document.getElementById('tab-ranking').classList.add('active'); loadRanking(); } }
-    window.showScreen = (id) => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-
-    window.switchAppView = (view) => {
-        document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-        
-        if(view === 'queue') { 
-            document.querySelectorAll('.app-tab')[0].classList.add('active'); 
-            document.getElementById('view-queue').classList.add('active'); 
-        }
-        else if(view === 'groups') { 
-            document.querySelectorAll('.app-tab')[1].classList.add('active'); 
-            document.getElementById('view-groups').classList.add('active'); 
-        }
-        else if(view === 'bracket') { 
-            document.querySelectorAll('.app-tab')[2].classList.add('active'); 
-            document.getElementById('view-bracket').classList.add('active'); 
-        }
-    }
-
-    function loadArenas() {
-        onValue(ref(db, 'arenas'), (snap) => {
-            const list = document.getElementById('grid-arenas'); list.innerHTML = '';
-            const data = snap.val(); if(!data) return; 
-            
-            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
-            const keys = Object.keys(data).sort((a,b) => { const favA = favorites[a] ? 1 : 0; const favB = favorites[b] ? 1 : 0; return favB - favA; });
-            
-            keys.forEach(key => { 
-                const d = data[key]; 
-                list.appendChild(createCard(key, d, d.img, isMaster, 'arena', () => enterArena(key, d))); 
-            });
-        });
-    }
-
-    function createCard(id, d, imgOrClass, isOwner, type, onClick, subtitle='') {
-        const name = d.name;
-        const div = document.createElement('div'); div.className = 'std-card'; let content = '';
-        if(type === 'category') { const bgClass = `bg-${imgOrClass.type}`; content = `<div class="cat-card-content ${bgClass}">${imgOrClass.short}</div>`; } 
-        else if (type === 'tournament') { content = `<div class="cat-card-content bg-tourney"><span class="material-icons">emoji_events</span></div>`; } 
-        else { content = `<img src="${imgOrClass || 'https://via.placeholder.com/300'}" class="card-img">`; }
-        const isFav = favorites[id]; const heartIcon = isFav ? 'favorite' : 'favorite_border'; const heartClass = isFav ? 'card-fav active' : 'card-fav'; const heartHTML = (type === 'arena') ? `<span class="material-icons ${heartClass}" onclick="toggleFavorite('${id}', event)">${heartIcon}</span>` : '';
-        const managersSafe = d.managers ? d.managers.replace(/'/g,"\\'") : '';
-        
-        div.innerHTML = `${content}${heartHTML}<div class="card-overlay"><div class="card-title">${name}</div>${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ''}</div>${isOwner ? `<div class="card-actions"><div class="btn-icon-circle" onclick="openModal('${type}', '${id}', '${name.replace(/'/g,"\\'")}', '${(type==='arena'?imgOrClass:'')}', '${managersSafe}'); event.stopPropagation()" title="Editar">✎</div><div class="btn-icon-circle" style="color:red;" onclick="deleteItem('${type}', '${id}'); event.stopPropagation()" title="Excluir">✕</div></div>` : ''}`;
-        div.onclick = onClick; return div;
-    }
-
-    window.enterArena = (id, data) => { 
-        curArenaId = id; 
-        curArenaData = data;
-        document.getElementById('title-arena').innerText = data.name; 
-        document.getElementById('btn-add-cat').style.display = hasEditPermission(data.owner, data.managers) ? 'flex' : 'none'; 
-        showScreen('screen-categories'); 
-        loadCategories(id); 
-    }
-    
-    function loadCategories(arenaId) { 
-        onValue(ref(db, `categories/${arenaId}`), (snap) => { 
-            const list = document.getElementById('grid-categories'); list.innerHTML = ''; 
-            const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhuma categoria.</div>'; return; } 
-            Object.keys(data).forEach(key => { 
-                const d = data[key]; 
-                const isOwner = hasEditPermission(curArenaData?.owner, curArenaData?.managers); 
-                list.appendChild(createCard(key, d, {type: d.type, short: d.short}, isOwner, 'category', () => enterCategory(key, d))); 
-            }); 
-        }); 
-    }
-    
-    window.enterCategory = (id, data) => { 
-        curCatId = id; 
-        curCatData = data; 
-        document.getElementById('title-cat').innerText = data.name; 
-        document.getElementById('btn-add-tourney').style.display = hasEditPermission(curArenaData?.owner, curArenaData?.managers) ? 'flex' : 'none'; 
-        switchTab('tournaments'); 
-        showScreen('screen-tournaments'); 
-        loadTournaments(id); 
-    }
-    
-    function loadTournaments(catId) { 
-        onValue(ref(db, `tournaments_meta/${catId}`), (snap) => { 
-            const list = document.getElementById('grid-tournaments'); list.innerHTML = ''; 
-            const data = snap.val(); if(!data) { list.innerHTML = '<div style="color:#999; grid-column:1/-1; text-align:center;">Nenhum torneio.</div>'; return; } 
-            Object.keys(data).forEach(key => { 
-                const d = data[key]; 
-                const isOwner = hasEditPermission(curArenaData?.owner, curArenaData?.managers); 
-                const sub = new Date(d.date).toLocaleDateString('pt-BR') + (d.finished ? ' (Finalizado)' : ''); 
-                list.appendChild(createCard(key, d, null, isOwner, 'tournament', () => enterApp(key, d.name, d.pwd, d.owner), sub)); 
-            }); 
-        }); 
-    }
-    
-    function loadRanking() { onValue(ref(db, `rankings/${curCatId}`), (snap) => { const table = document.getElementById('table-ranking'); table.innerHTML = '<tr><th title="Posição Geral">#</th><th title="Nome do Jogador">Nome</th><th title="Pontuação Total">Pts</th><th title="Jogos Disputados">J</th><th title="Vitórias">V</th></tr>'; const data = snap.val(); if(!data) { table.innerHTML += '<tr><td colspan="5" style="padding:20px; color:#999;">Sem ranking.</td></tr>'; return; } const rankArr = Object.values(data).sort((a,b) => b.points - a.points); rankArr.forEach((p, i) => { const tr = document.createElement('tr'); tr.className = `rank-${i+1}`; tr.innerHTML = `<td><div class="rank-pos">${i+1}</div></td><td style="text-align:left;">${p.name}</td><td style="color:var(--primary); font-size:1.1em; font-weight:bold;">${p.points}</td><td style="color:#777;">${p.tournaments || 0}</td><td style="color:#777;">${p.wins || 0}</td>`; table.appendChild(tr); }); }); }
-
-    window.enterApp = (tId, name, pwd, ownerId) => {
-        curTourneyId = tId; document.getElementById('t-title-header').innerText = name; showScreen('screen-app');
-        
-        const isOwner = hasEditPermission(curArenaData ? curArenaData.owner : ownerId, curArenaData ? curArenaData.managers : '');
-        if(isOwner) { 
-            document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; 
-        } else { 
-            document.body.classList.add('viewer-mode'); document.getElementById('btn-lock').innerText = '🔒'; 
-        }
-        switchAppView('groups'); 
-        
-        if(appRef) off(appRef); appRef = ref(db, `tournaments_data/${tId}`); document.getElementById('loading').style.display = 'flex';
-        
-        onValue(appRef, (snap) => {
-            document.getElementById('loading').style.display = 'none'; const d = snap.val();
-            if(d) { 
-                appState = d; 
-                ['players','groups','matches'].forEach(k => {
-                    if(!appState[k]) appState[k]=[];
-                    else if(!Array.isArray(appState[k])) appState[k] = Object.values(appState[k]);
-                });
-            } else { 
-                appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
+            if (ticks > 25) { 
+                clearInterval(interval);
+                modal.style.display = 'none';
+                pool.forEach(p => { 
+                    appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); 
+                    p.groupId=appState.groups[0].id; 
+                }); 
+                saveDB(); 
             }
-            if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
-                appState.groupCount = appState.groups ? appState.groups.length : 0;
-            }
-            recalc(); 
-            renderApp();
-        });
+        }, speed);
     }
 
-    window.exitApp = () => { if(appRef) off(appRef); showScreen('screen-tournaments'); }
-    window.shareLink = () => { const url = `${window.location.origin}${window.location.pathname}#${curArenaId}/${curCatId}/${curTourneyId}`; navigator.clipboard.writeText(url).then(() => alert("Link copiado!")); }
+    window.autoGroupsCBT = () => {
+        const pool = appState.players.filter(p => p.groupId === 'pool');
+        const n = appState.mode === 'individual' ? pool.length / 2 : pool.length;
+        if(n < 3) return alert("Mínimo 3 duplas.");
+        let G = n <= 5 ? 1 : Math.floor(n / 3);
+        let startIndex = appState.groups.length; let ng = [];
+        for(let i=0; i<G; i++) { let g = { id: 'g'+Date.now()+i, name: "GRUPO " + String.fromCharCode(65 + startIndex + i) }; appState.groups.push(g); ng.push(g); }
+        pool.sort(()=>Math.random()-0.5).forEach((p, i) => p.groupId = ng[i % G].id);
+        saveDB();
+    }
+
+    window.genMatches = (gid) => {
+        const ps = appState.players.filter(p => p.groupId === gid);
+        if(appState.matches.some(m => m.gid === gid)) return alert("Jogos já existem.");
+        let m = [];
+        if(ps.length === 4) m.push([0,1,2,3], [0,2,1,3], [0,3,1,2]);
+        else if(ps.length === 5) m.push([0,1,2,3], [0,2,3,4], [0,3,1,4], [0,4,1,2], [1,3,2,4]);
+        else if(ps.length === 6) m.push([0,1,2,3], [4,5,0,2], [1,4,3,5], [0,3,2,4], [1,5,0,4], [2,3,1,5], [0,5,2,1]);
+        else if(ps.length === 7) m.push([0,1,2,3], [4,5,6,0], [1,2,3,4], [5,6,0,1], [2,3,4,5], [6,0,1,2], [3,4,5,6], [0,2,1,3], [4,6,5,0], [1,3,2,4], [5,0,6,1]);
+        else for(let i=0; i<ps.length-3; i+=2) m.push([i, i+1, i+2, i+3]);
+        m.forEach(idx => appState.matches.push({ mid:'m'+Math.random(), gid, p1:ps[idx[0]].id, p2:ps[idx[1]].id, p3:ps[idx[2]].id, p4:ps[idx[3]].id, s1:'', s2:'', saved:false }));
+        saveDB();
+    }
+
+    window.addManual = gid => { appState.matches.push({ mid:'m'+Math.random(), gid, p1:'', p2:'', p3:'', p4:'', s1:'', s2:'', saved:false }); saveDB(); }
+    window.delM = mid => { appState.matches = appState.matches.filter(x=>x.mid!==mid); saveDB(); }
     
-    window.openFinalsModal = () => { 
-        document.getElementById('modal-finals').style.display = 'flex'; 
-        const fills = [
-            document.getElementById('sel-win-1a'), document.getElementById('sel-win-1b'), 
-            document.getElementById('sel-win-2a'), document.getElementById('sel-win-2b'), 
-            document.getElementById('sel-win-3a'), document.getElementById('sel-win-3b'), 
-            document.getElementById('sel-win-4a'), document.getElementById('sel-win-4b'),
-            document.getElementById('sel-q-1a'), document.getElementById('sel-q-1b'),
-            document.getElementById('sel-q-2a'), document.getElementById('sel-q-2b'),
-            document.getElementById('sel-q-3a'), document.getElementById('sel-q-3b'),
-            document.getElementById('sel-q-4a'), document.getElementById('sel-q-4b')
-        ]; 
-        fills.forEach(s => { 
-            s.innerHTML = '<option value="">Selecione...</option>'; 
-            appState.players.forEach(p => s.innerHTML += `<option value="${p.id}">${p.name}</option>`); 
-        }); 
-    }
-    
-    window.submitPoints = async () => { 
-        if(!curCatData || !curCatData.points) return alert("Erro na configuração da categoria. Por favor, edite a categoria e insira os pontos."); 
-        
-        const p1_id_a = document.getElementById('sel-win-1a').value; 
-        const p1_id_b = document.getElementById('sel-win-1b').value; 
-        const p2_id_a = document.getElementById('sel-win-2a').value; 
-        const p2_id_b = document.getElementById('sel-win-2b').value; 
-        const p3_id_a = document.getElementById('sel-win-3a').value; 
-        const p3_id_b = document.getElementById('sel-win-3b').value; 
-        const p4_id_a = document.getElementById('sel-win-4a').value; 
-        const p4_id_b = document.getElementById('sel-win-4b').value; 
-        
-        const q_ids = [
-            document.getElementById('sel-q-1a').value, document.getElementById('sel-q-1b').value,
-            document.getElementById('sel-q-2a').value, document.getElementById('sel-q-2b').value,
-            document.getElementById('sel-q-3a').value, document.getElementById('sel-q-3b').value,
-            document.getElementById('sel-q-4a').value, document.getElementById('sel-q-4b').value
-        ].filter(Boolean);
-        
-        if(!p1_id_a && !p1_id_b) return alert("Selecione pelo menos um campeão."); 
-        
-        update(ref(db, `tournaments_meta/${curCatId}/${curTourneyId}`), { finished: true }); 
-        
-        const rankRef = ref(db, `rankings/${curCatId}`); 
-        const snap = await get(rankRef); 
-        let localRanking = snap.val() || {}; 
-        let globalUpdates = {};
-        
-        for (let p of appState.players) {
-            let pts = 0;
-            let isChamp = false;
-            
-            if(p.id === p1_id_a || p.id === p1_id_b) { pts = curCatData.points.p1 || 0; isChamp = true; }
-            else if(p.id === p2_id_a || p.id === p2_id_b) pts = curCatData.points.p2 || 0;
-            else if(p.id === p3_id_a || p.id === p3_id_b) pts = curCatData.points.p3 || 0;
-            else if(p.id === p4_id_a || p.id === p4_id_b) pts = curCatData.points.p4 || 0;
-            else if(q_ids.includes(p.id)) pts = curCatData.points.quartas || 0;
-            else pts = curCatData.points.part || 0;
-
-            const localKey = p.name.replace(/[.#$/[\]]/g, ""); 
-            if(!localRanking[localKey]) localRanking[localKey] = { name: p.name, points: 0, tournaments: 0, wins: 0 }; 
-            localRanking[localKey].points += pts; 
-            localRanking[localKey].tournaments += 1; 
-            if(isChamp) localRanking[localKey].wins += 1; 
-
-            if(p.phone && p.phone.length >= 10) {
-                const gSnap = await get(ref(db, `global_players/${p.phone}`));
-                let gData = gSnap.val() || { name: p.name, points: 0, tournaments: 0, wins: 0 };
-                gData.points += pts;
-                gData.tournaments += 1;
-                if(isChamp) gData.wins += 1;
-                gData.name = p.name; 
-                globalUpdates[`global_players/${p.phone}`] = gData;
-            }
-        }
-        
-        await set(rankRef, localRanking); 
-        
-        if(Object.keys(globalUpdates).length > 0) {
-            await update(ref(db), globalUpdates);
-        }
-        
-        alert("🏆 Torneio encerrado! Ranking Local e Global atualizados com sucesso."); 
-        document.getElementById('modal-finals').style.display = 'none'; 
-    }
-
-    window.updateKnockoutSummary = () => {
-        let totalAdvancing = 0;
-        appState.groups.forEach(g => {
-            if(!g.id.includes('ko-')) {
-                const el = document.getElementById(`ko-n-${g.id}`);
-                if(el) totalAdvancing += (parseInt(el.value) || 0);
-            }
-        });
-        
-        let pairs = appState.mode === 'individual' ? totalAdvancing / 2 : totalAdvancing;
-        
-        const summaryDiv = document.getElementById('knockout-summary');
-        if(!summaryDiv) return;
-
-        if (appState.mode === 'individual' && totalAdvancing % 2 !== 0) {
-            summaryDiv.innerHTML = `⚠️ Aviso: No formato Individual, o total de classificados precisa ser PAR para formar as duplas. (Total atual: ${totalAdvancing} jogadores)`;
-            summaryDiv.style.background = "#ffebee";
-            summaryDiv.style.color = "#c62828";
-            return;
-        }
-
-        if (pairs < 2) {
-            summaryDiv.innerHTML = `⚠️ Poucos classificados. Mínimo de 2 duplas para haver Mata-Mata.`;
-            summaryDiv.style.background = "#fff3e0";
-            summaryDiv.style.color = "#e65100";
-            return;
-        }
-
-        let size = 2;
-        while(size < pairs) size *= 2;
-        
-        let phase = "";
-        if(size === 2) phase = "FINAL";
-        else if(size === 4) phase = "SEMIFINAL";
-        else if(size === 8) phase = "QUARTAS DE FINAL";
-        else if(size === 16) phase = "OITAVAS DE FINAL";
-        else phase = `CHAVE DE ${size}`;
-        
-        let byes = size - pairs;
-        let byeText = byes > 0 ? `<br><span style="font-size:0.8em; color:#666;">(Serão gerados ${byes} 'BYEs' / avanços diretos na primeira fase)</span>` : "";
-
-        summaryDiv.innerHTML = `📊 Total de Classificados: ${pairs} duplas<br>🏆 O mata-mata inicia na: <strong>${phase}</strong>${byeText}`;
-        summaryDiv.style.background = "#e3f2fd";
-        summaryDiv.style.color = "#0d47a1";
+    window.saveScore = (mid, btn) => {
+        const m = appState.matches.find(x => x.mid === mid);
+        if(m.saved) { m.saved = false; saveDB(); return; }
+        const inputs = btn.parentElement.querySelectorAll('input');
+        if(!inputs[0].value || !inputs[1].value) return alert("Preencha o placar.");
+        m.s1 = parseInt(inputs[0].value); m.s2 = parseInt(inputs[1].value);
+        m.saved = true; recalc(); saveDB();
     }
 
     window.openConfigKnockout = () => {
-        const div = document.getElementById('knockout-config-list');
-        div.innerHTML = '';
-        
-        let suggestion = appState.mode === 'individual' ? 4 : 2; 
-
-        appState.groups.forEach(g => {
-            if(g.id.includes('ko')) return;
-            div.innerHTML += `<div style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px; margin:0;" value="${suggestion}" min="0" oninput="updateKnockoutSummary()" onkeyup="updateKnockoutSummary()"></div>`;
-        });
+        let div = document.getElementById('knockout-config-list'); div.innerHTML = '';
+        appState.groups.forEach(g => { if(!g.id.includes('ko')) div.innerHTML += `<div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>${g.name}</span><input type="number" id="ko-n-${g.id}" class="inp-std" style="width:60px;margin:0" value="2"></div>`; });
         document.getElementById('modal-knockout').style.display = 'flex';
-        updateKnockoutSummary();
     }
+    
+    window.resetKnockout = () => { if(confirm("Apagar Mata-Mata?")) { appState.groups = appState.groups.filter(g=>!g.id.includes('ko')); appState.matches = appState.matches.filter(m=>!m.gid.includes('ko')); saveDB(); switchAppView('groups'); } }
 
     window.execKnockout = () => {
-        let qualified = [];
-        
+        appState.players.forEach(p => { p.tRank=null; p.tName=null; });
+        appState.groups.forEach(g => {
+            if (!g.id.includes('ko')) {
+                let ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b) => b.pts - a.pts || b.bal - a.bal || b.gameAvg - a.gameAvg || a.name.localeCompare(b.name));
+                ps.forEach((p, ix) => { p.tRank = ix + 1; p.tName = g.name; });
+            }
+        });
+
+        let q = [];
         appState.groups.forEach(g => {
             if(g.id.includes('ko')) return;
             const n = parseInt(document.getElementById(`ko-n-${g.id}`).value) || 0;
-            if(n > 0) {
-                const ps = appState.players.filter(p=>p.groupId===g.id);
-                
-                // Sort internal rules
-                const sortedPs = [...ps].sort((a, b) => {
-                    if (b.pts !== a.pts) return b.pts - a.pts;
-                    if (b.bal !== a.bal) return b.bal - a.bal;
-                    const aGA = a.gameAvg || 0;
-                    const bGA = b.gameAvg || 0;
-                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-                    if (b.wins !== a.wins) return b.wins - a.wins;
-                    return a.name.localeCompare(b.name);
-                });
-                
-                qualified.push(...sortedPs.slice(0, n));
-            }
+            q.push(...appState.players.filter(p=>p.groupId===g.id && p.tRank <= n));
         });
 
-        if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
-
-        const regularGroups = appState.groups.filter(g => !g.id.includes('ko'));
-        const groupSizes = new Set(regularGroups.map(g => appState.players.filter(p => p.groupId === g.id).length));
-        const diffSizes = groupSizes.size > 1;
-
-        if (diffSizes) {
-            qualified.sort((a,b) => {
-                const aWinPct = a.games > 0 ? a.wins / a.games : 0;
-                const bWinPct = b.games > 0 ? b.wins / b.games : 0;
-                if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
-                const aGA = a.gameAvg || 0;
-                const bGA = b.gameAvg || 0;
-                return bGA - aGA;
-            });
-        } else {
-            qualified.sort((a,b) => b.pts - a.pts || b.bal - a.bal || b.wins - a.wins);
-        }
-
-        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-
-        let finalSeeds = [];
-        if (appState.mode === 'individual') {
-            if (qualified.length % 2 !== 0) return alert("Para formar duplas no Mata-Mata Individual, o número total de classificados deve ser par (ex: 4, 8, 16).");
-            
-            let unpaired = [...qualified];
-            while (unpaired.length > 0) {
-                let pA = unpaired.shift(); 
-                let bIndex = unpaired.findIndex(p => p.groupId !== pA.groupId);
-                if (bIndex === -1) bIndex = 0;
-                let pB = unpaired.splice(bIndex, 1)[0]; 
-                
-                finalSeeds.push({ isPair: true, pA: pA, pB: pB });
+        q.sort((a,b) => a.tRank - b.tRank || b.pts - a.pts || b.bal - a.bal || b.gameAvg - a.gameAvg);
+        
+        let seeds = [];
+        if(appState.mode === 'individual') {
+            while(q.length) {
+                let pA = q.shift(); let bIdx = q.findIndex(x=>x.groupId !== pA.groupId); if(bIdx === -1) bIdx=0;
+                seeds.push({pA, pB: q.splice(bIdx,1)[0], isPair:true});
             }
-        } else {
-            finalSeeds = qualified.map(q => ({ isPair: false, pA: q, pB: null }));
+        } else seeds = q.map(x => ({pA:x, pB:null, isPair:false}));
+
+        let size = 2; while(size < seeds.length) size *= 2;
+        const gid = `g-ko-${Date.now()}`; appState.groups.push({ id: gid, name: `MATA-MATA (${size})` });
+
+        let S = new Array(size).fill(null); seeds.forEach((x,i) => S[i] = x);
+        let order = size===8 ? [0,7,3,4,2,5,1,6] : size===4 ? [0,3,1,2] : size===16 ? [0,15,7,8,4,11,3,12,2,13,5,10,6,9,1,14] : [0,1];
+        
+        for(let i=0; i<order.length; i+=2) {
+            let A = S[order[i]], B = S[order[i+1]];
+            appState.matches.push({ mid: 'm'+Math.random(), gid, round:1, pos:i/2, p1: A?A.pA.id:'BYE', p2: A?(A.isPair?A.pB.id:A.pA.id):'BYE', p3: B?B.pA.id:'BYE', p4: B?(B.isPair?B.pB.id:B.pA.id):'BYE', s1:'', s2:'', saved: false });
         }
-
-        let size = 2;
-        while(size < finalSeeds.length) size *= 2;
-        
-        const gid = `g-ko-${Date.now()}`;
-        appState.groups.push({ id: gid, name: `MATA-MATA (Chave de ${size})` });
-
-        let seeds = new Array(size).fill(null);
-        for(let i=0; i<finalSeeds.length; i++) seeds[i] = finalSeeds[i];
-
-        let pairingOrder = [];
-        if(size === 2) pairingOrder = [0, 1];
-        else if(size === 4) pairingOrder = [0, 3, 1, 2]; 
-        else if(size === 8) pairingOrder = [0, 7, 3, 4, 2, 5, 1, 6]; 
-        else if(size === 16) pairingOrder = [0, 15, 7, 8, 4, 11, 3, 12, 2, 13, 5, 10, 6, 9, 1, 14];
-
-        let koMatches = [];
-        let totalRounds = Math.log2(size);
-        
-        for(let i=0; i<pairingOrder.length; i+=2) {
-            const seedA = seeds[pairingOrder[i]];
-            const seedB = seeds[pairingOrder[i+1]];
-            
-            let m = {
-                mid: 'm' + Date.now() + Math.random().toString().substr(2, 3) + i, 
-                gid: gid, round: 1, pos: i/2, 
-                p1: seedA ? seedA.pA.id : 'BYE', p2: seedA ? (seedA.isPair ? seedA.pB.id : seedA.pA.id) : 'BYE',
-                p3: seedB ? seedB.pA.id : 'BYE', p4: seedB ? (seedB.isPair ? seedB.pB.id : seedB.pA.id) : 'BYE',
-                s1:'', s2:'', saved: false, isBye: (!seedA || !seedB)
-            };
-            koMatches.push(m);
-        }
-
-        let matchesInRound = size / 2;
-        for(let r=2; r<=totalRounds; r++) {
-            matchesInRound /= 2;
-            for(let i=0; i<matchesInRound; i++) {
-                koMatches.push({ mid: 'm-r' + r + '-' + i + '-' + Date.now(), gid: gid, round: r, pos: i, p1: '', p2: '', p3: '', p4: '', s1:'', s2:'', saved: false, isBye: false });
-            }
-        }
-        
-        koMatches.push({ mid: 'm-3rd-' + Date.now(), gid: gid, round: totalRounds, isThirdPlace: true, p1: '', p2: '', p3: '', p4: '', s1:'', s2:'', saved: false, isBye: false });
-
-        appState.matches.push(...koMatches);
-
-        koMatches.forEach(m => {
-            if (m.isBye) {
-                if (m.p3 === 'BYE' && m.p1 !== 'BYE') { m.s1 = 6; m.s2 = 0; m.saved = true; advanceWinner(m.mid, m, 6, 0); } 
-                else if (m.p1 === 'BYE' && m.p3 !== 'BYE') { m.s1 = 0; m.s2 = 6; m.saved = true; advanceWinner(m.mid, m, 0, 6); }
-            }
-        });
-        
-        document.getElementById('modal-knockout').style.display = 'none';
-        saveDB();
-        alert("Chave Gerada!");
-        switchAppView('bracket');
-    }
-
-    // -----------------------
-    // CORE TOURNAMENT ACTIONS
-    // -----------------------
-
-    window.addPlayer = () => { 
-        const n = document.getElementById('pName').value.trim(); 
-        const phone = document.getElementById('pPhone').value.trim().replace(/\D/g, ''); 
-        if(!n) return; 
-        if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe neste torneio!"); 
-        
-        appState.players.push({ id: 'p'+Date.now(), name: n, phone: phone, groupId: 'pool', games: 0, wins: 0, bal: 0, pts: 0 }); 
-        
-        if(curArenaId) { update(ref(db, `arena_players/${curArenaId}`), { [n.replace(/[.#$/[\]]/g, "")]: true }); } 
-        
-        document.getElementById('pName').value = ''; document.getElementById('pPhone').value = ''; document.getElementById('pName').focus(); 
-        saveDB(); renderApp(); 
-    }
-
-    window.delPlayer = (pid, e) => { 
-        if(e) e.stopPropagation();
-        if(confirm("Excluir este jogador permanentemente?")) { 
-            appState.players = appState.players.filter(p=>p.id!==pid); 
-            saveDB(); renderApp(); 
-        } 
-    };
-
-    window.toggleSel = (pid, e) => { if(document.body.classList.contains('viewer-mode')) return; if(e) e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
-    window.moveSel = (gid) => { if(!selectedPid) return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); saveDB(); renderApp();} }
-    window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); saveDB(); renderApp(); }
-
-    window.addGroup = () => { const nextNum = appState.groups.length + 1; appState.groups.push({ id: 'g' + Date.now(), name: "GRUPO " + String.fromCharCode(64 + nextNum) }); saveDB(); renderApp(); }
-    
-    window.delGroup = (gid, e) => { 
-        if(e) e.stopPropagation(); 
-        if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { 
-            appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); 
-            appState.groups=appState.groups.filter(g=>g.id!==gid); 
-            appState.matches=appState.matches.filter(m=>m.gid!==gid); 
-            saveDB(); renderApp(); 
-        }
-    };
-
-    window.renameGroup = (gid, e) => { if(e) e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome:", g.name); if(newName) { g.name = newName; saveDB(); renderApp(); } } }
-    
-    window.autoGroupsCBT = () => {
-        const pool = appState.players.filter(p => p.groupId === 'pool');
-        const N = pool.length;
-        const effectiveN = appState.mode === 'individual' ? N / 2 : N;
-        if(effectiveN < 3) return alert("Mínimo de 3 duplas na reserva.");
-        let G = effectiveN <= 5 ? 1 : Math.floor(effectiveN / 3);
-        if(!confirm(`Regras CBT: Formar ${G} grupo(s)?`)) return;
-        let startIndex = appState.groups.length; let newGroups = [];
-        for(let i=0; i<G; i++) { let newG = { id: 'g' + Date.now() + i, name: "GRUPO " + String.fromCharCode(64 + startIndex + i + 1) }; appState.groups.push(newG); newGroups.push(newG); }
-        pool.sort(()=>Math.random()-0.5); pool.forEach((p, i) => { p.groupId = newGroups[i % G].id; });
-        saveDB(); renderApp();
-    }
-
-    window.genMatches = (gid) => { 
-        const existing = appState.matches.filter(m => m.gid === gid);
-        if(existing.length > 0) return alert("Já existem jogos.");
-        const ps=appState.players.filter(p=>p.groupId===gid); 
-        if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
-        let roundMatches = [];
-        if(appState.mode==='fixed') { 
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); 
-        } else if(ps.length===4) { 
-            roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); 
-            roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); 
-            roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); 
-        } else if(ps.length===5) { 
-            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=> roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id})); 
-        } else if(ps.length===6) { 
-            [[0,1,2,3],[0,4,1,5],[2,4,3,5],[0,2,1,4],[0,5,3,4],[1,3,2,5]].forEach(r=> roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id})); 
-        } else { 
-            let pairs=[]; for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) pairs.push({p1:ps[i].id, p2:ps[j].id}); 
-            while(pairs.length) { 
-                let pA=pairs[0], found=false; 
-                for(let k=1; k<pairs.length; k++) { 
-                    let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
-                    if(all.size===4) { roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2}); pairs.splice(k,1); pairs.splice(0,1); found=true; break; } 
-                } 
-                if(!found) pairs.splice(0,1); 
-            } 
-        } 
-        roundMatches.forEach(m => { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1:m.p1, p2:m.p2, p3:m.p3, p4:m.p4, s1:'', s2:'', saved:false, isBye:false }); });
-        saveDB(); renderApp();
-    }
-    
-    window.addManual = (gid) => { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1:'', p2:'', p3:'', p4:'', s1:'', s2:'', saved:false, isBye:false }); saveDB(); renderApp(); }
-
-    window.delM = (mid, e) => { 
-        if(e) e.stopPropagation();
-        if(confirm("Excluir este Jogo?")) { 
-            appState.matches = appState.matches.filter(m=>m.mid!==mid); 
-            recalc(); saveDB(); renderApp(); 
-        } 
-    };
-
-    window.saveScore = async (mid, type, btnElement) => { 
-        const matchIndex = appState.matches.findIndex(x=>x.mid===mid);
-        if(matchIndex === -1) return;
-        const m = appState.matches[matchIndex];
-
-        if(m.saved) { if(confirm("Alterar placar?")) { m.saved = false; recalc(); saveDB(); renderApp(); } return; }
-
-        let container = btnElement.parentElement;
-        if (btnElement.closest('tr')) container = btnElement.closest('tr');
-        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
-        if (btnElement.closest('.queue-match-item')) container = btnElement.closest('.queue-match-item');
-        
-        let inputs = container.querySelectorAll('input[type="tel"]');
-        let val1 = inputs[0] ? inputs[0].value : ''; let val2 = inputs[1] ? inputs[1].value : '';
-        if(val1 === '' || val2 === '') { alert(`Preencha o placar.`); return; }
-        
-        let s1 = parseInt(val1); let s2 = parseInt(val2);
-        if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { if(!confirm("Jogo parece não ter acabado. Salvar?")) return; }
-        
-        m.s1 = s1; m.s2 = s2; m.saved = true;
-        recalc(); if(m.gid.includes('ko')) advanceWinner(mid, m, s1, s2); saveDB(); renderApp(); 
+        document.getElementById('modal-knockout').style.display = 'none'; saveDB(); switchAppView('bracket');
     }
 
     function advanceWinner(mid, currentMatch, s1, s2) {
@@ -1146,345 +401,106 @@
                 else { appState.matches[globalTargetIndex].p3 = w1; appState.matches[globalTargetIndex].p4 = w2; }
             }
         }
-
-        if(koMatches.filter(m => m.round === nextRound && !m.isThirdPlace).length === 1) {
-            const thirdPlaceMatch = koMatches.find(m => m.isThirdPlace === true);
-            if(thirdPlaceMatch) {
-                const tIdx = appState.matches.findIndex(m => m.mid === thirdPlaceMatch.mid);
-                if(tIdx > -1) {
-                    if(currentMatch.pos % 2 === 0) { appState.matches[tIdx].p1 = l1; appState.matches[tIdx].p2 = l2; } 
-                    else { appState.matches[tIdx].p3 = l1; appState.matches[tIdx].p4 = l2; }
-                }
-            }
-        }
     }
 
-    window.editS = async (mid) => { if(!confirm("Editar placar?")) return; const mIdx = appState.matches.findIndex(x => x.mid === mid); if(mIdx > -1) { appState.matches[mIdx].saved = false; saveDB(); renderApp(); } }
-    
-    function recalc() { 
-        appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
-        appState.matches.forEach(m => { 
-            if(m.saved && !m.isBye && !m.gid.includes('ko')) { 
-                const run = (id, my, op) => { 
-                    const pl = appState.players.find(x => x.id === id); 
-                    if(pl) { pl.games++; pl.bal += my - op; pl.gamesWon += my; pl.gamesPlayed += (my + op); if(my > op) { pl.wins++; pl.pts += 3; } } 
-                }; 
-                run(m.p1, m.s1, m.s2); run(m.p3, m.s2, m.s1); 
-                if(appState.mode === 'individual'){ run(m.p2, m.s1, m.s2); run(m.p4, m.s2, m.s1); } 
+    function recalc() {
+        appState.players.forEach(p => { p.pts=0; p.wins=0; p.bal=0; p.gamesWon=0; p.gamesPlayed=0; });
+        appState.matches.forEach(m => {
+            if(m.saved && !m.gid.includes('ko')) {
+                const U = (id, my, op) => { const p = appState.players.find(x=>x.id===id); if(p){ p.bal+=my-op; p.gamesWon+=my; p.gamesPlayed+=my+op; if(my>op){p.wins++; p.pts+=3;} } };
+                U(m.p1, m.s1, m.s2); U(m.p3, m.s2, m.s1); if(appState.mode==='individual'){ U(m.p2, m.s1, m.s2); U(m.p4, m.s2, m.s1); }
             }
-        }); 
-        appState.players.forEach(p => { p.gameAvg = p.manualGA !== undefined ? p.manualGA : (p.gamesPlayed > 0 ? p.gamesWon / p.gamesPlayed : 0); });
-    }
-
-    window.resetKnockout = () => { if(confirm("Excluir Mata-Mata?")) { appState.groups = appState.groups.filter(g => !g.id.includes('ko')); appState.matches = appState.matches.filter(m => !m.gid.includes('ko')); saveDB(); renderApp(); switchAppView('groups'); } }
-    
-    window.editGA = (pid, e) => {
-        if(e) e.stopPropagation();
-        if(document.body.classList.contains('viewer-mode')) return;
-        const p = appState.players.find(x => x.id === pid); if(!p) return;
-        const current = p.manualGA !== undefined ? p.manualGA : (p.gameAvg || 0);
-        const input = prompt(`Editar GA de ${p.name}\nDeixe em branco para Automático:`, current.toFixed(2));
-        if(input === null) return;
-        if(input.trim() === "") { delete p.manualGA; } else { const parsed = parseFloat(input.replace(',', '.')); if(!isNaN(parsed)) p.manualGA = parsed; else return alert("Inválido."); }
-        recalc(); saveDB(); renderApp();
-    };
-
-    window.editName = (pid, oldName, e) => { if(e) e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; saveDB(); renderApp(); } } }
-    window.removeFromGroup = (pid, e) => { if(e) e.stopPropagation(); if(confirm("Voltar para reserva?")) { const p = appState.players.find(x => x.id === pid); if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; saveDB(); renderApp(); } } }
-    window.openPlayerSelect = (mid, slot) => { if(document.body.classList.contains('viewer-mode')) return; selectingMatch = mid; selectingSlot = slot; const m = appState.matches.find(x => x.mid === mid); if(!m) return; const isKO = m.gid.includes('ko'); const list = document.getElementById('select-list-container'); list.innerHTML = ''; const noneItem = document.createElement('div'); noneItem.className = 'select-item'; noneItem.innerText = '[ Vazio ]'; noneItem.onclick = () => confirmPlayerSelect(''); list.appendChild(noneItem); let candidates = isKO ? appState.players : appState.players.filter(p => p.groupId === m.gid); candidates.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => { const item = document.createElement('div'); item.className = 'select-item'; item.innerText = p.name; item.onclick = () => confirmPlayerSelect(p.id); list.appendChild(item); }); document.getElementById('modal-player-select').style.display = 'flex'; }
-    window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; saveDB(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
-    
-    // UTILS
-    window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
-    window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; saveDB(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro: " + err.message); } }; reader.readAsText(file); }
-    window.setMode = (m) => { if(appState.players.length && !confirm("Mudar formato?"))return; appState.mode=m; saveDB(); renderApp(); }
-    window.resetT = () => { if(confirm("Zerar Torneio?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; saveDB(); renderApp(); } }
-    window.forceSave = () => { recalc(); saveDB(); renderApp(); alert("💾 Salvo na nuvem!"); };
-    const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
-
-    function getOptimizedMatchOrder(matches) {
-        let groupMatches = matches.filter(m => !m.gid.includes('ko') && !m.isBye);
-        let pending = groupMatches.map((m, originalIndex) => ({ m, originalIndex }));
-        let scheduled = []; let lastPlayed = {}; 
-        while(pending.length > 0) {
-            let bestIdx = -1; let maxScore = -Infinity;
-            for(let i = 0; i < pending.length; i++) {
-                let item = pending[i]; let m = item.m; let p = [m.p1, m.p2, m.p3, m.p4].filter(x => x && x !== 'd');
-                let minWait = Infinity;
-                for(let pid of p) { let last = lastPlayed[pid] !== undefined ? lastPlayed[pid] : -100; let wait = scheduled.length - last; if(wait < minWait) minWait = wait; }
-                let score = minWait * 1000 - item.originalIndex;
-                if(score > maxScore) { maxScore = score; bestIdx = i; }
-            }
-            let selected = pending.splice(bestIdx, 1)[0]; scheduled.push(selected.m);
-            let p = [selected.m.p1, selected.m.p2, selected.m.p3, selected.m.p4].filter(x => x && x !== 'd');
-            for(let pid of p) { lastPlayed[pid] = scheduled.length - 1; }
-        }
-        return scheduled;
+        });
+        appState.players.forEach(p => p.gameAvg = p.manualGA || (p.gamesPlayed ? p.gamesWon/p.gamesPlayed : 0));
     }
 
     function renderApp() {
-        appState.players.forEach(p => { p.tempGroupRank = null; p.tempGroupName = null; });
+        appState.players.forEach(p => { p.tRank = null; p.tName = null; });
+        let allP = [];
         appState.groups.forEach(g => {
-            if (!g.id.includes('ko-')) {
-                let ps = appState.players.filter(p=>p.groupId===g.id);
-                ps = [...ps].sort((a, b) => {
-                    if (b.pts !== a.pts) return b.pts - a.pts;
-                    if (b.bal !== a.bal) return b.bal - a.bal;
-                    const aGA = a.gameAvg || 0; const bGA = b.gameAvg || 0;
-                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-                    if (b.wins !== a.wins) return b.wins - a.wins;
-                    return a.name.localeCompare(b.name);
-                });
-                ps.forEach((p, ix) => { p.tempGroupRank = ix + 1; p.tempGroupName = g.name; });
+            if (!g.id.includes('ko')) {
+                let ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b) => b.pts - a.pts || b.bal - a.bal || b.gameAvg - a.gameAvg);
+                ps.forEach((p, ix) => { p.tRank = ix + 1; p.tName = g.name; allP.push(p); });
             }
         });
 
-        const gc = document.getElementById('groups-container'); gc.innerHTML='';
-        const bc = document.getElementById('bracket-container'); if(bc) bc.innerHTML = '';
-
-        const focusedId = document.activeElement ? document.activeElement.id : null;
-        document.getElementById('btn-mod-ind').style.background = appState.mode==='individual'?'var(--secondary)':'#ccc';
-        document.getElementById('btn-mod-fix').style.background = appState.mode==='fixed'?'var(--secondary)':'#ccc';
-        const pl = document.getElementById('pool-list'); pl.innerHTML=''; const poolPs = appState.players.filter(p=>p.groupId==='pool'); document.getElementById('pool-cnt').innerText = poolPs.length;
+        document.getElementById('groups-container').innerHTML = ''; document.getElementById('bracket-container').innerHTML = ''; document.getElementById('queue-container').innerHTML = '';
         
-        poolPs.forEach(p => { 
-            const d = document.createElement('div'); 
-            d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
-            d.onclick=(e)=>window.toggleSel(p.id,e);
-            d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="delPlayer('${p.id}', event)" style="color:red; cursor:pointer;" title="Excluir do Torneio">✕</span></div>`; 
-            pl.appendChild(d); 
-        });
-
-        const queueContainer = document.getElementById('queue-container');
-        if(queueContainer) {
-            let sortedMatches = getOptimizedMatchOrder(appState.matches);
-            if (sortedMatches.length === 0) {
-                queueContainer.innerHTML = '<div style="text-align:center; color:#999; padding: 20px;">Nenhum jogo de grupo pendente ou gerado.</div>';
-            } else {
-                let qHtml = '';
-                sortedMatches.forEach((m, idx) => {
-                    const g = appState.groups.find(x => x.id === m.gid);
-                    const n = (id) => appState.players.find(x=>x.id===id)?.name || '...';
-                    const p1Name = m.p1 ? n(m.p1) : '...'; const p2Name = m.p2 ? n(m.p2) : '...';
-                    const p3Name = m.p3 ? n(m.p3) : '...'; const p4Name = m.p4 ? n(m.p4) : '...';
-                    const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
-                    const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
-                    
-                    let isEditing = !m.saved;
-                    let opacity = m.saved ? '0.6' : '1';
-                    
-                    qHtml += `
-                    <div class="queue-match-item" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0; opacity: ${opacity};">
-                        <div style="font-weight:900; color:#333; width:35px; font-size:1.1em;" title="Ordem do Jogo">#${idx+1}</div>
-                        <div style="flex:1; display:flex; flex-direction:column;">
-                            <div style="font-size:0.75em; color:var(--primary); font-weight:800; text-transform:uppercase; margin-bottom:2px;">${g ? g.name : ''}</div>
-                            <div style="display:flex; justify-content:center; align-items:center; padding-right:5px; font-weight:700; font-size:0.95em;">
-                                <div style="text-align:right; flex:1; line-height:1.2;">${t1}</div>
-                                
-                                <div style="display:flex; align-items:center; margin: 0 10px;">
-                                    ${isEditing ? 
-                                        `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                         <span style="color:#aaa; font-size:0.9em;">X</span>
-                                         <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
-                                        : 
-                                        `<div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s1}</div>
-                                         <span style="color:#aaa; font-size:0.9em; margin:0 5px;">X</span>
-                                         <div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s2}</div>`
-                                    }
-                                </div>
-                                
-                                <div style="text-align:left; flex:1; line-height:1.2;">${t2}</div>
-                            </div>
-                        </div>
-                        <div class="admin-only" style="display:flex; align-items:center; width:35px; justify-content:flex-end;">
-                             ${isEditing ? 
-                                `<button class="btn-icon-circle" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'queue', this)" title="Salvar Placar">✓</button>` 
-                                : 
-                                `<button class="btn-icon-circle" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>`
-                            }
-                        </div>
+        appState.groups.forEach(g => {
+            if(g.id.includes('ko')) {
+                let html = `<div class="group-box" style="border:2px solid var(--primary)"><div class="group-header" style="background:var(--primary)">${g.name}</div>`;
+                appState.matches.filter(m=>m.gid===g.id).forEach(m => {
+                    const n = id => id==='BYE'?'BYE':(appState.players.find(x=>x.id===id)?.name || '');
+                    html += `<div class="ko-match-item">
+                        <div style="flex:1;text-align:right;padding-right:10px;font-size:0.9em">${n(m.p1)}<br>${n(m.p2)}</div>
+                        <div><input type="tel" value="${m.s1}" style="width:30px;text-align:center" ${m.saved?'disabled':''}> X <input type="tel" value="${m.s2}" style="width:30px;text-align:center" ${m.saved?'disabled':''}></div>
+                        <div style="flex:1;padding-left:10px;font-size:0.9em">${n(m.p3)}<br>${n(m.p4)}</div>
+                        <button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', this)">${m.saved?'✎':'✓'}</button>
                     </div>`;
                 });
-                queueContainer.innerHTML = qHtml;
-            }
-        }
-        
-        let h = ''; 
-
-        appState.groups.forEach((g,i) => {
-            let ps = appState.players.filter(p=>p.groupId===g.id);
-            ps = [...ps].sort((a, b) => {
-                if (b.pts !== a.pts) return b.pts - a.pts;
-                if (b.bal !== a.bal) return b.bal - a.bal;
-                const aGA = a.gameAvg || 0; const bGA = b.gameAvg || 0;
-                if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                return a.name.localeCompare(b.name);
-            });
-            const ms = appState.matches.filter(m=>m.gid===g.id);
-            const col = document.createElement('div'); col.className='group-box'; 
-            
-            if(g.id.includes('ko-')) { 
-                col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:15px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Chave">✕</span></div></div>`;
-                
-                h += `<div class="ko-list">`;
-                const rounds = {};
-                ms.forEach(m => { if(m.isThirdPlace) { if(!rounds['3rd']) rounds['3rd'] = []; rounds['3rd'].push(m); } else { if(!rounds[m.round]) rounds[m.round] = []; rounds[m.round].push(m); } });
-                let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
-                roundKeys.forEach(rNum => {
-                    let rName = 'Fase ' + rNum; const count = rounds[rNum].length;
-                    if(count === 8) rName = 'OITAVAS DE FINAL'; if(count === 4) rName = 'QUARTAS DE FINAL'; if(count === 2) rName = 'SEMI-FINAL'; if(count === 1) rName = 'FINAL';
-                    h += `<div class="ko-round-header">${rName}</div>`;
-                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...'); const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...'); const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const formatName = (pid, name) => { if (!pid || pid === 'BYE') return name; const p = appState.players.find(x => x.id === pid); if(p && p.tempGroupRank && p.tempGroupName) { const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`; return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`; } return name; };
-                        const formatAdmin = (pid, name, slot) => { if (!pid || pid === 'BYE') return name; return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`; };
-
-                        let t1 = '', t1_admin = ''; if (appState.mode === 'fixed') { t1 = formatName(m.p1, p1Name); t1_admin = formatAdmin(m.p1, p1Name, 'p1'); } else { t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`; t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`; }
-                        let t2 = '', t2_admin = ''; if (appState.mode === 'fixed') { t2 = formatName(m.p3, p3Name); t2_admin = formatAdmin(m.p3, p3Name, 'p3'); } else { t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`; t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`; }
-                        
-                        const isEditing = !m.saved && !m.isBye; const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
-                        h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only">${t1_admin}</div><div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                            ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0"><span class="ko-vs">X</span><input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` : `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div><div class="ko-vs">X</div><div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`}
-                            <div class="ko-player admin-only">${t2_admin}</div><div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                            ${isEditing && hasPlayers ? `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` : (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')}
-                        </div>`;
-                    });
-                });
-
-                if(rounds['3rd']) {
-                    h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
-                    rounds['3rd'].forEach(m => {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...'; const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
-                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...'; const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
-                        const formatName = (pid, name) => { if (!pid || pid === 'BYE') return name; const p = appState.players.find(x => x.id === pid); if(p && p.tempGroupRank && p.tempGroupName) { const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`; return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`; } return name; };
-                        const formatAdmin = (pid, name, slot) => { if (!pid || pid === 'BYE') return name; return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`; };
-
-                        let t1 = '', t1_admin = ''; if (appState.mode === 'fixed') { t1 = formatName(m.p1, p1Name); t1_admin = formatAdmin(m.p1, p1Name, 'p1'); } else { t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`; t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`; }
-                        let t2 = '', t2_admin = ''; if (appState.mode === 'fixed') { t2 = formatName(m.p3, p3Name); t2_admin = formatAdmin(m.p3, p3Name, 'p3'); } else { t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`; t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`; }
-
-                        const isEditing = !m.saved; const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
-                        h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only">${t1_admin}</div><div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                            ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0"><span class="ko-vs">X</span><input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` : `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div><div class="ko-vs">X</div><div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`}
-                            <div class="ko-player admin-only">${t2_admin}</div><div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                            ${isEditing && hasPlayers ? `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` : (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')}
-                        </div>`;
-                    });
-                }
-                h += `</div>`;
-                if(bc) bc.innerHTML = h;
-                
+                document.getElementById('bracket-container').innerHTML += html + '</div>';
             } else {
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:15px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                let ps = appState.players.filter(p=>p.groupId===g.id).sort((a,b) => b.pts - a.pts || b.bal - a.bal || b.gameAvg - a.gameAvg);
+                let ms = appState.matches.filter(m=>m.gid===g.id);
                 
-                if(ms.length) {
-                    h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
-                    ms.forEach(m => {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name || (id===''?'<span style="color:var(--primary); font-style:italic;">Selecionar...</span>':'?');
-                        const p1Block = `<span class="player-link ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>`;
-                        const p2Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p2===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p2')">${n(m.p2)}</span>`;
-                        const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
-                        const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
+                // V181: BOTÃO DE FOTO INDIVIDUAL DO GRUPO ADICIONADO
+                let html = `<div class="group-box" id="${g.id}">
+                    <div class="group-header" style="background:var(--secondary)">
+                        <span onclick="moveSel('${g.id}')">${g.name}</span> 
+                        <div class="admin-only">
+                            <span onclick="exportWhatsApp('${g.id}', '${g.name.replace(' ', '_')}')" style="cursor:pointer; margin-right:10px;" title="Tirar Print deste Grupo">📸</span>
+                            <span onclick="renameGroup('${g.id}', event)" style="margin-right:10px; cursor:pointer;" title="Renomear">✎</span>
+                            <span onclick="delGroup('${g.id}')" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span>
+                        </div>
+                    </div>`;
+                
+                html += `<div class="admin-only" style="margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}')">⚡ Auto Matches</button><button class="btn-std btn-blue" onclick="addManual('${g.id}')">+ Jogo</button></div>`;
+                
+                html += `<table class="bt-table" style="font-size:0.8em"><tr><th>Atleta</th><th>Pts</th><th>S</th><th>GA</th></tr>`;
+                ps.forEach(p => {
+                    const isTied = p.pts > 0 && ps.filter(x => x.pts === p.pts && x.bal === p.bal && Math.abs(x.gameAvg - p.gameAvg) < 0.001).length > 1;
+                    html += `<tr><td style="text-align:left" class="${isTied?'blink-tie-bg':''}">${p.name} <span class="admin-only" style="color:var(--blue-masc);float:right;cursor:pointer" onclick="delPlayer('${p.id}')">✕</span></td><td>${p.pts}</td><td>${p.bal}</td><td onclick="editGA('${p.id}')">${p.gameAvg.toFixed(2)}</td></tr>`;
+                });
+                html += `</table>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer; text-align:center; font-weight:bold; margin-top:5px; padding:5px;" onclick="delM('${m.mid}', event)" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
-                    });
-                    h += `</tbody></table>`;
-                } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
-                
-                if(ps.length) { 
-                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`; 
-                    ps.forEach((p,ix) => {
-                        const isTied = p.pts > 0 && ps.filter(x => x.pts === p.pts && x.bal === p.bal && x.wins === p.wins && Math.abs((x.gameAvg||0) - (p.gameAvg||0)) < 0.001).length > 1;
-                        const spanClass = isTied ? "blink-tie-bg" : "";
-                        h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span class="${spanClass}">${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`;
-                    }); 
-                    h += `</table>`; 
-                }
+                ms.forEach(m => {
+                    const n = id => appState.players.find(x=>x.id===id)?.name || '...';
+                    html += `<div style="display:flex;align-items:center;font-size:0.8em;border-bottom:1px dashed #ccc;padding:5px 0">
+                        <div style="flex:1;text-align:right;padding-right:5px">${n(m.p1)}<br>${n(m.p2)}</div>
+                        <div><input type="tel" value="${m.s1}" style="width:25px;text-align:center" ${m.saved?'disabled':''}> x <input type="tel" value="${m.s2}" style="width:25px;text-align:center" ${m.saved?'disabled':''}></div>
+                        <div style="flex:1;padding-left:5px">${n(m.p3)}<br>${n(m.p4)}</div>
+                        <button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', this)" style="background:#4CAF50;color:white;border:none;margin-right:5px;">${m.saved?'✎':'✓'}</button>
+                        <span class="admin-only" style="color:red;cursor:pointer" onclick="delM('${m.mid}')">✕</span>
+                    </div>`;
+                });
+                document.getElementById('groups-container').innerHTML += html + '</div>';
             }
-            col.innerHTML = h;
-            gc.appendChild(col);
         });
 
-        const activeGroups = appState.groups.filter(g => !g.id.includes('ko-'));
-        if (activeGroups.length > 0) {
-            let allPlayers = appState.players.filter(p => p.tempGroupRank);
-            if(allPlayers.length > 0) {
-                allPlayers.sort((a,b) => {
-                    if (a.tempGroupRank !== b.tempGroupRank) return a.tempGroupRank - b.tempGroupRank;
-                    if (b.pts !== a.pts) return b.pts - a.pts;
-                    const aGA = a.gameAvg || 0;
-                    const bGA = b.gameAvg || 0;
-                    if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-                    if (b.bal !== a.bal) return b.bal - a.bal;
-                    if (b.wins !== a.wins) return b.wins - a.wins;
-                    return a.name.localeCompare(b.name);
-                });
-
-                const genCol = document.createElement('div');
-                genCol.className = 'group-box';
-                genCol.style.gridColumn = '1 / -1'; 
-                genCol.style.borderColor = 'var(--primary)';
-                genCol.style.maxWidth = '800px'; 
-                genCol.style.margin = '0 auto';
-                genCol.style.width = '100%';
-                
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
-                <table class="bt-table" style="margin-top:0; border-top:none;">
-                <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`;
-                
-                allPlayers.forEach(p => {
-                    let rankClass = p.tempGroupRank === 1 ? 'color: var(--primary); font-weight: 900;' : (p.tempGroupRank === 2 ? 'color: #2196F3; font-weight:bold;' : 'color: #666;');
-                    thHtml += `<tr style="font-size:0.85em">
-                        <td style="${rankClass}" title="Posição Geral">${p.tempGroupRank}º</td>
-                        <td style="font-weight:bold; font-size:0.8em; color:#555;" title="Grupo de Origem">${p.tempGroupName.replace('GRUPO ', '')}</td>
-                        <td style="text-align:left; font-weight:bold;" title="${p.name}">${p.name}</td>
-                        <td title="Jogos Disputados">${p.games}</td>
-                        <td title="Vitórias">${p.wins}</td>
-                        <td title="Saldo de Games">${p.bal}</td>
-                        <td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td>
-                        <td style="font-weight:bold; color:var(--secondary)" title="Pontuação">${p.pts}</td>
-                    </tr>`;
-                });
-                thHtml += `</table>`;
-                genCol.innerHTML = thHtml;
-                gc.appendChild(genCol);
-            }
+        // Tabela Geral Ranking
+        if(allP.length) {
+            allP.sort((a,b) => a.tRank - b.tRank || b.pts - a.pts || b.bal - a.bal || b.gameAvg - a.gameAvg);
+            let gHTML = `<div class="group-box" id="ranking-geral-box" style="border-color:var(--primary)"><div class="group-header" style="background:var(--primary)">🏆 RANKING GERAL</div><table class="bt-table" style="font-size:0.8em"><tr><th>#</th><th>Gr.</th><th>Atleta</th><th>Pts</th><th>S</th><th>GA</th></tr>`;
+            allP.forEach(p => gHTML += `<tr><td style="font-weight:bold">${p.tRank}º</td><td>${p.tName.split(' ')[1]}</td><td style="text-align:left">${p.name}</td><td>${p.pts}</td><td>${p.bal}</td><td>${p.gameAvg.toFixed(2)}</td></tr>`);
+            document.getElementById('general-ranking-container').innerHTML = gHTML + '</table></div>';
         }
 
-        if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
-    }
-    
-    // REGISTRO DO PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js');
+        // Render Reservas
+        let pl = document.getElementById('pool-list'); pl.innerHTML = '';
+        appState.players.filter(p=>p.groupId==='pool').forEach(p => {
+            pl.innerHTML += `<span onclick="toggleSel('${p.id}')" style="padding:5px 10px; border:1px solid #ccc; margin:2px; display:inline-block; border-radius:4px; cursor:pointer; background:${selectedPid===p.id?'var(--primary)':'#f9f9f9'}; color:${selectedPid===p.id?'white':'black'}">${p.name} <b class="admin-only" style="color:red;margin-left:5px" onclick="delPlayer('${p.id}')">✕</b></span>`;
         });
     }
 
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const btnInstall = document.getElementById('btn-install-app');
-        if(btnInstall) btnInstall.style.display = 'flex';
-    });
-
-    window.installApp = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('btn-install-app').style.display = 'none';
-            }
-            deferredPrompt = null;
+    window.editGA = pid => { 
+        if(document.body.classList.contains('viewer-mode')) return;
+        const val = prompt("GA Manual (Deixe em branco para Automático):"); 
+        if(val !== null) { 
+            const p = appState.players.find(x=>x.id===pid);
+            if(val.trim() === '') delete p.manualGA; else p.manualGA = parseFloat(val.replace(',','.')); 
+            recalc(); saveDB(); renderApp();
         }
-    };
+    }
 </script>
 </body>
 </html>
