@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#004e98">
+    <meta name="theme-color" content="#9c27b0">
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,7 +24,7 @@
         :root { --primary: #ff6b00; --secondary: #0f172a; --bg-body: #f4f6f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-dark); margin: 0; height: 100vh; display: flex; flex-direction: column; font-size: var(--font-base); }
         
-        /* NAVBAR */
+        /* NAVBAR DO LAB (ROXO) */
         .navbar { background: white; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; border-bottom: 3px solid #9c27b0; }
         .nav-logo { font-weight: 800; font-size: 1.1em; color: var(--secondary); display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
         .nav-logo span { font-size: 1.4em; }
@@ -130,7 +130,6 @@
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
 
-        /* KNOCKOUT LIST VIEW */
         .ko-round-header { background: #444; color: white; padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; }
         .ko-list { background: white; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
         .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -139,19 +138,7 @@
         .ko-vs { font-size: 0.8em; color: #999; margin: 0 10px; }
         .ko-score { width: 40px; text-align: center; font-weight: 900; color: var(--primary); }
 
-        /* ANIMAÇÃO DE EMPATE ABSOLUTO */
-        @keyframes pulse-tie-bg { 
-            0% { background-color: transparent; } 
-            50% { background-color: rgba(255, 59, 48, 0.35); border-radius: 4px; } 
-            100% { background-color: transparent; } 
-        }
-        .blink-tie-bg { 
-            animation: pulse-tie-bg 1.5s infinite; 
-            padding: 3px 6px;
-            display: inline-block;
-        }
-
-        /* MODAL ROLETA */
+        /* MODAL ROLETA DE SORTEIO */
         #modal-sorteio { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 4000; display: none; justify-content: center; align-items: center; flex-direction: column; color: white; text-align: center; }
         .spinner-container { margin-bottom: 20px; font-size: 5em; animation: bounce 0.5s infinite alternate; }
         @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
@@ -159,18 +146,18 @@
 </head>
 <body class="viewer-mode">
 
-<div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-    <div style="font-size:3.5em;" id="loading-icon">🎾</div><b id="loading-text">Carregando Lab...</b>
-</div>
-
 <div id="modal-sorteio">
     <div class="spinner-container">🎲</div>
     <h2 style="color:var(--primary); margin:0 0 15px 0; text-transform:uppercase;">Sorteando Vagas...</h2>
     <div id="sorteio-text" style="font-size:2em; font-weight:900; color:white;">Preparando</div>
 </div>
 
+<div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
+    <div style="font-size:3.5em;" id="loading-icon">🎾</div><b id="loading-text">Carregando Lab...</b>
+</div>
+
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#9c27b0; font-size:0.7em; vertical-align:super;">LAB 🧪</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#9c27b0; font-size:0.7em; vertical-align:super;">LABORATÓRIO 🧪</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
     <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
 </div>
 
@@ -273,8 +260,7 @@
 
     <div id="view-groups" class="view-section active">
         <div class="admin-only" style="display:flex; gap:5px; margin-bottom:15px;">
-            <button class="btn-std btn-dark" style="font-size:0.85em; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="exportWhatsApp('groups-container', 'Todos_Os_Grupos')"><span class="material-icons" style="font-size:1.2em;">photo_camera</span> Todos Grupos</button>
-            <button class="btn-std btn-dark" style="font-size:0.85em; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="exportWhatsApp('general-ranking-container', 'Ranking_Geral')"><span class="material-icons" style="font-size:1.2em;">photo_camera</span> Ranking Geral</button>
+            <button class="btn-std btn-dark" style="font-size:0.85em; display:flex; align-items:center; justify-content:center; gap:5px;" onclick="exportWhatsApp('groups-container', 'Todos_Os_Grupos')"><span class="material-icons" style="font-size:1.2em;">photo_camera</span> Todos Grupos (Print)</button>
         </div>
 
         <div class="board">
@@ -285,21 +271,18 @@
                 </div>
                 <div id="pool-list" style="padding:5px; display:flex; flex-direction:column; gap:2px;"></div>
             </div>
-            
             <div id="groups-container"></div>
         </div>
         
-        <div id="general-ranking-container" style="margin-top: 20px; width: 100%;"></div>
     </div>
     
     <div id="view-bracket" class="view-section">
-        <button class="admin-only btn-std btn-dark" onclick="exportWhatsApp('bracket-container', 'Chaveamento')" style="margin-bottom:15px; display:flex; justify-content:center; align-items:center; gap:8px;"><span class="material-icons">photo_camera</span> Compartilhar Chaves</button>
-
+        <button class="admin-only btn-std btn-dark" onclick="exportWhatsApp('bracket-container', 'Chaveamento')" style="margin-bottom:15px; display:flex; justify-content:center; align-items:center; gap:8px;"><span class="material-icons">photo_camera</span> Compartilhar Chaves (Print)</button>
         <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto 40px; padding:5px; border-radius:8px;"></div>
     </div>
 </div>
 
-<div class="app-footer">Todos os direitos reservados © 2026<br>Desenvolvido por <a href="https://instagram.com/lsibie" target="_blank">@LSIBIE</a></div>
+<div class="app-footer">Todos os direitos reservados © 2026<br>Desenvolvido por <a href="https://instagram.com/lsibie" target="_blank" style="color:var(--primary); font-weight:bold; text-decoration:none;">@LSIBIE</a></div>
 
 <div id="modal-login">
     <div class="modal-box">
@@ -347,10 +330,7 @@
     <h3 class="modal-title">Configurar Mata-Mata</h3>
     <p style="font-size:0.9em;color:#666;">Classificados por grupo:</p>
     <div id="knockout-config-list" style="max-height:40vh;overflow-y:auto;margin-bottom:10px;"></div>
-    
-    <div id="knockout-summary" style="background:#e3f2fd; color:#0d47a1; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold; font-size:0.9em;">
-    </div>
-    
+    <div id="knockout-summary" style="background:#e3f2fd; color:#0d47a1; padding:10px; border-radius:6px; margin-bottom:15px; font-weight:bold; font-size:0.9em;"></div>
     <div style="display:flex;gap:10px;">
         <button class="btn-std btn-org" onclick="execKnockout()">Gerar Chaves</button>
         <button class="btn-std btn-red" onclick="document.getElementById('modal-knockout').style.display='none'">Cancelar</button>
@@ -410,6 +390,7 @@
     const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
     const MASTER_PASS = "lucas10";
 
+    // CHAVES DO LABORATÓRIO 🧪
     const firebaseConfig = {
       apiKey: "AIzaSyCttgr7SLeDU92pcMs5wcNGvLc7joZvw00",
       authDomain: "bt-manager-testes.firebaseapp.com",
@@ -535,7 +516,7 @@
     }
 
     window.toggleFavorite = (id, e) => {
-        if(e) e.stopPropagation();
+        e.stopPropagation();
         if(!user) return alert("Faça login para favoritar.");
         const isFav = favorites[id] ? null : true; 
         update(ref(db, `users/${user.uid}/favorites`), { [id]: isFav });
@@ -1005,12 +986,10 @@
     }
 
     window.resetKnockout = () => {
-        try {
-            if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
-            appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
-            appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
-            save(); renderApp(); switchAppView('groups');
-        } catch(e) { alert("Erro ao excluir: " + e.message); }
+        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
+        appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
+        appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
+        save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
     }
 
     window.execKnockout = () => {
@@ -1055,10 +1034,20 @@
             let unpaired = [...qualified];
             while (unpaired.length > 0) {
                 let pA = unpaired.shift(); 
+                
                 let bIndex = unpaired.findIndex(p => p.groupId !== pA.groupId);
-                if (bIndex === -1) bIndex = 0;
+                
+                if (bIndex === -1) {
+                    bIndex = 0;
+                }
+                
                 let pB = unpaired.splice(bIndex, 1)[0]; 
-                finalSeeds.push({ isPair: true, pA: pA, pB: pB });
+                
+                finalSeeds.push({
+                    isPair: true,
+                    pA: pA,
+                    pB: pB
+                });
             }
         } else {
             finalSeeds = qualified.map(q => ({ isPair: false, pA: q, pB: null }));
@@ -1169,9 +1158,191 @@
         
         document.getElementById('modal-knockout').style.display = 'none';
         save();
+        alert("Chave Gerada!");
         switchAppView('bracket');
     }
 
+    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
+
+    window.editGA = (pid, e) => {
+        e.stopPropagation();
+        if(document.body.classList.contains('viewer-mode')) return;
+        const p = appState.players.find(x => x.id === pid);
+        if(!p) return;
+        const current = p.manualGA !== undefined ? p.manualGA : (p.gameAvg || 0);
+        const input = prompt(`Editar GA de ${p.name}\n\nDigite o novo valor (ex: 1.50) ou deixe em branco para o sistema voltar a calcular automaticamente:`, current.toFixed(2));
+        
+        if(input === null) return;
+        
+        if(input.trim() === "") {
+            delete p.manualGA;
+        } else {
+            const parsed = parseFloat(input.replace(',', '.'));
+            if(!isNaN(parsed)) {
+                p.manualGA = parsed;
+            } else {
+                alert("Valor inválido. Use números e ponto/vírgula.");
+                return;
+            }
+        }
+        recalc();
+        save();
+        renderApp();
+    };
+
+    window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); renderApp(); } } }
+    window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); renderApp(); } } }
+    
+    window.removeFromGroup = (pid, e) => { 
+        e.stopPropagation(); 
+        if(confirm("Remover do grupo e voltar para a reserva?")) { 
+            const p = appState.players.find(x => x.id === pid); 
+            if(p) { p.groupId = 'pool'; p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; save(); renderApp(); } 
+        } 
+    }
+    
+    window.delPlayer = (pid) => { 
+        if(confirm("Excluir este jogador do torneio permanentemente?")) { 
+            appState.players = appState.players.filter(p=>p.id!==pid); 
+            save(); renderApp(); 
+        } 
+    }
+
+    window.openPlayerSelect = (mid, slot) => {
+        if(document.body.classList.contains('viewer-mode')) return;
+        selectingMatch = mid; selectingSlot = slot;
+        const m = appState.matches.find(x => x.mid === mid);
+        if(!m) return;
+        const isKO = m.gid.includes('ko');
+        const list = document.getElementById('select-list-container'); list.innerHTML = '';
+        const noneItem = document.createElement('div'); noneItem.className = 'select-item'; noneItem.innerText = '[ Vazio ]'; noneItem.onclick = () => confirmPlayerSelect(''); list.appendChild(noneItem);
+        let candidates = isKO ? appState.players : appState.players.filter(p => p.groupId === m.gid);
+        candidates.sort((a,b) => a.name.localeCompare(b.name)).forEach(p => { const item = document.createElement('div'); item.className = 'select-item'; item.innerText = p.name; item.onclick = () => confirmPlayerSelect(p.id); list.appendChild(item); });
+        document.getElementById('modal-player-select').style.display = 'flex';
+    }
+
+    window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; save(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
+    
+    window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
+    
+    window.deleteItem = (type, id) => { 
+        if(type === 'arena') {
+            const isMaster = user && user.email && ADMIN_EMAILS.includes(user.email);
+            if(!isMaster) return alert("Apenas o administrador do sistema pode excluir Arenas.");
+        }
+        if(confirm("Apagar permanentemente?")) { 
+            if(type==='arena'){remove(ref(db, `arenas/${id}`)); remove(ref(db, `categories/${id}`));} 
+            else if(type==='category'){remove(ref(db, `categories/${curArenaId}/${id}`)); remove(ref(db, `tournaments_meta/${id}`));} 
+            else {remove(ref(db, `tournaments_meta/${curCatId}/${id}`)); remove(ref(db, `tournaments_data/${id}`));} 
+        } 
+    }
+    
+    window.forceSave = () => { 
+        recalc(); 
+        save(); 
+        renderApp(); 
+        alert("💾 Torneio salvo com sucesso na nuvem!"); 
+    };
+
+    function save() { if(appRef) set(appRef, appState); }
+    const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
+    
+    window.addPlayer = () => { 
+        const n = document.getElementById('pName').value.trim(); 
+        const phone = document.getElementById('pPhone').value.trim().replace(/\D/g, ''); 
+        if(!n) return; 
+        
+        if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe neste torneio!"); 
+        
+        appState.players.push({
+            id: 'p'+Date.now(), 
+            name: n, 
+            phone: phone, 
+            groupId: 'pool', 
+            games: 0, wins: 0, bal: 0, pts: 0
+        }); 
+        
+        if(curArenaId) { 
+            const safeKey = n.replace(/[.#$/[\]]/g, ""); 
+            update(ref(db, `arena_players/${curArenaId}`), { [safeKey]: true }); 
+        } 
+        
+        document.getElementById('pName').value = ''; 
+        document.getElementById('pPhone').value = ''; 
+        document.getElementById('pName').focus(); 
+        
+        save(); 
+        renderApp(); 
+    }
+    
+    window.autoGroupsCBT = () => {
+        const pool = appState.players.filter(p => p.groupId === 'pool');
+        const N = pool.length;
+        const effectiveN = appState.mode === 'individual' ? N / 2 : N;
+        
+        if(effectiveN < 3) return alert("Inscritos insuficientes para gerar grupos. (Mínimo de 3 duplas).");
+        
+        let G = effectiveN <= 5 ? 1 : Math.floor(effectiveN / 3);
+        if(!confirm(`Regras CBT:\nPara a quantidade atual de inscritos, o ideal é formar ${G} grupo(s).\n\nDeseja criar esses grupos e sortear os jogadores automaticamente?`)) return;
+        
+        let startIndex = appState.groups.length;
+        let newGroups = [];
+        for(let i=0; i<G; i++) {
+            const groupName = "GRUPO " + String.fromCharCode(64 + startIndex + i + 1);
+            let newG = { id: 'g' + Date.now() + i, name: groupName };
+            appState.groups.push(newG);
+            newGroups.push(newG);
+        }
+        pool.sort(()=>Math.random()-0.5); 
+        pool.forEach((p, index) => { p.groupId = newGroups[index % G].id; });
+        save(); renderApp();
+    }
+
+    window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now(), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
+
+    window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
+    window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; save(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro ao ler arquivo: " + err.message); } }; reader.readAsText(file); }
+    window.setMode = (m) => { if(appState.players.length && !confirm("Mudar?"))return; appState.mode=m; save(); renderApp(); }
+    window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); renderApp(); } }
+    window.toggleSel = (pid,e) => { if(document.body.classList.contains('viewer-mode'))return; e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
+    window.moveSel = (gid) => { if(!selectedPid)return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); save(); renderApp();} }
+    
+    // V182: A ROLETA AGORA FUNCIONA NESTE BOTÃO "DISTRIBUIR"
+    window.distribute = () => { 
+        const pool=appState.players.filter(p=>p.groupId==='pool'); 
+        if(!pool.length) return alert("Não há reservas para distribuir.");
+        if(!appState.groups.length) return alert("Crie pelo menos 1 grupo primeiro.");
+        if(!confirm("Efetuar sorteio e distribuir jogadores nos grupos?")) return;
+
+        const modal = document.getElementById('modal-sorteio');
+        const text = document.getElementById('sorteio-text');
+        
+        if (modal && text) {
+            modal.style.display = 'flex';
+            let ticks = 0; const speed = 100;
+            
+            const interval = setInterval(() => {
+                text.innerText = pool[Math.floor(Math.random() * pool.length)].name;
+                ticks++;
+                if (ticks > 25) { 
+                    clearInterval(interval);
+                    modal.style.display = 'none';
+                    
+                    pool.forEach(p=>{ 
+                        appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); 
+                        if(appState.groups.length) p.groupId=appState.groups[0].id; 
+                    }); 
+                    save(); renderApp(); 
+                }
+            }, speed);
+        } else {
+            pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); 
+            save(); renderApp(); 
+        }
+    }
+    
+    window.delGroup = (gid, e) => { e.stopPropagation(); if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); renderApp(); }}
+    
     window.genMatches = (gid) => { 
         const existing = appState.matches.filter(m => m.gid === gid);
         if(existing.length > 0) return alert("Já existem jogos.");
@@ -1314,17 +1485,7 @@
         if(mIdx > -1) { appState.matches[mIdx].saved = false; save(); renderApp(); }
     }
 
-    window.delM = (mid, e) => { 
-        try {
-            if(e) e.stopPropagation();
-            if(confirm("Excluir Jogo?")) { 
-                appState.matches=appState.matches.filter(m=>m.mid!==mid); 
-                recalc(); 
-                save(); 
-                renderApp(); 
-            } 
-        } catch(e) { alert("Erro ao apagar jogo: " + e.message); }
-    }
+    window.delM = (mid) => { if(confirm("Excluir?")) { appState.matches=appState.matches.filter(m=>m.mid!==mid); recalc(); save(); renderApp(); } }
     
     function recalc() { 
         appState.players.forEach(p => { p.games = 0; p.wins = 0; p.bal = 0; p.pts = 0; p.gamesWon = 0; p.gamesPlayed = 0; }); 
@@ -1343,37 +1504,6 @@
         });
     }
     
-    // V182: ROLETA DE SORTEIO
-    window.distribute = () => { 
-        const pool = appState.players.filter(p=>p.groupId==='pool'); 
-        if(!pool.length) return alert("Não há reservas para distribuir.");
-        if(!appState.groups.length) return alert("Crie pelo menos 1 grupo primeiro.");
-        if(!confirm("Efetuar sorteio e distribuir jogadores nos grupos?")) return;
-
-        const modal = document.getElementById('modal-sorteio');
-        const text = document.getElementById('sorteio-text');
-        modal.style.display = 'flex';
-
-        let ticks = 0;
-        const speed = 100;
-        
-        const interval = setInterval(() => {
-            text.innerText = pool[Math.floor(Math.random() * pool.length)].name;
-            ticks++;
-            
-            if (ticks > 25) { 
-                clearInterval(interval);
-                modal.style.display = 'none';
-
-                pool.forEach(p => { 
-                    appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); 
-                    if(appState.groups.length) p.groupId=appState.groups[0].id; 
-                }); 
-                save(); renderApp(); 
-            }
-        }, speed);
-    }
-
     function renderApp() {
         appState.players.forEach(p => { p.tempGroupRank = null; p.tempGroupName = null; });
         appState.groups.forEach(g => {
@@ -1399,7 +1529,7 @@
             const d = document.createElement('div'); 
             d.className=`pool-card ${selectedPid===p.id?'selected':''}`; 
             d.onclick=(e)=>window.toggleSel(p.id,e);
-            d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="delPlayer('${p.id}', event)" style="color:red; cursor:pointer;" title="Excluir do Torneio">✕</span></div>`; 
+            d.innerHTML = `<span>${p.name}</span><div class="admin-only" style="display:flex; gap:5px;"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="delPlayer('${p.id}'); event.stopPropagation()" style="color:red; cursor:pointer;" title="Excluir do Torneio">✕</span></div>`; 
             pl.appendChild(d); 
         });
 
@@ -1463,13 +1593,14 @@
             let ps = appState.players.filter(p=>p.groupId===g.id);
             ps = sortPlayersCBT(ps, appState.matches);
             const ms = appState.matches.filter(m=>m.gid===g.id);
+            
             const col = document.createElement('div'); 
             col.className='group-box'; 
-            col.id = g.id; // V182: ID NO GRUPO PARA O PRINT
+            col.id = g.id; // V182: ID NO ELEMENTO HTML PARA O PRINT INDIVIDUAL
             
             if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Chave">✕</span></div></div>`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
                 
                 h += `<div class="ko-list">`;
                 
@@ -1634,11 +1765,11 @@
                 }
                 
                 h += `</div>`;
-                if(bc) bc.innerHTML = h;
+                document.getElementById('bracket-container').innerHTML = h;
                 
             } else {
-                // V182: BOTÃO CÂMERA ADICIONADO AO CABEÇALHO DOS GRUPOS INDIVIDUAIS
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="exportWhatsApp('${g.id}', '${g.name.replace(/ /g, '_')}')" style="cursor:pointer; margin-right:10px;" title="Tirar Print deste Grupo">📸</span><span onclick="renameGroup('${g.id}', event)" style="margin-right:15px; padding:5px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer; padding:5px;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
+                // V182: BOTÃO CÂMERA INJETADO NO CABEÇALHO DO GRUPO INDIVIDUAL
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="exportWhatsApp('${g.id}', '${g.name.replace(/ /g, '_')}')" style="cursor:pointer; margin-right:10px;" title="Tirar Print deste Grupo">📸</span><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
                 
                 if(ms.length) {
                     h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
@@ -1649,7 +1780,7 @@
                         const p3Block = `<span class="player-link ${m.p3===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p3')">${n(m.p3)}</span>`;
                         const p4Block = appState.mode==='fixed' ? '' : `/<br><span class="player-link ${m.p4===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p4')">${n(m.p4)}</span>`;
 
-                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer; text-align:center; font-weight:bold; margin-top:5px; padding:5px;" onclick="delM('${m.mid}', event)" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
+                        h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer; text-align:center; font-weight:bold; margin-top:5px;" onclick="delM('${m.mid}')" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
@@ -1683,16 +1814,20 @@
                     return a.name.localeCompare(b.name);
                 });
 
+                // V182: ID E BOTÃO CÂMERA INJETADOS NO RANKING GERAL
                 const genCol = document.createElement('div');
                 genCol.className = 'group-box';
-                genCol.id = 'general-ranking-container';
+                genCol.id = 'ranking-geral-box';
                 genCol.style.gridColumn = '1 / -1'; 
                 genCol.style.borderColor = 'var(--primary)';
                 genCol.style.maxWidth = '800px'; 
                 genCol.style.margin = '0 auto';
                 genCol.style.width = '100%';
                 
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:space-between; display:flex;">
+                    <span>🏆 CLASSIFICAÇÃO GERAL</span>
+                    <span class="admin-only" style="cursor:pointer;" onclick="exportWhatsApp('ranking-geral-box', 'Ranking_Geral')" title="Tirar Print">📸</span>
+                </div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
                 <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`;
                 
@@ -1711,47 +1846,11 @@
                 });
                 thHtml += `</table>`;
                 genCol.innerHTML = thHtml;
-                
-                const grc = document.getElementById('general-ranking-container');
-                if (grc) {
-                    grc.replaceWith(genCol);
-                } else {
-                    gc.appendChild(genCol);
-                }
+                gc.appendChild(genCol);
             }
         }
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
-    }
-
-    // Try/Catch nas exclusões
-    window.delGroup = (gid, e) => { 
-        try {
-            e.stopPropagation(); 
-            if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { 
-                appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); 
-                appState.groups=appState.groups.filter(g=>g.id!==gid); 
-                appState.matches=appState.matches.filter(m=>m.gid!==gid); 
-                save(); 
-                renderApp(); 
-            }
-        } catch(err) { alert("Erro ao excluir grupo: " + err.message); }
-    };
-
-    window.delPlayer = (pid) => { 
-        try {
-            if(confirm("Excluir este jogador do torneio permanentemente?")) { 
-                appState.players = appState.players.filter(p=>p.id!==pid); 
-                save(); 
-                renderApp(); 
-            } 
-        } catch(err) { alert("Erro ao excluir jogador: " + err.message); }
-    };
-
-    function save() { 
-        if(appRef) {
-            set(appRef, appState).catch(err => alert("Atenção: Falha de conexão com o banco de dados. " + err.message)); 
-        } 
     }
     
     // REGISTRO DO MOTOR DO APLICATIVO (PWA)
