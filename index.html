@@ -892,44 +892,56 @@
 
     function sortPlayersCBT(players, matches) {
         return [...players].sort((a, b) => {
+            // 1. Desempate por Pontos
             if (b.pts !== a.pts) return b.pts - a.pts;
 
-            const tiedPoints = players.filter(p => p.pts === a.pts);
-            if (tiedPoints.length === 2) {
-                const match = matches.find(m => 
-                    m.saved && !m.isBye &&
-                    (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
-                    (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
-                );
-                if (match) {
-                    let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
-                    let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
-                    if (aScore !== bScore) return bScore - aScore;
+            // CONFRONTO DIRETO (Apenas para modo FIXAS)
+            if (appState.mode === 'fixed') {
+                const tiedPoints = players.filter(p => p.pts === a.pts);
+                if (tiedPoints.length === 2) {
+                    const match = matches.find(m => 
+                        m.saved && !m.isBye &&
+                        (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
+                        (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
+                    );
+                    if (match) {
+                        let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
+                        let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
+                        if (aScore !== bScore) return bScore - aScore;
+                    }
                 }
             }
 
+            // 2. Desempate por Saldo de Games
             if (b.bal !== a.bal) return b.bal - a.bal;
 
-            const tiedBal = tiedPoints.filter(p => p.bal === a.bal);
-            if (tiedBal.length === 2) {
-                 const match = matches.find(m => 
-                    m.saved && !m.isBye &&
-                    (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
-                    (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
-                );
-                if (match) {
-                    let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
-                    let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
-                    if (aScore !== bScore) return bScore - aScore;
+            // CONFRONTO DIRETO NO SALDO (Apenas para modo FIXAS)
+            if (appState.mode === 'fixed') {
+                const tiedPoints = players.filter(p => p.pts === a.pts);
+                const tiedBal = tiedPoints.filter(p => p.bal === a.bal);
+                if (tiedBal.length === 2) {
+                     const match = matches.find(m => 
+                        m.saved && !m.isBye &&
+                        (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
+                        (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
+                    );
+                    if (match) {
+                        let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
+                        let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
+                        if (aScore !== bScore) return bScore - aScore;
+                    }
                 }
             }
 
+            // 3. Game Average (GA) - Onde o seu edit manual atua
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
 
+            // 4. Vitórias
             if (b.wins !== a.wins) return b.wins - a.wins;
 
+            // 5. Ordem Alfabética (Último recurso)
             return a.name.localeCompare(b.name);
         });
     }
@@ -1786,3 +1798,4 @@
 </script>
 </body>
 </html>
+
