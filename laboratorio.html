@@ -7,11 +7,11 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="BT Manager">
+    <meta name="apple-mobile-web-app-title" content="BT Manager Lab">
     <link rel="apple-touch-icon" href="./icone.png">
     <link rel="manifest" href="manifest.json">
     
-    <title>BT Manager</title>
+    <title>BT Manager - Laboratório</title>
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -157,7 +157,7 @@
 </div>
 
 <div class="navbar">
-    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#ff3b30; font-size:0.7em; vertical-align:super;">BETA</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
+    <div class="nav-logo" onclick="window.goHome()"><span>🎾</span><div>BT Manager <span style="color:#ff3b30; font-size:0.7em; vertical-align:super;">LAB</span><br><small style="font-weight:400; color:#666;">por Lucas Sibie</small></div></div>
     <div class="nav-user" onclick="openLoginModal()"><span id="nav-username" class="user-name">Visitante</span><img id="nav-avatar" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png"></div>
 </div>
 
@@ -168,13 +168,8 @@
     </div>
     
     <div style="background: linear-gradient(135deg, var(--secondary) 0%, #1e293b 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-        <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">👑 Use o BT Manager na sua Arena</div>
-        <div style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 12px;">Destrave a criação de torneios, ligas e chaves automáticas.</div>
-        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <a href="https://wa.me/5543999199481?text=Ola%20Lucas,%20quero%20usar%20o%20BT%20Manager!" target="_blank" style="background: #25D366; color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">chat</span> WhatsApp</a>
-            <a href="https://instagram.com/lsibie" target="_blank" style="background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; display: flex; align-items: center; gap: 5px;"><span class="material-icons" style="font-size: 1.2em;">photo_camera</span> Instagram</a>
-            <button id="btn-install-app" onclick="installApp()" style="display: none; background: #000; color: white; border: none; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 0.9em; align-items: center; gap: 5px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><span class="material-icons" style="font-size: 1.2em;">install_mobile</span> Instalar App</button>
-        </div>
+        <div style="font-weight: 800; font-size: 1.1em; margin-bottom: 5px;">👑 Ambiente de Testes</div>
+        <div style="font-size: 0.85em; color: #cbd5e1; margin-bottom: 12px;">Os dados salvos aqui não afetam a produção oficial.</div>
     </div>
 
     <div id="grid-arenas" class="grid-container"></div>
@@ -398,14 +393,15 @@
 
     const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
 
-    // V172: DE VOLTA PARA A PRODUÇÃO OFICIAL
+    // CONFIGURAÇÃO DO AMBIENTE DE TESTES (LABORATÓRIO)
     const firebaseConfig = {
-        apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
-        authDomain: "beach-tennis-manager-92f17.firebaseapp.com",
-        projectId: "beach-tennis-manager-92f17",
-        storageBucket: "beach-tennis-manager-92f17.firebasestorage.app",
-        messagingSenderId: "311372138486",
-        appId: "1:311372138486:web:50c9e403ad877ab094e9d7"
+        apiKey: "AIzaSyCttgr7SLeDU92pcMs5wcNGvLc7joZvw00",
+        authDomain: "bt-manager-testes.firebaseapp.com",
+        databaseURL: "https://bt-manager-testes-default-rtdb.firebaseio.com",
+        projectId: "bt-manager-testes",
+        storageBucket: "bt-manager-testes.firebasestorage.app",
+        messagingSenderId: "145113677026",
+        appId: "1:145113677026:web:71c579fb817c81daf372bb"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -1902,12 +1898,14 @@
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
     
-    // REGISTRO DO MOTOR DO APLICATIVO (PWA)
+    // REGISTRO DO MOTOR DO APLICATIVO (PWA) - DESATIVADO NO LABORATÓRIO PARA NÃO DAR CONFLITO DE CACHE
+    /*
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js');
         });
     }
+    */
 
     // CAPTURA DO AVISO DE INSTALAÇÃO DO ANDROID/CHROME
     let deferredPrompt;
