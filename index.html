@@ -383,6 +383,14 @@
     </div>
 </div></div>
 
+<div id="modal-roulette" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.95); z-index:4000; justify-content:center; align-items:center; flex-direction:column; color:white; font-family:'Poppins', sans-serif;">
+    <h2 style="color:var(--primary); font-size:1.8em; margin-bottom:30px; text-transform:uppercase; letter-spacing:2px;">Sorteio das Chaves</h2>
+    <div id="roulette-player" style="font-size:2em; font-weight:700; margin-bottom:10px; text-align:center;">Nome do Atleta</div>
+    <div style="font-size:1em; margin-bottom:20px; color:#aaa;">vai para...</div>
+    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#fff; background:#222; padding:20px 40px; border-radius:12px; border:3px solid #555; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
+    <button id="btn-skip-roulette" class="btn-std btn-dark" style="margin-top:40px; width:auto; padding:10px 20px;">Pular Animação</button>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
@@ -560,7 +568,8 @@
         }
 
         const id = document.getElementById('modal-id').value;
-        const name = document.getElementById('inp-name').value.trim();
+        const nameRaw = document.getElementById('inp-name').value.trim();
+        const name = nameRaw.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // XSS Sanitização
         if(!name) return alert("Nome obrigatório");
         let path = ''; let data = { name, owner: user ? user.uid : 'local' };
         
@@ -933,7 +942,7 @@
                 }
             }
 
-            // 3. Game Average (GA) - Onde o seu edit manual atua
+            // 3. Game Average (GA)
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
@@ -959,9 +968,16 @@
         appState.groups.forEach(g => {
             if(g.id.includes('ko')) return;
             const n = parseInt(document.getElementById(`ko-n-${g.id}`).value) || 0;
+            
+            let ps = appState.players.filter(p=>p.groupId===g.id);
+            const sortedPs = sortPlayersCBT(ps, appState.matches);
+            
+            // GRAVA A POSIÇÃO REAL DO JOGADOR NO GRUPO (1º, 2º, 3º...)
+            sortedPs.forEach((p, index) => {
+                p.tempGroupRank = index + 1;
+            });
+
             if(n > 0) {
-                const ps = appState.players.filter(p=>p.groupId===g.id);
-                const sortedPs = sortPlayersCBT(ps, appState.matches);
                 qualified.push(...sortedPs.slice(0, n));
             }
         });
@@ -972,35 +988,44 @@
         const groupSizes = new Set(regularGroups.map(g => appState.players.filter(p => p.groupId === g.id).length));
         const diffSizes = groupSizes.size > 1;
 
-        if (diffSizes) {
-            qualified.sort((a,b) => {
+        // ORDENAÇÃO GERAL (CABEÇAMENTO)
+        qualified.sort((a,b) => {
+            // 1. REGRA MESTRA: Posição no grupo sempre manda!
+            if (a.tempGroupRank !== b.tempGroupRank) {
+                return a.tempGroupRank - b.tempGroupRank;
+            }
+
+            // 2. DESEMPATE ENTRE MESMAS POSIÇÕES
+            if (diffSizes) {
                 const aWinPct = a.games > 0 ? a.wins / a.games : 0;
                 const bWinPct = b.games > 0 ? b.wins / b.games : 0;
                 if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
                 const aGA = a.gameAvg || 0;
                 const bGA = b.gameAvg || 0;
                 return bGA - aGA;
-            });
-        } else {
-            qualified.sort((a,b) => b.pts - a.pts || b.bal - a.bal || b.wins - a.wins);
-        }
+            } else {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                if (b.bal !== a.bal) return b.bal - a.bal;
+                if (b.wins !== a.wins) return b.wins - a.wins;
+                const aGA = a.gameAvg || 0;
+                const bGA = b.gameAvg || 0;
+                return bGA - aGA;
+            }
+        });
 
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
 
         let finalSeeds = [];
         if (appState.mode === 'individual') {
-            if (qualified.length % 2 !== 0) return alert("Para formar duplas no Mata-Mata Individual, o número total de classificados deve ser par (ex: 4, 8, 16).");
+            if (qualified.length % 2 !== 0) return alert("Para formar duplas no Mata-Mata Individual, o número total de classificados deve ser par.");
             
             let unpaired = [...qualified];
             while (unpaired.length > 0) {
                 let pA = unpaired.shift(); 
                 
                 let bIndex = unpaired.findIndex(p => p.groupId !== pA.groupId);
-                
-                if (bIndex === -1) {
-                    bIndex = 0;
-                }
+                if (bIndex === -1) { bIndex = 0; }
                 
                 let pB = unpaired.splice(bIndex, 1)[0]; 
                 
@@ -1037,7 +1062,7 @@
             const seedB = seeds[pairingOrder[i+1]];
             
             let m = {
-                mid: 'm' + Date.now() + Math.random().toString().substr(2, 3) + i, 
+                mid: 'm' + Date.now() + Math.random().toString(36).substring(2, 7) + i, 
                 gid: gid, 
                 round: 1,
                 pos: i/2, 
@@ -1051,40 +1076,12 @@
             koMatches.push(m);
         }
 
-        for(let i=0; i<koMatches.length; i++) {
-            let m = koMatches[i];
-            if(m.round === 1 && m.p1 !== 'BYE' && m.p3 !== 'BYE') {
-                let pA = appState.players.find(x=>x.id===m.p1);
-                let pB = appState.players.find(x=>x.id===m.p3);
-                if(pA && pB && pA.groupId === pB.groupId) {
-                    for(let j=0; j<koMatches.length; j++) {
-                        if(i === j) continue;
-                        let m2 = koMatches[j];
-                        if(m2.round === 1 && m2.p3 !== 'BYE') {
-                            let pC = appState.players.find(x=>x.id===m2.p1);
-                            let pD = appState.players.find(x=>x.id===m2.p3);
-                            
-                            let valid1 = !pD || pA.groupId !== pD.groupId;
-                            let valid2 = !pC || pB.groupId !== pC.groupId;
-                            
-                            if(valid1 && valid2) {
-                                let temp1 = m.p3; let temp2 = m.p4;
-                                m.p3 = m2.p3; m.p4 = m2.p4;
-                                m2.p3 = temp1; m2.p4 = temp2;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         let matchesInRound = size / 2;
         for(let r=2; r<=totalRounds; r++) {
             matchesInRound /= 2;
             for(let i=0; i<matchesInRound; i++) {
                 koMatches.push({
-                    mid: 'm-r' + r + '-' + i + '-' + Date.now(), 
+                    mid: 'm-r' + r + '-' + i + '-' + Date.now() + Math.random().toString(36).substring(2, 7), 
                     gid: gid, 
                     round: r,
                     pos: i,
@@ -1095,7 +1092,7 @@
         }
         
         koMatches.push({
-            mid: 'm-3rd-' + Date.now(),
+            mid: 'm-3rd-' + Date.now() + Math.random().toString(36).substring(2, 7),
             gid: gid,
             round: totalRounds,
             isThirdPlace: true,
@@ -1123,7 +1120,7 @@
         switchAppView('bracket');
     }
 
-    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString().substr(2,3), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
+    function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString(36).substring(2,7), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
 
     window.editGA = (pid, e) => {
         e.stopPropagation();
@@ -1151,8 +1148,25 @@
         renderApp();
     };
 
-    window.editName = (pid, oldName, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const newName = prompt("Novo nome:", oldName); if(newName && newName !== oldName) { const p = appState.players.find(x => x.id === pid); if(p) { p.name = newName; save(); renderApp(); } } }
-    window.renameGroup = (gid, e) => { e.stopPropagation(); if(document.body.classList.contains('viewer-mode')) return; const g = appState.groups.find(x => x.id === gid); if(g) { const newName = prompt("Novo nome do grupo:", g.name); if(newName) { g.name = newName; save(); renderApp(); } } }
+    window.editName = (pid, oldName, e) => { 
+        e.stopPropagation(); 
+        if(document.body.classList.contains('viewer-mode')) return; 
+        const newName = prompt("Novo nome:", oldName); 
+        if(newName && newName !== oldName) { 
+            const p = appState.players.find(x => x.id === pid); 
+            if(p) { p.name = newName.replace(/</g, "&lt;").replace(/>/g, "&gt;"); save(); renderApp(); } 
+        } 
+    }
+    
+    window.renameGroup = (gid, e) => { 
+        e.stopPropagation(); 
+        if(document.body.classList.contains('viewer-mode')) return; 
+        const g = appState.groups.find(x => x.id === gid); 
+        if(g) { 
+            const newName = prompt("Novo nome do grupo:", g.name); 
+            if(newName) { g.name = newName.replace(/</g, "&lt;").replace(/>/g, "&gt;"); save(); renderApp(); } 
+        } 
+    }
     
     window.removeFromGroup = (pid, e) => { 
         e.stopPropagation(); 
@@ -1184,7 +1198,18 @@
 
     window.confirmPlayerSelect = (pid) => { if(!selectingMatch || !selectingSlot) return; const m = appState.matches.find(x => x.mid === selectingMatch); if(m) { m[selectingSlot] = pid; save(); renderApp(); } document.getElementById('modal-player-select').style.display = 'none'; selectingMatch = null; selectingSlot = null; }
     
-    window.tryAdmin = () => { if(!document.body.classList.contains('viewer-mode')) return; const p = prompt("Senha:"); if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { document.body.classList.remove('viewer-mode'); document.getElementById('btn-lock').innerText = '🔓'; localAdmin = true; updateUserUI(); } else alert("Senha incorreta"); }
+    window.tryAdmin = () => { 
+        if(!document.body.classList.contains('viewer-mode')) return; 
+        const p = prompt("Senha do Torneio:"); 
+        if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { 
+            document.body.classList.remove('viewer-mode'); 
+            document.getElementById('btn-lock').innerText = '🔓'; 
+            localAdmin = true; 
+            updateUserUI(); 
+        } else {
+            alert("Senha incorreta"); 
+        }
+    }
     
     window.deleteItem = (type, id) => { 
         if(type === 'arena') {
@@ -1209,14 +1234,15 @@
     const pInput = document.getElementById('pName'); if(pInput) pInput.addEventListener('keypress', (e)=>{if(e.key==='Enter') window.addPlayer()});
     
     window.addPlayer = () => { 
-        const n = document.getElementById('pName').value.trim(); 
+        const nRaw = document.getElementById('pName').value.trim(); 
+        const n = nRaw.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // XSS Sanitização
         const phone = document.getElementById('pPhone').value.trim().replace(/\D/g, ''); 
         if(!n) return; 
         
         if(appState.players.some(p => p.name.toLowerCase() === n.toLowerCase())) return alert("Nome já existe neste torneio!"); 
         
         appState.players.push({
-            id: 'p'+Date.now(), 
+            id: 'p'+Date.now()+Math.random().toString(36).substring(2, 7), 
             name: n, 
             phone: phone, 
             groupId: 'pool', 
@@ -1250,7 +1276,7 @@
         let newGroups = [];
         for(let i=0; i<G; i++) {
             const groupName = "GRUPO " + String.fromCharCode(64 + startIndex + i + 1);
-            let newG = { id: 'g' + Date.now() + i, name: groupName };
+            let newG = { id: 'g' + Date.now() + Math.random().toString(36).substring(2, 7), name: groupName };
             appState.groups.push(newG);
             newGroups.push(newG);
         }
@@ -1259,7 +1285,7 @@
         save(); renderApp();
     }
 
-    window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now(), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
+    window.addGroup = () => { try { if(!appState.groups || !Array.isArray(appState.groups)) appState.groups = []; const nextNum = appState.groups.length + 1; const groupName = "GRUPO " + String.fromCharCode(64 + nextNum); appState.groups.push({ id: 'g' + Date.now() + Math.random().toString(36).substring(2, 7), name: groupName }); save(); renderApp(); } catch(e) { alert("Erro ao criar grupo: " + e.message); } }
 
     window.exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState)); const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "bt_manager_backup.json"); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); }
     window.importData = (input) => { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const json = JSON.parse(e.target.result); if (confirm("Restaurar backup?")) { appState = json; save(); renderApp(); alert("Restaurado!"); } } catch(err) { alert("Erro ao ler arquivo: " + err.message); } }; reader.readAsText(file); }
@@ -1267,8 +1293,114 @@
     window.resetT = () => { if(confirm("Zerar?")) { appState.players=[]; appState.groups=[]; appState.matches=[]; appState.groupCount=0; save(); renderApp(); } }
     window.toggleSel = (pid,e) => { if(document.body.classList.contains('viewer-mode'))return; e.stopPropagation(); selectedPid = selectedPid===pid?null:pid; renderApp(); }
     window.moveSel = (gid) => { if(!selectedPid)return; const p=appState.players.find(x=>x.id===selectedPid); if(p){p.groupId=gid; selectedPid=null; recalc(); save(); renderApp();} }
-    window.distribute = () => { const pool=appState.players.filter(p=>p.groupId==='pool'); if(!pool.length||!confirm("Distribuir?"))return; pool.forEach(p=>{ appState.groups.sort((a,b)=>appState.players.filter(x=>x.groupId===a.id).length - appState.players.filter(x=>x.groupId===b.id).length); if(appState.groups.length) p.groupId=appState.groups[0].id; }); save(); renderApp(); }
-    window.delGroup = (gid, e) => { e.stopPropagation(); if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); appState.groups=appState.groups.filter(g=>g.id!==gid); appState.matches=appState.matches.filter(m=>m.gid!==gid); save(); renderApp(); }}
+    
+    window.distribute = () => {
+        const pool = appState.players.filter(p => p.groupId === 'pool');
+        if (!pool.length || appState.groups.length === 0) return alert("Sem jogadores na reserva ou sem grupos criados.");
+        if (!confirm("Iniciar o sorteio animado?")) return;
+
+        // Algoritmo de Embaralhamento (Fisher-Yates)
+        let shuffledPool = [...pool];
+        for (let i = shuffledPool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledPool[i], shuffledPool[j]] = [shuffledPool[j], shuffledPool[i]];
+        }
+
+        // Pré-cálculo de Balanceamento
+        let groupCounts = appState.groups.map(g => ({
+            id: g.id,
+            name: g.name,
+            count: appState.players.filter(x => x.groupId === g.id).length
+        }));
+
+        let assignments = [];
+        shuffledPool.forEach(p => {
+            groupCounts.sort((a, b) => a.count - b.count);
+            let targetGroup = groupCounts[0];
+            assignments.push({ player: p, group: targetGroup });
+            targetGroup.count++; 
+        });
+
+        // Controle da Animação
+        const modal = document.getElementById('modal-roulette');
+        const pEl = document.getElementById('roulette-player');
+        const gEl = document.getElementById('roulette-group');
+        const btnSkip = document.getElementById('btn-skip-roulette');
+        
+        modal.style.display = 'flex';
+        let currentIndex = 0;
+        let isSkipped = false;
+        let spinInterval;
+        let timeoutId;
+
+        const finalizeDistribution = () => {
+            clearInterval(spinInterval);
+            clearTimeout(timeoutId);
+            modal.style.display = 'none';
+            
+            assignments.forEach(a => {
+                let pRef = appState.players.find(x => x.id === a.player.id);
+                if (pRef) pRef.groupId = a.group.id;
+            });
+            
+            save();
+            renderApp();
+        };
+
+        btnSkip.onclick = () => {
+            isSkipped = true;
+            finalizeDistribution();
+        };
+
+        function animateNext() {
+            if (isSkipped) return;
+            if (currentIndex >= assignments.length) {
+                setTimeout(finalizeDistribution, 1000);
+                return;
+            }
+
+            let curr = assignments[currentIndex];
+            pEl.innerText = curr.player.name;
+            
+            gEl.style.color = '#fff';
+            gEl.style.borderColor = '#555';
+            gEl.style.transform = 'scale(1)';
+
+            let ticks = 0;
+            const maxTicks = 12; // Quantidade de "giros"
+            
+            spinInterval = setInterval(() => {
+                let randomGroup = appState.groups[Math.floor(Math.random() * appState.groups.length)].name;
+                gEl.innerText = randomGroup;
+                ticks++;
+
+                if (ticks >= maxTicks) {
+                    clearInterval(spinInterval);
+                    gEl.innerText = curr.group.name; // Crava o resultado real
+                    gEl.style.color = '#FFD700';
+                    gEl.style.borderColor = '#FFD700';
+                    gEl.style.transform = 'scale(1.1)'; // Efeito de impacto
+                    
+                    currentIndex++;
+                    timeoutId = setTimeout(animateNext, 800);
+                }
+            }, 50);
+        }
+
+        animateNext();
+    };
+
+    window.delGroup = (gid, e) => { 
+        e.stopPropagation(); 
+        if(confirm("Excluir grupo? Os jogadores voltarão para a reserva.")) { 
+            appState.players.forEach(p=>{if(p.groupId===gid)p.groupId='pool'}); 
+            appState.groups=appState.groups.filter(g=>g.id!==gid); 
+            appState.matches=appState.matches.filter(m=>m.gid!==gid); 
+            recalc(); // <-- Corrige o bug dos dados fantasmas
+            save(); 
+            renderApp(); 
+        }
+    }
     
     window.genMatches = (gid) => { 
         const existing = appState.matches.filter(m => m.gid === gid);
@@ -1798,4 +1930,3 @@
 </script>
 </body>
 </html>
-
