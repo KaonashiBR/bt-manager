@@ -148,9 +148,64 @@
             padding: 3px 6px;
             display: inline-block;
         }
+
+        /* REGULAMENTO MODAL STYLES */
+        .reg-article { margin-bottom: 12px; font-size: 0.95em; color: #444; }
+        .reg-article strong { color: #111; }
+        .reg-chapter { background: #eee; padding: 5px; text-align: center; font-weight: bold; color: #111; margin: 20px 0 10px 0; border-radius: 4px; }
     </style>
 </head>
 <body class="viewer-mode">
+
+<div id="modal-regulamento" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:4000; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;">
+    <div style="background:white; width:100%; max-width:700px; max-height:90vh; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+        <div style="background:var(--secondary); color:white; padding:15px; font-weight:bold; display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:8px;"><span class="material-icons">gavel</span> Regulamento Oficial</div>
+            <span class="material-icons" style="cursor:pointer;" onclick="document.getElementById('modal-regulamento').style.display='none'">close</span>
+        </div>
+        <div style="padding:20px; overflow-y:auto; line-height:1.6; text-align:justify;">
+            <h3 style="text-align:center; margin-top:0; color:var(--primary);">FORMATO JAPONÊS</h3>
+            
+            <div class="reg-chapter">CAPÍTULO I - DISPOSIÇÕES GERAIS</div>
+            <div class="reg-article"><strong>Art. 1º</strong> O torneio será disputado no formato japonês, com fase classificatória em grupos, apuração de classificação individual por atleta e posterior formação de duplas fixas para a fase eliminatória.</div>
+            <div class="reg-article"><strong>Art. 2º</strong> Na fase classificatória, os atletas disputarão partidas em duplas formadas por combinações previamente definidas pela organização, sendo a classificação apurada individualmente, e não por dupla eventual.</div>
+            
+            <div class="reg-chapter">CAPÍTULO II - DA FORMAÇÃO DOS GRUPOS</div>
+            <div class="reg-article"><strong>Art. 4º</strong> A fase classificatória será disputada em grupos compostos por, no mínimo, 4 atletas e, no máximo, 5 atletas.</div>
+            <div class="reg-article"><strong>Art. 6º</strong> As combinações de duplas seguirão os seguintes critérios:<br>
+            I - cada atleta atuará como parceiro de cada um dos demais atletas do mesmo grupo uma única vez;<br>
+            II - em grupos de 5 atletas, haverá obrigatoriamente 1 atleta de folga em cada rodada.</div>
+
+            <div class="reg-chapter">CAPÍTULO IV - SISTEMA DE JOGO (FASE CLASSIFICATÓRIA)</div>
+            <div class="reg-article"><strong>Art. 9º</strong> Os jogos em duplas serão disputados em set único de 6 games.</div>
+            <div class="reg-article"><strong>Art. 11 e 12º</strong> Não haverá tie-break. Vence o lado que primeiro alcançar 6 games.</div>
+            <div class="reg-article"><strong>Art. 13º</strong> Não será exigida vantagem mínima de 2 games, sendo válidos placares como 6x5.</div>
+
+            <div class="reg-chapter">CAPÍTULO V - CLASSIFICAÇÃO E DESEMPATE</div>
+            <div class="reg-article"><strong>Art. 16º</strong> Em caso de empate na classificação individual, os critérios de desempate serão aplicados na seguinte ordem:<br>
+            I - <strong>Maior percentual de vitórias</strong> (vitórias / partidas disputadas);<br>
+            II - <strong>Maior percentual de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
+            III - Sorteio.</div>
+            <div class="reg-article"><strong>Art. 17º</strong> O confronto direto não será utilizado como critério de desempate na fase classificatória individual.</div>
+            <div class="reg-article"><strong>Art. 18 e 19º</strong> Quando houver comparação entre atletas de grupos distintos (tamanhos diferentes), será vedada a utilização de critérios brutos, devendo prevalecer os critérios percentuais.</div>
+
+            <div class="reg-chapter">CAPÍTULO IX - FORMAÇÃO DAS DUPLAS MATA-MATA</div>
+            <div class="reg-article"><strong>Art. 37 e 38º</strong> Os atletas serão organizados em listas distintas conforme sua colocação (1ºs lugares, 2ºs lugares, etc) e ordenados do melhor para o pior desempenho global.</div>
+            <div class="reg-article"><strong>Art. 40 e 41º</strong> As duplas da fase eliminatória serão formadas em ordem sequencial (O 1º melhor forma dupla com o 2º melhor, o 3º melhor com o 4º melhor, etc). Sobrando 1 atleta na faixa, ele formará dupla com o melhor atleta da faixa seguinte (transbordo).</div>
+
+            <div class="reg-chapter">CAPÍTULO X - CHAVEAMENTO MATA-MATA</div>
+            <div class="reg-article"><strong>Art. 49º</strong> Na composição dos confrontos, observará a lógica onde as melhores duplas enfrentarão as piores duplas (Ex: 1º vs 8º, 2º vs 7º). Esgotada a última faixa, aplicar-se-á o critério com a faixa imediatamente superior.</div>
+            
+            <div class="reg-chapter">CAPÍTULO XI - FASE ELIMINATÓRIA</div>
+            <div class="reg-article"><strong>Art. 54 e 55º</strong> Jogos disputados em set único. Vence quem alcançar 6 games.</div>
+            <div class="reg-article"><strong>Art. 56 e 57º</strong> Em caso de empate em 5x5, vai a 7 games. Se empatar em 6x6, haverá tie-break decisivo até 7 pontos (com vantagem de 2).</div>
+            
+            <div style="text-align:center; margin-top:20px;">
+                <button class="btn-std btn-dark" onclick="document.getElementById('modal-regulamento').style.display='none'">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
     <div style="font-size:3.5em;">🎾</div><b>Carregando...</b>
@@ -216,6 +271,7 @@
     <div class="status-bar">
         <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.2em;">arrow_back</span> Sair</div>
         <div style="display:flex; align-items:center; gap:5px;">
+            <button onclick="document.getElementById('modal-regulamento').style.display='flex'" style="background:transparent; border:none; color:white; cursor:pointer; padding: 2px;" title="Regulamento"><span class="material-icons" style="font-size: 1.2em; color: #FFD700;">menu_book</span></button>
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
             <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Compartilhar Link"><span class="material-icons">link</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;" title="Acesso Admin">🔒</button>
@@ -456,6 +512,8 @@
                     if(sc.exists()) { 
                         document.getElementById('title-cat').innerText = sc.val().name; 
                         curCatData = sc.val(); 
+                    } else {
+                        curCatData = { points: {} }; // Prevenção de race condition
                     }
                     get(ref(db, `tournaments_meta/${c}/${t}`)).then(st => { 
                         if(st.exists()) enterApp(t, st.val().name, st.val().pwd, st.val().owner); 
@@ -901,7 +959,7 @@
 
     function sortPlayersCBT(players, matches) {
         return [...players].sort((a, b) => {
-            // 1. Desempate por Pontos
+            // 1. Pontos
             if (b.pts !== a.pts) return b.pts - a.pts;
 
             // CONFRONTO DIRETO (Apenas para modo FIXAS)
@@ -921,36 +979,17 @@
                 }
             }
 
-            // 2. Desempate por Saldo de Games
-            if (b.bal !== a.bal) return b.bal - a.bal;
+            // 2. Percentual de Vitórias (Art. 16, Inciso I do Regulamento)
+            const aWinPct = a.games > 0 ? a.wins / a.games : 0;
+            const bWinPct = b.games > 0 ? b.wins / b.games : 0;
+            if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
 
-            // CONFRONTO DIRETO NO SALDO (Apenas para modo FIXAS)
-            if (appState.mode === 'fixed') {
-                const tiedPoints = players.filter(p => p.pts === a.pts);
-                const tiedBal = tiedPoints.filter(p => p.bal === a.bal);
-                if (tiedBal.length === 2) {
-                     const match = matches.find(m => 
-                        m.saved && !m.isBye &&
-                        (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
-                        (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
-                    );
-                    if (match) {
-                        let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
-                        let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
-                        if (aScore !== bScore) return bScore - aScore;
-                    }
-                }
-            }
-
-            // 3. Game Average (GA)
+            // 3. Percentual de Games Vencidos / Game Average (Art. 16, Inciso II)
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
 
-            // 4. Vitórias
-            if (b.wins !== a.wins) return b.wins - a.wins;
-
-            // 5. Ordem Alfabética (Último recurso)
+            // Sorteio (Ordem Alfabética como paliativo de software)
             return a.name.localeCompare(b.name);
         });
     }
@@ -972,7 +1011,7 @@
             let ps = appState.players.filter(p=>p.groupId===g.id);
             const sortedPs = sortPlayersCBT(ps, appState.matches);
             
-            // GRAVA A POSIÇÃO REAL DO JOGADOR NO GRUPO (1º, 2º, 3º...)
+            // GRAVA A POSIÇÃO REAL DO JOGADOR NO GRUPO (Art. 37)
             sortedPs.forEach((p, index) => {
                 p.tempGroupRank = index + 1;
             });
@@ -984,33 +1023,27 @@
 
         if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
 
-        const regularGroups = appState.groups.filter(g => !g.id.includes('ko'));
-        const groupSizes = new Set(regularGroups.map(g => appState.players.filter(p => p.groupId === g.id).length));
-        const diffSizes = groupSizes.size > 1;
-
-        // ORDENAÇÃO GERAL (CABEÇAMENTO)
+        // ORDENAÇÃO GERAL PARA FORMAR AS LISTAS (Art. 38 e Art. 18)
         qualified.sort((a,b) => {
-            // 1. REGRA MESTRA: Posição no grupo sempre manda!
+            // 1. Posição no grupo sempre manda
             if (a.tempGroupRank !== b.tempGroupRank) {
                 return a.tempGroupRank - b.tempGroupRank;
             }
 
-            // 2. DESEMPATE ENTRE MESMAS POSIÇÕES
-            if (diffSizes) {
-                const aWinPct = a.games > 0 ? a.wins / a.games : 0;
-                const bWinPct = b.games > 0 ? b.wins / b.games : 0;
-                if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
-                const aGA = a.gameAvg || 0;
-                const bGA = b.gameAvg || 0;
-                return bGA - aGA;
-            } else {
-                if (b.pts !== a.pts) return b.pts - a.pts;
-                if (b.bal !== a.bal) return b.bal - a.bal;
-                if (b.wins !== a.wins) return b.wins - a.wins;
-                const aGA = a.gameAvg || 0;
-                const bGA = b.gameAvg || 0;
-                return bGA - aGA;
-            }
+            // 2. Pontos
+            if (b.pts !== a.pts) return b.pts - a.pts;
+
+            // 3. Percentual de Vitórias
+            const aWinPct = a.games > 0 ? a.wins / a.games : 0;
+            const bWinPct = b.games > 0 ? b.wins / b.games : 0;
+            if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
+            
+            // 4. Percentual de Games (GA)
+            const aGA = a.gameAvg || 0;
+            const bGA = b.gameAvg || 0;
+            if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+
+            return a.name.localeCompare(b.name);
         });
 
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
@@ -1022,12 +1055,9 @@
             
             let unpaired = [...qualified];
             while (unpaired.length > 0) {
+                // FORMAÇÃO DE DUPLAS SEQUENCIAL PURA (Art. 40 a 42)
                 let pA = unpaired.shift(); 
-                
-                let bIndex = unpaired.findIndex(p => p.groupId !== pA.groupId);
-                if (bIndex === -1) { bIndex = 0; }
-                
-                let pB = unpaired.splice(bIndex, 1)[0]; 
+                let pB = unpaired.shift(); 
                 
                 finalSeeds.push({
                     isPair: true,
@@ -1048,6 +1078,7 @@
         let seeds = new Array(size).fill(null);
         for(let i=0; i<finalSeeds.length; i++) seeds[i] = finalSeeds[i];
 
+        // CHAVEAMENTO DA FASE ELIMINATÓRIA (Art. 46 a 49)
         let pairingOrder = [];
         if(size === 2) pairingOrder = [0, 1];
         else if(size === 4) pairingOrder = [0, 3, 1, 2]; 
@@ -1102,6 +1133,7 @@
 
         appState.matches.push(...koMatches);
 
+        // ATRIBUIÇÃO DE BYES (Art. 50 a 52)
         koMatches.forEach(m => {
             if (m.isBye) {
                 if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
@@ -1859,11 +1891,12 @@
                 allPlayers.sort((a,b) => {
                     if (a.tempGroupRank !== b.tempGroupRank) return a.tempGroupRank - b.tempGroupRank;
                     if (b.pts !== a.pts) return b.pts - a.pts;
+                    const aWinPct = a.games > 0 ? a.wins / a.games : 0;
+                    const bWinPct = b.games > 0 ? b.wins / b.games : 0;
+                    if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
                     const aGA = a.gameAvg || 0;
                     const bGA = b.gameAvg || 0;
                     if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
-                    if (b.bal !== a.bal) return b.bal - a.bal;
-                    if (b.wins !== a.wins) return b.wins - a.wins;
                     return a.name.localeCompare(b.name);
                 });
 
