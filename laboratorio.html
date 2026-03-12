@@ -247,17 +247,15 @@
             <div class="reg-article"><strong>Art. 3º</strong> As partidas serão disputadas em set único de 6 games. Em caso de empate em 5x5, vai a 7. Empate em 6x6 joga-se um tie-break até 7 pontos.</div>
             
             <div class="reg-chapter">CAPÍTULO III - CLASSIFICAÇÃO E DESEMPATE</div>
-            <div class="reg-article"><strong>Art. 4º</strong> A classificação dentro dos grupos será definida, primordialmente, pelo maior número de vitórias.</div>
-            <div class="reg-article"><strong>Art. 5º</strong> Em caso de empate no número de vitórias entre <strong>2 (duas) duplas</strong>, o primeiro critério de desempate será o <strong>Confronto Direto</strong>.</div>
-            <div class="reg-article"><strong>Art. 6º</strong> Em caso de empate entre <strong>3 (três) ou mais duplas</strong>, o confronto direto é anulado, e os critérios aplicados serão na seguinte ordem:<br>
-            I - <strong>Saldo de Games</strong> (Games Vencidos subtraídos dos Games Perdidos);<br>
-            II - <strong>Game Average</strong> (Games Vencidos divididos pelos Games Disputados);<br>
+            <div class="reg-article"><strong>Art. 4º</strong> A classificação dentro dos grupos e o ranqueamento geral obedecerão ao princípio da proporcionalidade matemática, sendo vedado o uso de confronto direto ou saldo absoluto.</div>
+            <div class="reg-article"><strong>Art. 5º</strong> Em caso de empate, os critérios aplicados serão na seguinte ordem de prioridade:<br>
+            I - <strong>Maior percentual de vitórias</strong> (vitórias / partidas disputadas);<br>
+            II - <strong>Maior percentual de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
             III - Sorteio.</div>
 
             <div class="reg-chapter">CAPÍTULO IV - FASE ELIMINATÓRIA (MATA-MATA)</div>
-            <div class="reg-article"><strong>Art. 7º</strong> As melhores duplas de cada grupo avançam para a fase eliminatória, conforme a quantidade de vagas e modelo de cruzamento estipulado previamente pela organização do evento.</div>
-            <div class="reg-article"><strong>Art. 8º</strong> Os confrontos eliminatórios serão disputados em set único de 6 games.</div>
-            <div class="reg-article"><strong>Art. 9º</strong> Em caso de empate em 5x5, a partida prosseguirá até 7 games. Se empatar em 6x6, haverá tie-break decisivo até 7 pontos (com vantagem de 2).</div>
+            <div class="reg-article"><strong>Art. 6º</strong> O cruzamento das chaves observará a lógica matemática pura, onde as melhores duplas rankeadas enfrentarão as piores duplas (Ex: 1º vs 8º, 2º vs 7º), baseando-se estritamente na posição conquistada no grupo.</div>
+            <div class="reg-article"><strong>Art. 7º</strong> Em caso de empate em 5x5, a partida prosseguirá até 7 games. Se empatar em 6x6, haverá tie-break decisivo até 7 pontos.</div>
         </div>
         
         <div style="padding: 15px; text-align:center; border-top: 1px solid #ccc; background:#f8f9fa;">
@@ -1033,34 +1031,17 @@
             // 1. Pontos
             if (b.pts !== a.pts) return b.pts - a.pts;
 
-            // CONFRONTO DIRETO (Apenas para modo FIXAS)
-            if (appState.mode === 'fixed') {
-                const tiedPoints = players.filter(p => p.pts === a.pts);
-                if (tiedPoints.length === 2) {
-                    const match = matches.find(m => 
-                        m.saved && !m.isBye &&
-                        (m.p1 === a.id || m.p2 === a.id || m.p3 === a.id || m.p4 === a.id) &&
-                        (m.p1 === b.id || m.p2 === b.id || m.p3 === b.id || m.p4 === b.id)
-                    );
-                    if (match) {
-                        let aScore = (match.p1 === a.id || match.p2 === a.id) ? match.s1 : match.s2;
-                        let bScore = (match.p1 === b.id || match.p2 === b.id) ? match.s1 : match.s2;
-                        if (aScore !== bScore) return bScore - aScore;
-                    }
-                }
-            }
-
-            // 2. Percentual de Vitórias (Art. 16, Inciso I do Regulamento)
+            // 2. Percentual de Vitórias
             const aWinPct = a.games > 0 ? a.wins / a.games : 0;
             const bWinPct = b.games > 0 ? b.wins / b.games : 0;
             if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
 
-            // 3. Percentual de Games Vencidos / Game Average (Art. 16, Inciso II)
+            // 3. Percentual de Games Vencidos / Game Average
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
 
-            // Sorteio (Ordem Alfabética como paliativo de software)
+            // Sorteio (Ordem Alfabética)
             return a.name.localeCompare(b.name);
         });
     }
@@ -1082,7 +1063,6 @@
             let ps = appState.players.filter(p=>p.groupId===g.id);
             const sortedPs = sortPlayersCBT(ps, appState.matches);
             
-            // GRAVA A POSIÇÃO REAL DO JOGADOR NO GRUPO (Art. 37)
             sortedPs.forEach((p, index) => {
                 p.tempGroupRank = index + 1;
             });
@@ -1094,22 +1074,17 @@
 
         if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
 
-        // ORDENAÇÃO GERAL PARA FORMAR AS LISTAS (Art. 38 e Art. 18)
         qualified.sort((a,b) => {
-            // 1. Posição no grupo sempre manda
             if (a.tempGroupRank !== b.tempGroupRank) {
                 return a.tempGroupRank - b.tempGroupRank;
             }
 
-            // 2. Pontos
             if (b.pts !== a.pts) return b.pts - a.pts;
 
-            // 3. Percentual de Vitórias
             const aWinPct = a.games > 0 ? a.wins / a.games : 0;
             const bWinPct = b.games > 0 ? b.wins / b.games : 0;
             if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
             
-            // 4. Percentual de Games (GA)
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
@@ -1126,7 +1101,6 @@
             
             let unpaired = [...qualified];
             while (unpaired.length > 0) {
-                // FORMAÇÃO DE DUPLAS SEQUENCIAL PURA (Art. 40 a 42)
                 let pA = unpaired.shift(); 
                 let pB = unpaired.shift(); 
                 
@@ -1149,7 +1123,6 @@
         let seeds = new Array(size).fill(null);
         for(let i=0; i<finalSeeds.length; i++) seeds[i] = finalSeeds[i];
 
-        // CHAVEAMENTO DA FASE ELIMINATÓRIA (Art. 46 a 49)
         let pairingOrder = [];
         if(size === 2) pairingOrder = [0, 1];
         else if(size === 4) pairingOrder = [0, 3, 1, 2]; 
@@ -1204,7 +1177,6 @@
 
         appState.matches.push(...koMatches);
 
-        // ATRIBUIÇÃO DE BYES (Art. 50 a 52)
         koMatches.forEach(m => {
             if (m.isBye) {
                 if (m.p3 === 'BYE' && m.p1 !== 'BYE') {
@@ -1338,7 +1310,7 @@
     
     window.addPlayer = () => { 
         const nRaw = document.getElementById('pName').value.trim(); 
-        const n = nRaw.replace(/</g, "&lt;").replace(/>/g, "&gt;"); // XSS Sanitização
+        const n = nRaw.replace(/</g, "&lt;").replace(/>/g, "&gt;"); 
         const phone = document.getElementById('pPhone').value.trim().replace(/\D/g, ''); 
         if(!n) return; 
         
@@ -1725,9 +1697,9 @@
                                          <span style="color:#aaa; font-size:0.9em;">X</span>
                                          <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
                                         : 
-                                        `<div style="width:35px; text-align:center; font-size:1.2em; color:var(--secondary); font-weight:900;">${m.s1}</div>
+                                        `<div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s1}</div>
                                          <span style="color:#aaa; font-size:0.9em; margin:0 5px;">X</span>
-                                         <div style="width:35px; text-align:center; font-size:1.2em; color:var(--secondary); font-weight:900;">${m.s2}</div>`
+                                         <div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s2}</div>`
                                     }
                                 </div>
                                 
@@ -1757,7 +1729,7 @@
             
             if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:var(--primary); border: 2px dashed var(--primary);"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
                 
                 h += `<div class="ko-list">`;
                 
@@ -1979,7 +1951,7 @@
                 genCol.style.margin = '0 auto';
                 genCol.style.width = '100%';
                 
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:#111; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
                 <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`;
                 
@@ -2004,6 +1976,35 @@
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
+    
+    // REGISTRO DO MOTOR DO APLICATIVO (PWA) - DESATIVADO NO LAB
+    /*
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js');
+        });
+    }
+    */
+
+    // CAPTURA DO AVISO DE INSTALAÇÃO DO ANDROID/CHROME
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btnInstall = document.getElementById('btn-install-app');
+        if(btnInstall) btnInstall.style.display = 'flex';
+    });
+
+    window.installApp = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('btn-install-app').style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    };
 </script>
 </body>
 </html>
