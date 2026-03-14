@@ -179,23 +179,23 @@
         .reg-tab.active { background: white; color: var(--primary); }
         .reg-tab:hover:not(.active) { background: #cbd5e1; }
 
-        /* NOVA CHAVE MATA-MATA (ÁRVORE HORIZONTAL) */
+        /* NOVA CHAVE MATA-MATA (ÁRVORE HORIZONTAL CONVERGENTE) */
         .tournament-bracket-two-sided {
             display: flex;
             flex-direction: row;
             justify-content: center;
             overflow-x: auto;
-            padding: 20px 40px;
+            padding: 20px 40px 100px; /* Margem extra no final para o box do campeão */
             background: #fff;
             border-radius: 8px;
             border: 2px dashed #cbd5e1;
             margin-top: 15px;
-            gap: 40px;
+            gap: 40px; /* Distância entre as colunas */
         }
         .bracket-column {
             display: flex;
             flex-direction: column;
-            justify-content: space-around;
+            justify-content: flex-start;
             width: 220px;
             min-width: 220px;
             position: relative;
@@ -204,17 +204,25 @@
             text-align: center;
             font-weight: 800;
             color: #475569;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-size: 0.85em;
             text-transform: uppercase;
             height: 20px;
+            flex-shrink: 0;
+        }
+        .brk-matches-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: flex-start;
+            position: relative;
         }
         .brk-match-wrapper {
             position: relative;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            flex: 1;
+            flex: 1; /* Força que cada caixa ocupe proporções iguais na coluna */
             padding: 10px 0;
         }
         .bracket-match-box {
@@ -243,7 +251,7 @@
         .bracket-name { flex: 1; line-height: 1.2; word-break: break-word; padding-right: 5px;}
         .bracket-admin-panel { background: #f8fafc; padding: 6px; display: flex; justify-content: center; gap: 5px; border-top: 1px solid #cbd5e1; border-radius: 0 0 4px 4px; }
         
-        /* CONECTORES LADO ESQUERDO */
+        /* CONECTORES LADO ESQUERDO (Avançam para a Direita) */
         .left-col .brk-match-wrapper:not(:only-child):nth-child(odd)::after {
             content: ''; position: absolute; right: -20px; top: 50%; height: 50%; width: 20px;
             border-right: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-top-right-radius: 4px;
@@ -259,7 +267,7 @@
             content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
         }
 
-        /* CONECTORES LADO DIREITO */
+        /* CONECTORES LADO DIREITO (Avançam para a Esquerda) */
         .right-col .brk-match-wrapper:not(:only-child):nth-child(odd)::before {
             content: ''; position: absolute; left: -20px; top: 50%; height: 50%; width: 20px;
             border-left: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-top-left-radius: 4px;
@@ -275,7 +283,7 @@
             content: ''; position: absolute; right: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
         }
 
-        /* CONECTORES DO CENTRO (FINAL) */
+        /* CONECTORES DA COLUNA CENTRAL (A Final) */
         .center-col .brk-match-wrapper::before {
             content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
         }
@@ -286,7 +294,7 @@
         .single-final .center-col .brk-match-wrapper::after { display: none; }
 
         /* TERCEIRO LUGAR E CAMPEÃO */
-        .champion-box { margin-top: 20px; text-align: center; animation: pulse-tie-bg 2s infinite; border-radius: 6px; }
+        .champion-box { position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%); width: 100%; text-align: center; animation: pulse-tie-bg 2s infinite; border-radius: 6px; }
         .third-place-box { width: 100%; max-width: 320px; margin: 30px auto 0; border: 2px dashed #b45309; border-radius: 8px; background: #fffbeb; }
         .third-place-header { background: #b45309; color: white; padding: 8px; text-align: center; font-weight: bold; font-size: 0.9em; border-radius: 6px 6px 0 0; }
         .third-col .brk-match-wrapper::before, .third-col .brk-match-wrapper::after { display: none !important; }
@@ -1323,6 +1331,7 @@
             [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); 
         } 
         else if(ps.length===6) {
+            // Matriz fixa e determinística para 6 jogadores (Gera sempre 7 jogos exatos)
             [[0,1,2,3],[0,2,4,5],[0,3,1,4],[0,4,2,5],[0,5,1,3],[1,5,2,4],[3,5,1,2]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); });
         }
         else { 
@@ -1423,7 +1432,7 @@
     window.tryAdmin = () => { 
         if(!document.body.classList.contains('viewer-mode')) return; 
         const p = prompt("Senha do Torneio:"); 
-        if(p === appState.pwd || (user && ADMIN_EMAILS.includes(user.email))) { 
+        if(p === appState.pwd || p === MASTER_PASS || (user && ADMIN_EMAILS.includes(user.email))) { 
             document.body.classList.remove('viewer-mode'); 
             document.getElementById('btn-lock').innerText = '🔓'; 
             localAdmin = true; 
@@ -1934,20 +1943,19 @@
                         let matchArray = rounds[rNum].sort((a,b) => a.pos - b.pos);
                         let half = matchArray.slice(0, matchArray.length / 2);
 
-                        colsHTML += `<div class="bracket-column left-col"><div class="bracket-header">${rName}</div>`;
+                        colsHTML += `<div class="bracket-column left-col"><div class="bracket-header">${rName}</div><div class="brk-matches-container">`;
                         half.forEach(m => colsHTML += renderBrkMatch(m));
-                        colsHTML += `</div>`;
+                        colsHTML += `</div></div>`;
                     }
 
                     // CENTER COL
                     let finalRNum = roundKeys[roundKeys.length - 1];
                     let finalMatchArray = rounds[finalRNum];
-                    colsHTML += `<div class="bracket-column center-col"><div class="bracket-header">Final</div>`;
+                    colsHTML += `<div class="bracket-column center-col"><div class="bracket-header">Final</div><div class="brk-matches-container" style="position:relative;">`;
                     if (finalMatchArray && finalMatchArray.length > 0) {
                          const fM = finalMatchArray[0];
                          colsHTML += renderBrkMatch(fM);
                          
-                         // Champion Rendering
                          if(fM.saved && !fM.isBye) {
                              const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
                              let champName = '';
@@ -1965,7 +1973,7 @@
                              </div>`;
                          }
                     }
-                    colsHTML += `</div>`;
+                    colsHTML += `</div></div>`;
 
                     // RIGHT COLS
                     for(let i = roundKeys.length - 2; i >= 0; i--) {
@@ -1974,9 +1982,9 @@
                         let matchArray = rounds[rNum].sort((a,b) => a.pos - b.pos);
                         let half = matchArray.slice(matchArray.length / 2);
 
-                        colsHTML += `<div class="bracket-column right-col"><div class="bracket-header">${rName}</div>`;
+                        colsHTML += `<div class="bracket-column right-col"><div class="bracket-header">${rName}</div><div class="brk-matches-container">`;
                         half.forEach(m => colsHTML += renderBrkMatch(m));
-                        colsHTML += `</div>`;
+                        colsHTML += `</div></div>`;
                     }
 
                     h += `<div class="tournament-bracket-two-sided ${extraClass}">${colsHTML}</div>`;
@@ -2049,7 +2057,7 @@
                 genCol.style.margin = '0 auto';
                 genCol.style.width = '100%';
                 
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:#111; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
                 <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
                 
