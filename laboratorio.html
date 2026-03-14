@@ -180,16 +180,17 @@
         .reg-tab:hover:not(.active) { background: #cbd5e1; }
 
         /* NOVA CHAVE MATA-MATA (ÁRVORE HORIZONTAL) */
-        .tournament-bracket {
+        .tournament-bracket-two-sided {
             display: flex;
             flex-direction: row;
+            justify-content: center;
             overflow-x: auto;
-            padding: 20px;
-            gap: 40px; /* Distância entre as colunas */
+            padding: 20px 40px;
             background: #fff;
             border-radius: 8px;
-            border: 1px dashed #94a3b8;
+            border: 2px dashed #cbd5e1;
             margin-top: 15px;
+            gap: 40px;
         }
         .bracket-column {
             display: flex;
@@ -197,15 +198,16 @@
             justify-content: space-around;
             width: 220px;
             min-width: 220px;
-            gap: 15px;
+            position: relative;
         }
         .bracket-header {
             text-align: center;
             font-weight: 800;
             color: #475569;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-size: 0.85em;
             text-transform: uppercase;
+            height: 20px;
         }
         .brk-match-wrapper {
             position: relative;
@@ -213,16 +215,16 @@
             flex-direction: column;
             justify-content: center;
             flex: 1;
-            padding: 5px 0;
+            padding: 10px 0;
         }
         .bracket-match-box {
-            width: 100%;
             background: white;
             border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             z-index: 2;
             position: relative;
+            overflow: hidden;
         }
         .bracket-team {
             display: flex;
@@ -233,26 +235,61 @@
             font-weight: 600;
             color: #1e293b;
             border-bottom: 1px solid #f1f5f9;
-            min-height: 28px;
+            min-height: 32px;
         }
         .bracket-team:last-child { border-bottom: none; }
         .bracket-seed { font-size: 0.7em; color: #94a3b8; margin-right: 5px; display: inline-block; vertical-align: top;}
-        .bracket-score { font-weight: 900; color: var(--primary); font-size: 1.1em; width: 30px; text-align: center; }
+        .bracket-score { font-weight: 900; color: var(--secondary); font-size: 1.1em; width: 30px; text-align: center; }
         .bracket-name { flex: 1; line-height: 1.2; word-break: break-word; padding-right: 5px;}
         .bracket-admin-panel { background: #f8fafc; padding: 6px; display: flex; justify-content: center; gap: 5px; border-top: 1px solid #cbd5e1; border-radius: 0 0 4px 4px; }
         
-        /* Linhas conectoras da árvore */
-        .brk-match-wrapper::after { content: ''; position: absolute; right: -20px; width: 20px; border-right: 2px solid #94a3b8; z-index: 1; }
-        .brk-match-wrapper:nth-child(odd)::after { top: 50%; height: 50%; border-top: 2px solid #94a3b8; border-top-right-radius: 4px; }
-        .brk-match-wrapper:nth-child(even)::after { bottom: 50%; height: 50%; border-bottom: 2px solid #94a3b8; border-bottom-right-radius: 4px; }
-        .bracket-column:last-child .brk-match-wrapper::after { display: none; }
-        
-        .brk-match-wrapper::before { content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8; z-index: 1; }
-        .bracket-column:first-child .brk-match-wrapper::before { display: none; }
+        /* CONECTORES LADO ESQUERDO */
+        .left-col .brk-match-wrapper:not(:only-child):nth-child(odd)::after {
+            content: ''; position: absolute; right: -20px; top: 50%; height: 50%; width: 20px;
+            border-right: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-top-right-radius: 4px;
+        }
+        .left-col .brk-match-wrapper:not(:only-child):nth-child(even)::after {
+            content: ''; position: absolute; right: -20px; top: 0; height: 50%; width: 20px;
+            border-right: 2px solid #94a3b8; border-bottom: 2px solid #94a3b8; border-bottom-right-radius: 4px;
+        }
+        .left-col .brk-match-wrapper:only-child::after {
+            content: ''; position: absolute; right: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
+        }
+        .left-col:not(:first-child) .brk-match-wrapper::before {
+            content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
+        }
 
-        /* Estilo para Terceiro Lugar fora da árvore */
-        .third-place-box { width: 100%; max-width: 300px; margin: 20px auto 0; border: 2px dashed #b45309; border-radius: 8px; background: #fffbeb; }
+        /* CONECTORES LADO DIREITO */
+        .right-col .brk-match-wrapper:not(:only-child):nth-child(odd)::before {
+            content: ''; position: absolute; left: -20px; top: 50%; height: 50%; width: 20px;
+            border-left: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-top-left-radius: 4px;
+        }
+        .right-col .brk-match-wrapper:not(:only-child):nth-child(even)::before {
+            content: ''; position: absolute; left: -20px; top: 0; height: 50%; width: 20px;
+            border-left: 2px solid #94a3b8; border-bottom: 2px solid #94a3b8; border-bottom-left-radius: 4px;
+        }
+        .right-col .brk-match-wrapper:only-child::before {
+            content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
+        }
+        .right-col:not(:last-child) .brk-match-wrapper::after {
+            content: ''; position: absolute; right: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
+        }
+
+        /* CONECTORES DO CENTRO (FINAL) */
+        .center-col .brk-match-wrapper::before {
+            content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
+        }
+        .center-col .brk-match-wrapper::after {
+            content: ''; position: absolute; right: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
+        }
+        .single-final .center-col .brk-match-wrapper::before,
+        .single-final .center-col .brk-match-wrapper::after { display: none; }
+
+        /* TERCEIRO LUGAR E CAMPEÃO */
+        .champion-box { margin-top: 20px; text-align: center; animation: pulse-tie-bg 2s infinite; border-radius: 6px; }
+        .third-place-box { width: 100%; max-width: 320px; margin: 30px auto 0; border: 2px dashed #b45309; border-radius: 8px; background: #fffbeb; }
         .third-place-header { background: #b45309; color: white; padding: 8px; text-align: center; font-weight: bold; font-size: 0.9em; border-radius: 6px 6px 0 0; }
+        .third-col .brk-match-wrapper::before, .third-col .brk-match-wrapper::after { display: none !important; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -1638,6 +1675,7 @@
         if (btnElement.closest('tr')) container = btnElement.closest('tr');
         if (btnElement.closest('.bracket-match-box')) container = btnElement.closest('.bracket-match-box');
         if (btnElement.closest('.queue-match-item')) container = btnElement.closest('.queue-match-item');
+        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
         
         let inputs = container.querySelectorAll('input[type="tel"]');
         let val1 = inputs[0] ? inputs[0].value : '';
@@ -1803,6 +1841,57 @@
         
         let h = ''; 
 
+        const renderBrkMatch = (m, slot1='p1', slot2='p2', slot3='p3', slot4='p4') => {
+            const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
+            const getBrkName = (pid1, pid2) => {
+                if(pid1 === 'BYE') return 'BYE';
+                if(!pid1) return '<span style="color:#94a3b8;font-style:italic;">Aguardando...</span>';
+                const pObj = appState.players.find(x => x.id === pid1);
+                const seedHtml = pObj && pObj.tempGroupRank && pObj.tempGroupName ? `<div class="bracket-seed" title="${pObj.tempGroupRank}º do ${pObj.tempGroupName.replace('GRUPO ', 'Gr. ')}">${pObj.tempGroupRank}º</div>` : `<div class="bracket-seed"></div>`;
+                if (appState.mode === 'fixed') return `${seedHtml} ${n(pid1)}`;
+                return `${seedHtml} ${n(pid1)}<br><div style="margin-left:19px;">${n(pid2)}</div>`;
+            };
+            const getBrkNameAdmin = (pid1, pid2, s1, s2) => {
+                if(pid1 === 'BYE') return 'BYE';
+                if(!pid1) return `<span style="color:var(--primary);font-style:italic;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${s1}')">Selecionar...</span>`;
+                const pObj = appState.players.find(x => x.id === pid1);
+                const seedHtml = pObj && pObj.tempGroupRank && pObj.tempGroupName ? `<div class="bracket-seed" title="${pObj.tempGroupRank}º do ${pObj.tempGroupName.replace('GRUPO ', 'Gr. ')}">${pObj.tempGroupRank}º</div>` : `<div class="bracket-seed"></div>`;
+                if (appState.mode === 'fixed') return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${s1}')">${seedHtml} ${n(pid1)}</span>`;
+                return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${s1}')">${seedHtml} ${n(pid1)}</span><br><div style="margin-left:19px;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${s2}')">${n(pid2)}</div>`;
+            };
+
+            let t1 = getBrkName(m.p1, m.p2); let t1_admin = getBrkNameAdmin(m.p1, m.p2, slot1, slot2);
+            let t2 = getBrkName(m.p3, m.p4); let t2_admin = getBrkNameAdmin(m.p3, m.p4, slot3, slot4);
+            const isEditing = !m.saved && !m.isBye;
+            const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
+
+            return `
+            <div class="brk-match-wrapper">
+                <div class="bracket-match-box">
+                    <div class="bracket-team">
+                        <div class="bracket-name admin-only">${t1_admin}</div>
+                        <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
+                        <div style="display:flex; align-items:center;">
+                            ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:28px;height:28px;font-size:0.9em;padding:0;border:1px solid var(--primary);" placeholder="0">` : `<span class="bracket-score">${m.s1!==''?m.s1:'-'}</span>`}
+                        </div>
+                    </div>
+                    <div class="bracket-team">
+                        <div class="bracket-name admin-only">${t2_admin}</div>
+                        <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
+                        <div style="display:flex; align-items:center;">
+                            ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:28px;height:28px;font-size:0.9em;padding:0;border:1px solid var(--primary);" placeholder="0">` : `<span class="bracket-score">${m.s2!==''?m.s2:'-'}</span>`}
+                        </div>
+                    </div>
+                    ${document.body.classList.contains('viewer-mode') ? '' : `
+                    <div class="bracket-admin-panel admin-only">
+                        ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:4px 8px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'ko', this)">Salvar</button>` : ''}
+                        ${m.saved ? `<button class="btn-std btn-dark" style="padding:4px 8px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">Editar</button>` : ''}
+                    </div>
+                    `}
+                </div>
+            </div>`;
+        };
+
         appState.groups.forEach((g,i) => {
             let ps = appState.players.filter(p=>p.groupId===g.id);
             ps = sortPlayersCBT(ps, appState.matches);
@@ -1826,159 +1915,78 @@
                 
                 let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
                 
-                // --- CONSTRUÇÃO DA ÁRVORE MATA-MATA HORIZONTAL ---
-                h += `<div class="tournament-bracket">`;
-                
-                roundKeys.forEach((rNum, index) => {
-                    let rName = 'Fase ' + rNum;
-                    const count = rounds[rNum].length;
-                    if(count === 8) rName = 'Oitavas de Final';
-                    if(count === 4) rName = 'Quartas de Final';
-                    if(count === 2) rName = 'Semifinal';
-                    if(count === 1) rName = 'Final';
+                if(roundKeys.length > 0) {
+                    const getRoundName = (count) => {
+                        if(count === 16) return 'Oitavas';
+                        if(count === 8) return 'Quartas';
+                        if(count === 4) return 'Semifinal';
+                        if(count === 2) return 'Final';
+                        return 'Fase';
+                    };
 
-                    h += `<div class="bracket-column"><div class="bracket-header">${rName}</div>`;
-                    
-                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach((m, matchIndex) => {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
-                        const getBrkName = (pid1, pid2) => {
-                            if(pid1 === 'BYE') return 'BYE';
-                            if(!pid1) return '<span style="color:#94a3b8;font-style:italic;">Aguardando...</span>';
-                            const pObj = appState.players.find(x => x.id === pid1);
-                            const seedHtml = pObj && pObj.tempGroupRank && pObj.tempGroupName ? `<div class="bracket-seed" title="${pObj.tempGroupRank}º do ${pObj.tempGroupName.replace('GRUPO ', 'Gr. ')}">${pObj.tempGroupRank}º</div>` : `<div class="bracket-seed"></div>`;
-                            
-                            if (appState.mode === 'fixed') {
-                                return `${seedHtml} ${n(pid1)}`;
-                            } else {
-                                return `${seedHtml} ${n(pid1)}<br><div style="margin-left:19px;">${n(pid2)}</div>`;
-                            }
-                        };
-                        
-                        const getBrkNameAdmin = (pid1, pid2, slot1, slot2) => {
-                            if(pid1 === 'BYE') return 'BYE';
-                            if(!pid1) return `<span style="color:var(--primary);font-style:italic;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">Selecionar...</span>`;
-                            const pObj = appState.players.find(x => x.id === pid1);
-                            const seedHtml = pObj && pObj.tempGroupRank && pObj.tempGroupName ? `<div class="bracket-seed" title="${pObj.tempGroupRank}º do ${pObj.tempGroupName.replace('GRUPO ', 'Gr. ')}">${pObj.tempGroupRank}º</div>` : `<div class="bracket-seed"></div>`;
-                            
-                            if (appState.mode === 'fixed') {
-                                return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">${seedHtml} ${n(pid1)}</span>`;
-                            } else {
-                                return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">${seedHtml} ${n(pid1)}</span><br><span style="margin-left:19px;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot2}')">${n(pid2)}</span>`;
-                            }
-                        };
+                    let extraClass = (roundKeys.length === 1) ? 'single-final' : '';
+                    let colsHTML = '';
 
-                        let t1 = getBrkName(m.p1, m.p2);
-                        let t1_admin = getBrkNameAdmin(m.p1, m.p2, 'p1', 'p2');
-                        let t2 = getBrkName(m.p3, m.p4);
-                        let t2_admin = getBrkNameAdmin(m.p3, m.p4, 'p3', 'p4');
-                        
-                        const isEditing = !m.saved && !m.isBye;
-                        const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
-                        
-                        // Lógica das linhas conectivas
-                        let connectors = '';
-                        if (index > 0) connectors += `<div class="line-straight"></div>`;
-                        if (index < roundKeys.length - 1) { 
-                            if (m.pos % 2 === 0) connectors += `<div class="line-down"></div>`;
-                            else connectors += `<div class="line-up"></div>`;
-                        }
+                    // LEFT COLS
+                    for(let i=0; i<roundKeys.length - 1; i++) {
+                        let rNum = roundKeys[i];
+                        let rName = getRoundName(rounds[rNum].length * 2);
+                        let matchArray = rounds[rNum].sort((a,b) => a.pos - b.pos);
+                        let half = matchArray.slice(0, matchArray.length / 2);
 
-                        h += `
-                        <div class="brk-match-wrapper">
-                            ${connectors}
-                            <div class="bracket-match-box">
-                                <div class="bracket-team">
-                                    <div class="bracket-name admin-only">${t1_admin}</div>
-                                    <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                                    <div style="display:flex; align-items:center; gap:5px;">
-                                        ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:28px;height:28px;font-size:0.9em;padding:0;border:1px solid var(--primary);" placeholder="0">` : `<span class="bracket-score">${m.s1!==''?m.s1:'-'}</span>`}
-                                    </div>
-                                </div>
-                                <div class="bracket-team">
-                                    <div class="bracket-name admin-only">${t2_admin}</div>
-                                    <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                                    <div style="display:flex; align-items:center; gap:5px;">
-                                        ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:28px;height:28px;font-size:0.9em;padding:0;border:1px solid var(--primary);" placeholder="0">` : `<span class="bracket-score">${m.s2!==''?m.s2:'-'}</span>`}
-                                    </div>
-                                </div>
-                                ${document.body.classList.contains('viewer-mode') ? '' : `
-                                <div class="bracket-admin-panel admin-only">
-                                    ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:4px 8px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'ko', this)">Salvar</button>` : ''}
-                                    ${m.saved ? `<button class="btn-std btn-dark" style="padding:4px 8px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">Editar</button>` : ''}
-                                </div>
-                                `}
-                            </div>
-                        </div>`;
-                    });
-                    h += `</div>`; 
-                });
-
-                // Coluna do Campeão
-                const finalMatchRounds = rounds[roundKeys[roundKeys.length - 1]];
-                if(finalMatchRounds && finalMatchRounds.length > 0) {
-                    const finalMatch = finalMatchRounds[0];
-                    if (finalMatch && finalMatch.saved) {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
-                        let champName = '';
-                        if (finalMatch.s1 > finalMatch.s2) {
-                            champName = appState.mode === 'fixed' ? n(finalMatch.p1) : n(finalMatch.p1) + '<br>' + n(finalMatch.p2);
-                        } else {
-                            champName = appState.mode === 'fixed' ? n(finalMatch.p3) : n(finalMatch.p3) + '<br>' + n(finalMatch.p4);
-                        }
-
-                        h += `<div class="bracket-column">
-                                <div class="bracket-header">Campeão</div>
-                                <div class="brk-match-wrapper">
-                                    <div class="line-straight"></div>
-                                    <div class="bracket-match-box" style="border-color:#FFD700; background:#fffdf0; border-width: 2px;">
-                                        <div class="bracket-team" style="justify-content:center; color:#b8860b; font-weight:900; font-size:1.1em; text-align:center; padding: 15px;">
-                                            🏆<br>${champName}
-                                        </div>
-                                    </div>
-                                </div>
-                              </div>`;
+                        colsHTML += `<div class="bracket-column left-col"><div class="bracket-header">${rName}</div>`;
+                        half.forEach(m => colsHTML += renderBrkMatch(m));
+                        colsHTML += `</div>`;
                     }
+
+                    // CENTER COL
+                    let finalRNum = roundKeys[roundKeys.length - 1];
+                    let finalMatchArray = rounds[finalRNum];
+                    colsHTML += `<div class="bracket-column center-col"><div class="bracket-header">Final</div>`;
+                    if (finalMatchArray && finalMatchArray.length > 0) {
+                         const fM = finalMatchArray[0];
+                         colsHTML += renderBrkMatch(fM);
+                         
+                         // Champion Rendering
+                         if(fM.saved && !fM.isBye) {
+                             const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
+                             let champName = '';
+                             if (fM.s1 > fM.s2) {
+                                 champName = appState.mode === 'fixed' ? n(fM.p1) : n(fM.p1) + '<br>' + n(fM.p2);
+                             } else {
+                                 champName = appState.mode === 'fixed' ? n(fM.p3) : n(fM.p3) + '<br>' + n(fM.p4);
+                             }
+                             colsHTML += `
+                             <div class="champion-box">
+                               <div style="font-weight: 800; color: #b45309; font-size: 0.85em; text-transform: uppercase;">🏆 Campeão</div>
+                               <div style="background: #fffdf0; border: 2px solid #FFD700; border-radius: 6px; padding: 10px; font-weight: 900; font-size: 1.1em; color: #b8860b;">
+                                   ${champName}
+                               </div>
+                             </div>`;
+                         }
+                    }
+                    colsHTML += `</div>`;
+
+                    // RIGHT COLS
+                    for(let i = roundKeys.length - 2; i >= 0; i--) {
+                        let rNum = roundKeys[i];
+                        let rName = getRoundName(rounds[rNum].length * 2);
+                        let matchArray = rounds[rNum].sort((a,b) => a.pos - b.pos);
+                        let half = matchArray.slice(matchArray.length / 2);
+
+                        colsHTML += `<div class="bracket-column right-col"><div class="bracket-header">${rName}</div>`;
+                        half.forEach(m => colsHTML += renderBrkMatch(m));
+                        colsHTML += `</div>`;
+                    }
+
+                    h += `<div class="tournament-bracket-two-sided ${extraClass}">${colsHTML}</div>`;
                 }
-                
-                h += `</div>`; // Fim da .tournament-bracket
 
-                // BLOCO DE TERCEIRO LUGAR (Abaixo da árvore)
+                // THIRD PLACE
                 if(rounds['3rd']) {
-                    h += `<div class="third-place-box"><div class="third-place-header">🥉 DISPUTA DE 3º LUGAR</div><div style="padding:10px;">`;
+                    h += `<div class="third-place-box"><div class="third-place-header">🥉 DISPUTA DE 3º LUGAR</div><div class="bracket-column third-col" style="padding:15px; width:100%; margin:0 auto;">`;
                     rounds['3rd'].forEach(m => {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const getBrkName = (pid1, pid2) => {
-                            if(!pid1) return '<span style="color:#94a3b8;font-style:italic;font-size:0.9em;">Aguardando perdedor da Semi...</span>';
-                            if (appState.mode === 'fixed') return `${n(pid1)}`;
-                            return `${n(pid1)} / ${n(pid2)}`;
-                        };
-                        const getBrkNameAdmin = (pid1, pid2, slot1, slot2) => {
-                            if(!pid1) return `<span style="color:#b45309;font-style:italic;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">Selecionar perdedor...</span>`;
-                            if (appState.mode === 'fixed') return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">${n(pid1)}</span>`;
-                            return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">${n(pid1)}</span> / <span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot2}')">${n(pid2)}</span>`;
-                        };
-
-                        let t1 = getBrkName(m.p1, m.p2); let t1_admin = getBrkNameAdmin(m.p1, m.p2, 'p1', 'p2');
-                        let t2 = getBrkName(m.p3, m.p4); let t2_admin = getBrkNameAdmin(m.p3, m.p4, 'p3', 'p4');
-                        const isEditing = !m.saved;
-                        const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
-
-                        h += `<div class="ko-match-item" style="border:none; padding:0;">
-                            <div class="ko-player admin-only" style="font-size:0.9em;">${t1_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}; font-size:0.9em;">${t1}</div>
-                            ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input auth-input" style="width:30px;height:30px;margin:0 5px;" placeholder="0"><span class="ko-vs">X</span><input type="tel" class="tbl-input score-input auth-input" style="width:30px;height:30px;margin:0 5px;" placeholder="0">` 
-                                : 
-                                `<div class="ko-score" style="color:#b45309;">${m.s1!==''?m.s1:'-'}</div><div class="ko-vs">X</div><div class="ko-score" style="color:#b45309;">${m.s2!==''?m.s2:'-'}</div>`
-                            }
-                            <div class="ko-player admin-only" style="font-size:0.9em;">${t2_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}; font-size:0.9em;">${t2}</div>
-                            ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" style="width:28px;height:28px;" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
-                                : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;width:28px;height:28px;" onclick="editS('${m.mid}')">✎</button>` : '')
-                            }
-                        </div>`;
+                        h += renderBrkMatch(m, 'p1', 'p2', 'p3', 'p4');
                     });
                     h += `</div></div>`;
                 }
@@ -2041,7 +2049,7 @@
                 genCol.style.margin = '0 auto';
                 genCol.style.width = '100%';
                 
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:#111; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
                 <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
                 
@@ -2071,6 +2079,35 @@
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
+    
+    // REGISTRO DO MOTOR DO APLICATIVO (PWA) - DESATIVADO NO LAB
+    /*
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js');
+        });
+    }
+    */
+
+    // CAPTURA DO AVISO DE INSTALAÇÃO DO ANDROID/CHROME
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const btnInstall = document.getElementById('btn-install-app');
+        if(btnInstall) btnInstall.style.display = 'flex';
+    });
+
+    window.installApp = async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('btn-install-app').style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    };
 </script>
 </body>
 </html>
