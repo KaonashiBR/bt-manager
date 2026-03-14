@@ -149,7 +149,12 @@
             display: inline-block;
         }
 
-        /* REGULAMENTO MODAL STYLES */
+        /* TOOLTIPS E REGULAMENTO */
+        .tooltip { position: relative; display: inline-block; cursor: help; color: var(--primary); margin-left: 2px; }
+        .tooltip .tooltiptext { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 6px 8px; position: absolute; z-index: 100; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 11px; font-weight: normal; line-height: 1.4; white-space: normal; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333 transparent transparent transparent; }
+        .tooltip:hover .tooltiptext, .tooltip:active .tooltiptext { visibility: visible; opacity: 1; }
+
         .reg-article { margin-bottom: 12px; font-size: 0.95em; color: #444; }
         .reg-article strong { color: #111; }
         .reg-chapter { background: #eee; padding: 5px; text-align: center; font-weight: bold; color: #111; margin: 20px 0 10px 0; border-radius: 4px; }
@@ -190,8 +195,8 @@
 
             <div class="reg-chapter">CAPÍTULO V - CLASSIFICAÇÃO E DESEMPATE</div>
             <div class="reg-article"><strong>Art. 16º</strong> Em caso de empate na classificação individual, os critérios de desempate serão aplicados na seguinte ordem:<br>
-            I - <strong>Maior percentual de vitórias</strong> (vitórias / partidas disputadas);<br>
-            II - <strong>Maior percentual de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
+            I - <strong>Maior percentagem de vitórias</strong> (vitórias / partidas disputadas);<br>
+            II - <strong>Maior percentagem de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
             III - Sorteio.</div>
             <div class="reg-article"><strong>Art. 17º</strong> O confronto direto não será utilizado como critério de desempate na fase classificatória individual.</div>
             <div class="reg-article"><strong>Art. 18 e 19º</strong> Quando houver comparação entre atletas de grupos distintos (tamanhos diferentes), é vedada a utilização de critérios brutos absolutos (como saldo total), devendo prevalecer os critérios proporcionais/percentuais.</div>
@@ -215,14 +220,14 @@
             <div class="reg-article"><strong>Art. 1º</strong> O torneio será disputado no formato de duplas fixas, onde a mesma parceria de atletas atua em conjunto desde a fase classificatória até a fase eliminatória final.</div>
             
             <div class="reg-chapter">CAPÍTULO II - FASE CLASSIFICATÓRIA</div>
-            <div class="reg-article"><strong>Art. 2º</strong> Na fase classificatória (Fase de Grupos), as duplas jogarão no sistema "Round Robin" (todas contra todas dentro do seu respectivo grupo).</div>
+            <div class="reg-article"><strong>Art. 2º</strong> Na fase classificatória (Fase de Grupos), as duplas jogarão no sistema "Round Robin" (todas contra todas dentro do seu respetivo grupo).</div>
             <div class="reg-article"><strong>Art. 3º</strong> As partidas serão disputadas em set único de 6 games. Em caso de empate em 5x5, vai a 7. Empate em 6x6 joga-se um tie-break até 7 pontos.</div>
             
             <div class="reg-chapter">CAPÍTULO III - CLASSIFICAÇÃO E DESEMPATE</div>
             <div class="reg-article"><strong>Art. 4º</strong> A classificação dentro dos grupos e o ranqueamento geral obedecerão ao princípio da proporcionalidade matemática, sendo vedado o uso de confronto direto ou saldo absoluto.</div>
             <div class="reg-article"><strong>Art. 5º</strong> Em caso de empate, os critérios aplicados serão na seguinte ordem de prioridade:<br>
-            I - <strong>Maior percentual de vitórias</strong> (vitórias / partidas disputadas);<br>
-            II - <strong>Maior percentual de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
+            I - <strong>Maior percentagem de vitórias</strong> (vitórias / partidas disputadas);<br>
+            II - <strong>Maior percentagem de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
             III - Sorteio.</div>
 
             <div class="reg-chapter">CAPÍTULO IV - FASE ELIMINATÓRIA (MATA-MATA)</div>
@@ -237,7 +242,7 @@
 </div>
 
 <div id="loading" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.9);z-index:3000;display:flex;justify-content:center;align-items:center;flex-direction:column;">
-    <div style="font-size:3.5em;">🎾</div><b>Carregando...</b>
+    <div style="font-size:3.5em;">🎾</div><b>A Carregar...</b>
 </div>
 
 <div class="navbar">
@@ -273,7 +278,7 @@
     </div>
     <div style="background:white; border-radius:8px; overflow:hidden; border:1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         <table class="rank-table" id="table-global-ranking">
-            <tr><td style="padding:20px;">Carregando...</td></tr>
+            <tr><td style="padding:20px;">A carregar...</td></tr>
         </table>
     </div>
 </div>
@@ -302,7 +307,7 @@
         <div style="display:flex; align-items:center; gap:5px;">
             <button onclick="document.getElementById('modal-regulamento').style.display='flex'" style="background:transparent; border:none; color:white; cursor:pointer; padding: 2px;" title="Ler Regulamento"><span class="material-icons" style="font-size: 1.2em; color: #FFD700;">menu_book</span></button>
             <span class="conn-dot"></span> <span id="app-status">ONLINE</span>
-            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Compartilhar Link"><span class="material-icons">link</span></button>
+            <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Partilhar Link"><span class="material-icons">link</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px solid #aaa; padding:2px 5px; color:white;" title="Acesso Admin">🔒</button>
         </div>
     </div>
@@ -311,7 +316,7 @@
     <div class="admin-only" style="background:white; padding:10px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;">
         
         <div style="display:flex; gap:5px; margin-bottom:5px;">
-            <input type="tel" id="pPhone" class="inp-std auth-input" style="margin:0; width:45%; font-size:0.9em;" placeholder="Celular (Opcional)" autocomplete="off">
+            <input type="tel" id="pPhone" class="inp-std auth-input" style="margin:0; width:45%; font-size:0.9em;" placeholder="Telemóvel (Opcional)" autocomplete="off">
             <input type="text" id="pName" class="inp-std auth-input" style="margin:0; width:55%;" placeholder="Nome da dupla/atleta..." autocomplete="off">
             <button class="btn-std btn-org" style="width:auto;" onclick="addPlayer()">+ Add</button>
         </div>
@@ -371,8 +376,8 @@
     <div class="modal-box">
         <h3 class="modal-title">Entrar no Sistema</h3>
         
-        <input type="email" id="login-email" class="inp-std auth-input" placeholder="Seu e-mail" style="margin-bottom: 10px;">
-        <input type="password" id="login-pwd" class="inp-std auth-input" placeholder="Sua senha" style="margin-bottom: 15px;">
+        <input type="email" id="login-email" class="inp-std auth-input" placeholder="O seu e-mail" style="margin-bottom: 10px;">
+        <input type="password" id="login-pwd" class="inp-std auth-input" placeholder="A sua palavra-passe" style="margin-bottom: 15px;">
         
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <button class="btn-std btn-blue" onclick="doEmailLogin()">Entrar</button>
@@ -407,7 +412,7 @@
     </div>
 </div>
 
-<div id="field-pwd" style="display:none;"><label class="modal-label">Senha</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Salvar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
+<div id="field-pwd" style="display:none;"><label class="modal-label">Palavra-passe</label><input type="text" id="inp-pwd" class="inp-std auth-input"></div><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn-std btn-green" onclick="saveModal()">Guardar</button><button class="btn-std btn-red" onclick="closeModal()">Cancelar</button></div></div></div>
 
 <div id="modal-knockout"><div class="modal-box">
     <h3 class="modal-title">Configurar Mata-Mata</h3>
@@ -602,26 +607,26 @@
     window.doEmailLogin = async () => {
         const email = document.getElementById('login-email').value.trim();
         const pwd = document.getElementById('login-pwd').value;
-        if(!email || !pwd) return alert("Preencha e-mail e senha!");
+        if(!email || !pwd) return alert("Preencha e-mail e palavra-passe!");
         try {
             await signInWithEmailAndPassword(auth, email, pwd);
             closeLoginModal();
         } catch(e) {
-            alert("Erro ao entrar. Verifique se o e-mail e a senha estão corretos.");
+            alert("Erro ao entrar. Verifique se o e-mail e a palavra-passe estão corretos.");
         }
     }
 
     window.doEmailSignUp = async () => {
         const email = document.getElementById('login-email').value.trim();
         const pwd = document.getElementById('login-pwd').value;
-        if(!email || !pwd) return alert("Preencha e-mail e senha!");
-        if(pwd.length < 6) return alert("A senha deve ter pelo menos 6 caracteres.");
+        if(!email || !pwd) return alert("Preencha e-mail e palavra-passe!");
+        if(pwd.length < 6) return alert("A palavra-passe deve ter pelo menos 6 caracteres.");
         try {
             await createUserWithEmailAndPassword(auth, email, pwd);
             alert("Conta criada com sucesso!");
             closeLoginModal();
         } catch(e) {
-            if(e.code === 'auth/email-already-in-use') return alert("Este e-mail já está cadastrado. Clique em Entrar.");
+            if(e.code === 'auth/email-already-in-use') return alert("Este e-mail já está registado. Clique em Entrar.");
             alert("Erro ao criar conta: " + e.message);
         }
     }
@@ -704,13 +709,13 @@
                 if(type === 'tournament') { await set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user?user.uid:'local' }); }
             }
             closeModal();
-        } catch(e) { console.error(e); alert("Erro ao salvar: " + e.message); }
+        } catch(e) { console.error(e); alert("Erro ao guardar: " + e.message); }
     }
 
     window.showGlobalRanking = () => {
         showScreen('screen-global-ranking');
         const table = document.getElementById('table-global-ranking');
-        table.innerHTML = '<tr><td style="padding:20px;">Carregando dados da nuvem...</td></tr>';
+        table.innerHTML = '<tr><td style="padding:20px;">A carregar dados da nuvem...</td></tr>';
         
         get(ref(db, 'global_players')).then((snap) => {
             table.innerHTML = '<tr><th title="Posição Global">#</th><th title="Nome do Jogador">Nome</th><th title="Pontuação Total">Pts</th><th title="Torneios Jogados">J</th><th title="Títulos de Campeão">Títulos</th></tr>';
@@ -1007,12 +1012,12 @@
             // 1. Pontos
             if (b.pts !== a.pts) return b.pts - a.pts;
 
-            // 2. Percentual de Vitórias
+            // 2. Percentagem de Vitórias
             const aWinPct = a.games > 0 ? a.wins / a.games : 0;
             const bWinPct = b.games > 0 ? b.wins / b.games : 0;
             if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
 
-            // 3. Percentual de Games Vencidos / Game Average
+            // 3. Percentagem de Games Vencidos / Game Average
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
@@ -1023,7 +1028,7 @@
     }
 
     window.resetKnockout = () => {
-        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
+        if(!confirm("Tem a certeza? Isso apagará TODA a fase de mata-mata e os seus placares.")) return;
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
         save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
@@ -1191,7 +1196,6 @@
             [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); 
         } 
         else if(ps.length===6) {
-            // Matriz fixa e determinística para 6 jogadores (Gera sempre 7 jogos exatos)
             [[0,1,2,3],[0,2,4,5],[0,3,1,4],[0,4,2,5],[0,5,1,3],[1,5,2,4],[3,5,1,2]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); });
         }
         else { 
@@ -1767,11 +1771,12 @@
                 } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
                 
                 if(ps.length) { 
-                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="10" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`; 
+                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="11" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos). 1º Critério de desempate.</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games). 2º Critério de desempate.</span></div></td><td title="Pontuação">Pts</td></tr>`; 
                     ps.forEach((p,ix) => {
                         const isTied = p.pts > 0 && ps.filter(x => x.pts === p.pts && x.bal === p.bal && x.wins === p.wins && Math.abs((x.gameAvg||0) - (p.gameAvg||0)) < 0.001).length > 1;
                         const spanClass = isTied ? "blink-tie-bg" : "";
-                        h += `<tr style="font-size:0.75em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span class="${spanClass}">${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Partidas Jogadas">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Games Vencidos" style="color:#2e7d32; font-weight:bold;">${p.gamesWon}</td><td title="Games Perdidos" style="color:#d32f2f;">${p.gamesPlayed - p.gamesWon}</td><td title="Total de Games Disputados" style="color:#0f172a;">${p.gamesPlayed}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`;
+                        const winPct = p.games > 0 ? ((p.wins / p.games) * 100).toFixed(0) + '%' : '0%';
+                        h += `<tr style="font-size:0.75em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span class="${spanClass}">${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Games Vencidos" style="color:#2e7d32; font-weight:bold;">${p.gamesWon}</td><td title="Games Perdidos" style="color:#d32f2f;">${p.gamesPlayed - p.gamesWon}</td><td title="Total de Games Disputados" style="color:#0f172a;">${p.gamesPlayed}</td><td style="font-weight:bold; color:#1976D2;">${winPct}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`;
                     }); 
                     h += `</table>`; 
                 }
@@ -1806,11 +1811,12 @@
                 
                 let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
-                <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`;
+                <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
                 
                 allPlayers.forEach(p => {
                     let rankClass = p.tempGroupRank === 1 ? 'color: var(--primary); font-weight: 900;' : (p.tempGroupRank === 2 ? 'color: #2196F3; font-weight:bold;' : 'color: #666;');
-                    thHtml += `<tr style="font-size:0.8em">
+                    const winPct = p.games > 0 ? ((p.wins / p.games) * 100).toFixed(0) + '%' : '0%';
+                    thHtml += `<tr style="font-size:0.85em">
                         <td style="${rankClass}" title="Posição Geral">${p.tempGroupRank}º</td>
                         <td style="font-weight:bold; font-size:0.8em; color:#555;" title="Grupo de Origem">${p.tempGroupName.replace('GRUPO ', '')}</td>
                         <td style="text-align:left; font-weight:bold;" title="${p.name}">${p.name}</td>
@@ -1820,6 +1826,7 @@
                         <td title="Games Vencidos" style="color:#2e7d32; font-weight:bold;">${p.gamesWon}</td>
                         <td title="Games Perdidos" style="color:#d32f2f;">${p.gamesPlayed - p.gamesWon}</td>
                         <td title="Total de Games Disputados" style="color:#0f172a;">${p.gamesPlayed}</td>
+                        <td style="font-weight:bold; color:#1976D2;">${winPct}</td>
                         <td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td>
                         <td style="font-weight:bold; color:var(--secondary)" title="Pontuação">${p.pts}</td>
                     </tr>`;
