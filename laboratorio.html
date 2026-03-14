@@ -76,7 +76,7 @@
         /* TABLES & LISTS */
         .bt-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-bottom: 5px; background: white; border: 1px solid #eee; }
         .bt-table th { padding: 8px; border: 1px solid #eee; color: black; font-weight: 900; }
-        .bt-table td { border: 1px solid #eee; padding: 6px; text-align: center; vertical-align: middle; font-weight: 700; }
+        .bt-table td { border: 1px solid #eee; padding: 4px 2px; text-align: center; vertical-align: middle; font-weight: 700; }
         .bt-table tr:nth-child(even) { background: #f9f9f9; }
         .bt-table th[title], .bt-table td[title] { cursor: help; }
         
@@ -138,15 +138,6 @@
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
 
-        /* KNOCKOUT LIST VIEW */
-        .ko-round-header { background: #1e293b; color: var(--primary); padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; border-bottom: 2px dashed #334155; }
-        .ko-list { background: white; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
-        .ko-match-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #eee; }
-        .ko-match-item:last-child { border-bottom: none; }
-        .ko-player { flex: 1; text-align: center; font-weight: 600; cursor: pointer; }
-        .ko-vs { font-size: 0.8em; color: #999; margin: 0 10px; }
-        .ko-score { width: 40px; text-align: center; font-weight: 900; color: var(--secondary); }
-
         /* ANIMAÇÃO DE EMPATE ABSOLUTO */
         @keyframes pulse-tie-bg { 
             0% { background-color: transparent; } 
@@ -175,13 +166,93 @@
             user-select: none;
         }
 
-        /* REGULAMENTO MODAL STYLES */
+        /* TOOLTIPS E REGULAMENTO */
+        .tooltip { position: relative; display: inline-block; cursor: help; color: var(--primary); margin-left: 2px; }
+        .tooltip .tooltiptext { visibility: hidden; width: 180px; background-color: #333; color: #fff; text-align: center; border-radius: 6px; padding: 6px 8px; position: absolute; z-index: 100; bottom: 125%; left: 50%; transform: translateX(-50%); opacity: 0; transition: opacity 0.3s; font-size: 11px; font-weight: normal; line-height: 1.4; white-space: normal; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: #333 transparent transparent transparent; }
+        .tooltip:hover .tooltiptext, .tooltip:active .tooltiptext { visibility: visible; opacity: 1; }
+
         .reg-article { margin-bottom: 12px; font-size: 0.95em; color: #444; }
         .reg-article strong { color: #111; }
         .reg-chapter { background: #e2e8f0; padding: 6px; text-align: center; font-weight: bold; color: #1e293b; margin: 20px 0 10px 0; border-radius: 4px; border: 1px dashed #94a3b8; }
         .reg-tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; font-weight: 800; font-size: 0.95em; color: #475569; transition: 0.2s; background: #e2e8f0; }
         .reg-tab.active { background: white; color: var(--primary); }
         .reg-tab:hover:not(.active) { background: #cbd5e1; }
+
+        /* NOVA CHAVE MATA-MATA (ÁRVORE HORIZONTAL) */
+        .tournament-bracket {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            padding: 20px;
+            gap: 40px; /* Distância entre as colunas */
+            background: #fff;
+            border-radius: 8px;
+            border: 1px dashed #94a3b8;
+            margin-top: 15px;
+        }
+        .bracket-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 220px;
+            min-width: 220px;
+            gap: 15px;
+        }
+        .bracket-header {
+            text-align: center;
+            font-weight: 800;
+            color: #475569;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+        .brk-match-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+            padding: 5px 0;
+        }
+        .bracket-match-box {
+            width: 100%;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            z-index: 2;
+            position: relative;
+        }
+        .bracket-team {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #1e293b;
+            border-bottom: 1px solid #f1f5f9;
+            min-height: 28px;
+        }
+        .bracket-team:last-child { border-bottom: none; }
+        .bracket-seed { font-size: 0.7em; color: #94a3b8; margin-right: 5px; display: inline-block; vertical-align: top;}
+        .bracket-score { font-weight: 900; color: var(--primary); font-size: 1.1em; width: 30px; text-align: center; }
+        .bracket-name { flex: 1; line-height: 1.2; word-break: break-word; padding-right: 5px;}
+        .bracket-admin-panel { background: #f8fafc; padding: 6px; display: flex; justify-content: center; gap: 5px; border-top: 1px solid #cbd5e1; border-radius: 0 0 4px 4px; }
+        
+        /* Linhas conectoras da árvore */
+        .brk-match-wrapper::after { content: ''; position: absolute; right: -20px; width: 20px; border-right: 2px solid #94a3b8; z-index: 1; }
+        .brk-match-wrapper:nth-child(odd)::after { top: 50%; height: 50%; border-top: 2px solid #94a3b8; border-top-right-radius: 4px; }
+        .brk-match-wrapper:nth-child(even)::after { bottom: 50%; height: 50%; border-bottom: 2px solid #94a3b8; border-bottom-right-radius: 4px; }
+        .bracket-column:last-child .brk-match-wrapper::after { display: none; }
+        
+        .brk-match-wrapper::before { content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8; z-index: 1; }
+        .bracket-column:first-child .brk-match-wrapper::before { display: none; }
+
+        /* Estilo para Terceiro Lugar fora da árvore */
+        .third-place-box { width: 100%; max-width: 300px; margin: 20px auto 0; border: 2px dashed #b45309; border-radius: 8px; background: #fffbeb; }
+        .third-place-header { background: #b45309; color: white; padding: 8px; text-align: center; font-weight: bold; font-size: 0.9em; border-radius: 6px 6px 0 0; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -218,8 +289,8 @@
 
             <div class="reg-chapter">CAPÍTULO V - CLASSIFICAÇÃO E DESEMPATE</div>
             <div class="reg-article"><strong>Art. 16º</strong> Em caso de empate na classificação individual, os critérios de desempate serão aplicados na seguinte ordem:<br>
-            I - <strong>Maior percentual de vitórias</strong> (vitórias / partidas disputadas);<br>
-            II - <strong>Maior percentual de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
+            I - <strong>Maior percentagem de vitórias</strong> (vitórias / partidas disputadas);<br>
+            II - <strong>Maior percentagem de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
             III - Sorteio.</div>
             <div class="reg-article"><strong>Art. 17º</strong> O confronto direto não será utilizado como critério de desempate na fase classificatória individual.</div>
             <div class="reg-article"><strong>Art. 18 e 19º</strong> Quando houver comparação entre atletas de grupos distintos (tamanhos diferentes), é vedada a utilização de critérios brutos absolutos (como saldo total), devendo prevalecer os critérios proporcionais/percentuais.</div>
@@ -249,8 +320,8 @@
             <div class="reg-chapter">CAPÍTULO III - CLASSIFICAÇÃO E DESEMPATE</div>
             <div class="reg-article"><strong>Art. 4º</strong> A classificação dentro dos grupos e o ranqueamento geral obedecerão ao princípio da proporcionalidade matemática, sendo vedado o uso de confronto direto ou saldo absoluto.</div>
             <div class="reg-article"><strong>Art. 5º</strong> Em caso de empate, os critérios aplicados serão na seguinte ordem de prioridade:<br>
-            I - <strong>Maior percentual de vitórias</strong> (vitórias / partidas disputadas);<br>
-            II - <strong>Maior percentual de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
+            I - <strong>Maior percentagem de vitórias</strong> (vitórias / partidas disputadas);<br>
+            II - <strong>Maior percentagem de games vencidos / Game Average</strong> (games vencidos / games disputados);<br>
             III - Sorteio.</div>
 
             <div class="reg-chapter">CAPÍTULO IV - FASE ELIMINATÓRIA (MATA-MATA)</div>
@@ -385,7 +456,7 @@
     </div>
     
     <div id="view-bracket" class="view-section">
-        <div id="bracket-container" style="width:100%; max-width:600px; margin:0 auto 40px;"></div>
+        <div id="bracket-container" style="width:100%; margin:0 auto 40px;"></div>
     </div>
 </div>
 
@@ -582,7 +653,7 @@
                         document.getElementById('title-cat').innerText = sc.val().name; 
                         curCatData = sc.val(); 
                     } else {
-                        curCatData = { points: {} }; 
+                        curCatData = { points: {} }; // Prevenção de race condition
                     }
                     get(ref(db, `tournaments_meta/${c}/${t}`)).then(st => { 
                         if(st.exists()) enterApp(t, st.val().name, st.val().pwd, st.val().owner); 
@@ -1031,12 +1102,12 @@
             // 1. Pontos
             if (b.pts !== a.pts) return b.pts - a.pts;
 
-            // 2. Percentual de Vitórias
+            // 2. Percentagem de Vitórias
             const aWinPct = a.games > 0 ? a.wins / a.games : 0;
             const bWinPct = b.games > 0 ? b.wins / b.games : 0;
             if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
 
-            // 3. Percentual de Games Vencidos / Game Average
+            // 3. Percentagem de Games Vencidos / Game Average
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
@@ -1047,7 +1118,7 @@
     }
 
     window.resetKnockout = () => {
-        if(!confirm("Tem certeza? Isso apagará TODA a fase de mata-mata e seus placares.")) return;
+        if(!confirm("Tem a certeza? Isso apagará TODA a fase de mata-mata e os seus placares.")) return;
         appState.groups = appState.groups.filter(g => !g.id.includes('ko'));
         appState.matches = appState.matches.filter(m => !m.gid.includes('ko'));
         save(); renderApp(); alert("Mata-Mata excluído!"); switchAppView('groups');
@@ -1193,6 +1264,45 @@
         save();
         alert("Chave Gerada!");
         switchAppView('bracket');
+    }
+
+    window.genMatches = (gid) => { 
+        const existing = appState.matches.filter(m => m.gid === gid);
+        if(existing.length > 0) return alert("Já existem jogos.");
+        const ps=appState.players.filter(p=>p.groupId===gid); 
+        if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
+        
+        let roundMatches = [];
+        
+        if(appState.mode==='fixed') { 
+            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } 
+        } 
+        else if(ps.length===4) { 
+            roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); 
+            roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); 
+            roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); 
+        }
+        else if(ps.length===5) { 
+            [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); 
+        } 
+        else if(ps.length===6) {
+            [[0,1,2,3],[0,2,4,5],[0,3,1,4],[0,4,2,5],[0,5,1,3],[1,5,2,4],[3,5,1,2]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); });
+        }
+        else { 
+            let pairs=[]; 
+            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
+            
+            while(pairs.length) { 
+                let pA=pairs[0], found=false; 
+                for(let k=1; k<pairs.length; k++) { 
+                    let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
+                    if(all.size===4) { roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2}); pairs.splice(k,1); pairs.splice(0,1); found=true; break; } 
+                } 
+                if(!found) pairs.splice(0,1); 
+            } 
+        } 
+        roundMatches.forEach(m => { addMatch(gid, m.p1, m.p2, m.p3, m.p4, false); });
+        save(); renderApp();
     }
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString(36).substring(2,7), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
@@ -1477,34 +1587,6 @@
         }
     }
     
-    window.genMatches = (gid) => { 
-        const existing = appState.matches.filter(m => m.gid === gid);
-        if(existing.length > 0) return alert("Já existem jogos.");
-        const ps=appState.players.filter(p=>p.groupId===gid); 
-        if(appState.mode==='individual' && ps.length<4) return alert("Min 4 jogadores."); 
-        let roundMatches = [];
-        if(appState.mode==='fixed') { for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { roundMatches.push({p1:ps[i].id, p2:'d', p3:ps[j].id, p4:'d'}); } } 
-        else if(ps.length===4) { roundMatches.push({p1:ps[0].id, p2:ps[1].id, p3:ps[2].id, p4:ps[3].id}); roundMatches.push({p1:ps[0].id, p2:ps[2].id, p3:ps[1].id, p4:ps[3].id}); roundMatches.push({p1:ps[0].id, p2:ps[3].id, p3:ps[1].id, p4:ps[2].id}); }
-        else if(ps.length===5) { [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); } 
-        else { 
-            let pairs=[]; 
-            for(let i=0;i<ps.length;i++) for(let j=i+1;j<ps.length;j++) { pairs.push({p1:ps[i].id, p2:ps[j].id}); } 
-            pairs.sort(()=>Math.random()-0.5); 
-            while(pairs.length) { 
-                let pA=pairs[0], found=false; 
-                for(let k=1; k<pairs.length; k++) { 
-                    let pB=pairs[k], all=new Set([pA.p1,pA.p2,pB.p1,pB.p2]); 
-                    if(all.size===4) { roundMatches.push({p1:pA.p1, p2:pA.p2, p3:pB.p1, p4:pB.p2}); pairs.splice(k,1); pairs.splice(0,1); found=true; break; } 
-                } 
-                if(!found) pairs.splice(0,1); 
-            } 
-        } 
-        roundMatches.forEach(m => { addMatch(gid, m.p1, m.p2, m.p3, m.p4, false); });
-        save(); renderApp();
-    }
-    
-    window.addManual = (gid) => { addMatch(gid, '', '', '', '', false); save(); renderApp(); }
-    
     function getOptimizedMatchOrder(matches) {
         let groupMatches = matches.filter(m => !m.gid.includes('ko') && !m.isBye);
         let pending = groupMatches.map((m, originalIndex) => ({ m, originalIndex }));
@@ -1554,7 +1636,7 @@
 
         let container = btnElement.parentElement;
         if (btnElement.closest('tr')) container = btnElement.closest('tr');
-        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
+        if (btnElement.closest('.bracket-match-box')) container = btnElement.closest('.bracket-match-box');
         if (btnElement.closest('.queue-match-item')) container = btnElement.closest('.queue-match-item');
         
         let inputs = container.querySelectorAll('input[type="tel"]');
@@ -1729,9 +1811,7 @@
             
             if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
-                
-                h += `<div class="ko-list">`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:var(--primary); border: 2px dashed var(--primary);"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
                 
                 const rounds = {};
                 ms.forEach(m => {
@@ -1746,161 +1826,170 @@
                 
                 let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
                 
-                roundKeys.forEach(rNum => {
+                // --- CONSTRUÇÃO DA ÁRVORE MATA-MATA HORIZONTAL ---
+                h += `<div class="tournament-bracket">`;
+                
+                roundKeys.forEach((rNum, index) => {
                     let rName = 'Fase ' + rNum;
                     const count = rounds[rNum].length;
-                    if(count === 8) rName = 'OITAVAS DE FINAL';
-                    if(count === 4) rName = 'QUARTAS DE FINAL';
-                    if(count === 2) rName = 'SEMI-FINAL';
-                    if(count === 1) rName = 'FINAL';
+                    if(count === 8) rName = 'Oitavas de Final';
+                    if(count === 4) rName = 'Quartas de Final';
+                    if(count === 2) rName = 'Semifinal';
+                    if(count === 1) rName = 'Final';
 
-                    h += `<div class="ko-round-header">${rName}</div>`;
+                    h += `<div class="bracket-column"><div class="bracket-header">${rName}</div>`;
                     
-                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
-                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
-                        
-                        const formatName = (pid, name) => {
-                            if (!pid || pid === 'BYE') return name;
-                            const p = appState.players.find(x => x.id === pid);
-                            if(p && p.tempGroupRank && p.tempGroupName) {
-                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
-                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach((m, matchIndex) => {
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
+                        const getBrkName = (pid1, pid2) => {
+                            if(pid1 === 'BYE') return 'BYE';
+                            if(!pid1) return '<span style="color:#94a3b8;font-style:italic;">Aguardando...</span>';
+                            const pObj = appState.players.find(x => x.id === pid1);
+                            const seedHtml = pObj && pObj.tempGroupRank && pObj.tempGroupName ? `<div class="bracket-seed" title="${pObj.tempGroupRank}º do ${pObj.tempGroupName.replace('GRUPO ', 'Gr. ')}">${pObj.tempGroupRank}º</div>` : `<div class="bracket-seed"></div>`;
+                            
+                            if (appState.mode === 'fixed') {
+                                return `${seedHtml} ${n(pid1)}`;
+                            } else {
+                                return `${seedHtml} ${n(pid1)}<br><div style="margin-left:19px;">${n(pid2)}</div>`;
                             }
-                            return name;
                         };
-
-                        const formatAdmin = (pid, name, slot) => {
-                             if (!pid || pid === 'BYE') return name;
-                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
-                        };
-
-                        let t1 = '', t1_admin = '';
-                        if (appState.mode === 'fixed') {
-                            t1 = formatName(m.p1, p1Name);
-                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
-                        } else {
-                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
-                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
-                        }
                         
-                        let t2 = '', t2_admin = '';
-                        if (appState.mode === 'fixed') {
-                            t2 = formatName(m.p3, p3Name);
-                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
-                        } else {
-                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
-                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
-                        }
+                        const getBrkNameAdmin = (pid1, pid2, slot1, slot2) => {
+                            if(pid1 === 'BYE') return 'BYE';
+                            if(!pid1) return `<span style="color:var(--primary);font-style:italic;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">Selecionar...</span>`;
+                            const pObj = appState.players.find(x => x.id === pid1);
+                            const seedHtml = pObj && pObj.tempGroupRank && pObj.tempGroupName ? `<div class="bracket-seed" title="${pObj.tempGroupRank}º do ${pObj.tempGroupName.replace('GRUPO ', 'Gr. ')}">${pObj.tempGroupRank}º</div>` : `<div class="bracket-seed"></div>`;
+                            
+                            if (appState.mode === 'fixed') {
+                                return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">${seedHtml} ${n(pid1)}</span>`;
+                            } else {
+                                return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">${seedHtml} ${n(pid1)}</span><br><span style="margin-left:19px;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot2}')">${n(pid2)}</span>`;
+                            }
+                        };
+
+                        let t1 = getBrkName(m.p1, m.p2);
+                        let t1_admin = getBrkNameAdmin(m.p1, m.p2, 'p1', 'p2');
+                        let t2 = getBrkName(m.p3, m.p4);
+                        let t2_admin = getBrkNameAdmin(m.p3, m.p4, 'p3', 'p4');
                         
                         const isEditing = !m.saved && !m.isBye;
                         const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
                         
-                        h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only">${t1_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                            
-                            ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                 <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
-                                : 
-                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
-                                 <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
-                            }
-                            
-                            <div class="ko-player admin-only">${t2_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                            
-                            ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
-                                : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
-                            }
+                        // Lógica das linhas conectivas
+                        let connectors = '';
+                        if (index > 0) connectors += `<div class="line-straight"></div>`;
+                        if (index < roundKeys.length - 1) { 
+                            if (m.pos % 2 === 0) connectors += `<div class="line-down"></div>`;
+                            else connectors += `<div class="line-up"></div>`;
+                        }
+
+                        h += `
+                        <div class="brk-match-wrapper">
+                            ${connectors}
+                            <div class="bracket-match-box">
+                                <div class="bracket-team">
+                                    <div class="bracket-name admin-only">${t1_admin}</div>
+                                    <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
+                                    <div style="display:flex; align-items:center; gap:5px;">
+                                        ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:28px;height:28px;font-size:0.9em;padding:0;border:1px solid var(--primary);" placeholder="0">` : `<span class="bracket-score">${m.s1!==''?m.s1:'-'}</span>`}
+                                    </div>
+                                </div>
+                                <div class="bracket-team">
+                                    <div class="bracket-name admin-only">${t2_admin}</div>
+                                    <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
+                                    <div style="display:flex; align-items:center; gap:5px;">
+                                        ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:28px;height:28px;font-size:0.9em;padding:0;border:1px solid var(--primary);" placeholder="0">` : `<span class="bracket-score">${m.s2!==''?m.s2:'-'}</span>`}
+                                    </div>
+                                </div>
+                                ${document.body.classList.contains('viewer-mode') ? '' : `
+                                <div class="bracket-admin-panel admin-only">
+                                    ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:4px 8px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'ko', this)">Salvar</button>` : ''}
+                                    ${m.saved ? `<button class="btn-std btn-dark" style="padding:4px 8px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">Editar</button>` : ''}
+                                </div>
+                                `}
+                            </div>
                         </div>`;
                     });
+                    h += `</div>`; 
                 });
 
+                // Coluna do Campeão
+                const finalMatchRounds = rounds[roundKeys[roundKeys.length - 1]];
+                if(finalMatchRounds && finalMatchRounds.length > 0) {
+                    const finalMatch = finalMatchRounds[0];
+                    if (finalMatch && finalMatch.saved) {
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
+                        let champName = '';
+                        if (finalMatch.s1 > finalMatch.s2) {
+                            champName = appState.mode === 'fixed' ? n(finalMatch.p1) : n(finalMatch.p1) + '<br>' + n(finalMatch.p2);
+                        } else {
+                            champName = appState.mode === 'fixed' ? n(finalMatch.p3) : n(finalMatch.p3) + '<br>' + n(finalMatch.p4);
+                        }
+
+                        h += `<div class="bracket-column">
+                                <div class="bracket-header">Campeão</div>
+                                <div class="brk-match-wrapper">
+                                    <div class="line-straight"></div>
+                                    <div class="bracket-match-box" style="border-color:#FFD700; background:#fffdf0; border-width: 2px;">
+                                        <div class="bracket-team" style="justify-content:center; color:#b8860b; font-weight:900; font-size:1.1em; text-align:center; padding: 15px;">
+                                            🏆<br>${champName}
+                                        </div>
+                                    </div>
+                                </div>
+                              </div>`;
+                    }
+                }
+                
+                h += `</div>`; // Fim da .tournament-bracket
+
+                // BLOCO DE TERCEIRO LUGAR (Abaixo da árvore)
                 if(rounds['3rd']) {
-                    h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
+                    h += `<div class="third-place-box"><div class="third-place-header">🥉 DISPUTA DE 3º LUGAR</div><div style="padding:10px;">`;
                     rounds['3rd'].forEach(m => {
-                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
-                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...';
-                        const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
-                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
-                        const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
-                        
-                        const formatName = (pid, name) => {
-                            if (!pid || pid === 'BYE') return name;
-                            const p = appState.players.find(x => x.id === pid);
-                            if(p && p.tempGroupRank && p.tempGroupName) {
-                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
-                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
-                            }
-                            return name;
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        const getBrkName = (pid1, pid2) => {
+                            if(!pid1) return '<span style="color:#94a3b8;font-style:italic;font-size:0.9em;">Aguardando perdedor da Semi...</span>';
+                            if (appState.mode === 'fixed') return `${n(pid1)}`;
+                            return `${n(pid1)} / ${n(pid2)}`;
+                        };
+                        const getBrkNameAdmin = (pid1, pid2, slot1, slot2) => {
+                            if(!pid1) return `<span style="color:#b45309;font-style:italic;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">Selecionar perdedor...</span>`;
+                            if (appState.mode === 'fixed') return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">${n(pid1)}</span>`;
+                            return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot1}')">${n(pid1)}</span> / <span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${slot2}')">${n(pid2)}</span>`;
                         };
 
-                        const formatAdmin = (pid, name, slot) => {
-                             if (!pid || pid === 'BYE') return name;
-                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
-                        };
+                        let t1 = getBrkName(m.p1, m.p2); let t1_admin = getBrkNameAdmin(m.p1, m.p2, 'p1', 'p2');
+                        let t2 = getBrkName(m.p3, m.p4); let t2_admin = getBrkNameAdmin(m.p3, m.p4, 'p3', 'p4');
+                        const isEditing = !m.saved;
+                        const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
 
-                        let t1 = '', t1_admin = '';
-                        if (appState.mode === 'fixed') {
-                            t1 = formatName(m.p1, p1Name);
-                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
-                        } else {
-                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
-                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
-                        }
-                        
-                        let t2 = '', t2_admin = '';
-                        if (appState.mode === 'fixed') {
-                            t2 = formatName(m.p3, p3Name);
-                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
-                        } else {
-                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
-                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
-                        }
-
-                         const isEditing = !m.saved;
-                         const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
-
-                         h += `<div class="ko-match-item">
-                            <div class="ko-player admin-only">${t1_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
+                        h += `<div class="ko-match-item" style="border:none; padding:0;">
+                            <div class="ko-player admin-only" style="font-size:0.9em;">${t1_admin}</div>
+                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}; font-size:0.9em;">${t1}</div>
                             ${isEditing && hasPlayers ? 
-                                `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                 <span class="ko-vs">X</span>
-                                 <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                `<input type="tel" class="tbl-input score-input auth-input" style="width:30px;height:30px;margin:0 5px;" placeholder="0"><span class="ko-vs">X</span><input type="tel" class="tbl-input score-input auth-input" style="width:30px;height:30px;margin:0 5px;" placeholder="0">` 
                                 : 
-                                `<div class="ko-score">${m.s1!==''?m.s1:'-'}</div>
-                                 <div class="ko-vs">X</div>
-                                 <div class="ko-score">${m.s2!==''?m.s2:'-'}</div>`
+                                `<div class="ko-score" style="color:#b45309;">${m.s1!==''?m.s1:'-'}</div><div class="ko-vs">X</div><div class="ko-score" style="color:#b45309;">${m.s2!==''?m.s2:'-'}</div>`
                             }
-                            <div class="ko-player admin-only">${t2_admin}</div>
-                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
+                            <div class="ko-player admin-only" style="font-size:0.9em;">${t2_admin}</div>
+                            <div class="ko-player" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}; font-size:0.9em;">${t2}</div>
                             ${isEditing && hasPlayers ? 
-                                `<button class="btn-icon-circle admin-only" onclick="saveScore('${m.mid}', 'ko', this)" title="Salvar Placar">✓</button>` 
+                                `<button class="btn-icon-circle admin-only" style="width:28px;height:28px;" onclick="saveScore('${m.mid}', 'ko', this)">✓</button>` 
                                 : 
-                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>` : '')
+                                (m.saved ? `<button class="btn-icon-circle admin-only" style="background:#999;color:white;border:none;width:28px;height:28px;" onclick="editS('${m.mid}')">✎</button>` : '')
                             }
                         </div>`;
                     });
+                    h += `</div></div>`;
                 }
                 
-                h += `</div>`;
                 document.getElementById('bracket-container').innerHTML = h;
                 
             } else {
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
                 
                 if(ms.length) {
-                    h += `<table class="bt-table"><thead><tr><th colspan="6" class="gh-${i%4}">${g.name}</th></tr></thead><tbody>`;
+                    h += `<table class="bt-table"><thead><tr><th colspan="6" style="background:var(--primary); color:#111;">${g.name}</th></tr></thead><tbody>`;
                     ms.forEach(m => {
                         const n = (id) => appState.players.find(x=>x.id===id)?.name || (id===''?'<span style="color:var(--primary); font-style:italic;">Selecionar...</span>':'?');
                         const p1Block = `<span class="player-link ${m.p1===''?'empty':''}" onclick="openPlayerSelect('${m.mid}', 'p1')">${n(m.p1)}</span>`;
@@ -1911,14 +2000,15 @@
                         h += `<tr><td style="text-align:right; font-size:0.9em;">${p1Block}${p2Block}</td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s1}" ${m.saved?'disabled':''}></td><td style="padding:0;"><input type="tel" class="tbl-input auth-input score-input" value="${m.s2}" ${m.saved?'disabled':''}></td><td style="text-align:left; font-size:0.9em;">${p3Block}${p4Block}</td><td class="admin-only" style="width:40px"><button class="btn-icon-circle" style="background:${m.saved?'#2196F3':'#4CAF50'}; color:white; border:none;" onclick="saveScore('${m.mid}', 'grp', this)" title="${m.saved?'Editar Placar':'Salvar Placar'}">${m.saved?'✎':'OK'}</button>${!m.saved ? `<div style="color:red; cursor:pointer; text-align:center; font-weight:bold; margin-top:5px;" onclick="delM('${m.mid}')" title="Excluir Jogo">✕</div>` : ''}</td></tr>`;
                     });
                     h += `</tbody></table>`;
-                } else { h += `<div class="gh-${i%4}" style="padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
+                } else { h += `<div style="background:var(--secondary); padding:10px; font-weight:bold; text-align:center; color:white; border-radius:4px;" onclick="moveSel('${g.id}')">Vazio</div>`; }
                 
                 if(ps.length) { 
-                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="7" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`; 
+                    h += `<table class="bt-table" style="margin-top:0; border-top:none;"><tr style="background:#333; color:white"><td colspan="11" style="padding:2px; font-size:0.7em">CLASSIFICAÇÃO</td></tr><tr style="background:#ccc; font-size:0.7em"><td title="Posição">#</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`; 
                     ps.forEach((p,ix) => {
                         const isTied = p.pts > 0 && ps.filter(x => x.pts === p.pts && x.bal === p.bal && x.wins === p.wins && Math.abs((x.gameAvg||0) - (p.gameAvg||0)) < 0.001).length > 1;
                         const spanClass = isTied ? "blink-tie-bg" : "";
-                        h += `<tr style="font-size:0.8em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span class="${spanClass}">${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`;
+                        const winPct = p.games > 0 ? ((p.wins / p.games) * 100).toFixed(0) + '%' : '0%';
+                        h += `<tr style="font-size:0.75em"><td title="Posição">${ix+1}</td><td style="text-align:left; display:flex; justify-content:space-between; align-items:center;" title="${p.name}"><span class="${spanClass}">${p.name}</span><div class="admin-only"><span onclick="editName('${p.id}', '${p.name.replace(/'/g,"\\'")}', event)" style="cursor:pointer; color:#666;" title="Editar Nome">✎</span><span onclick="removeFromGroup('${p.id}', event)" style="color:var(--blue-masc); cursor:pointer; margin-left:5px;" title="Remover do Grupo e Voltar para Reserva">⬆</span></div></td><td title="Jogos Disputados">${p.games}</td><td title="Vitórias">${p.wins}</td><td title="Saldo de Games">${p.bal}</td><td title="Games Vencidos" style="color:#2e7d32; font-weight:bold;">${p.gamesWon}</td><td title="Games Perdidos" style="color:#d32f2f;">${p.gamesPlayed - p.gamesWon}</td><td title="Total de Games Disputados" style="color:#0f172a;">${p.gamesPlayed}</td><td style="font-weight:bold; color:#1976D2;">${winPct}</td><td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td><td title="Pontuação">${p.pts}</td></tr>`;
                     }); 
                     h += `</table>`; 
                 }
@@ -1951,12 +2041,13 @@
                 genCol.style.margin = '0 auto';
                 genCol.style.width = '100%';
                 
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:#111; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
-                <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Jogos Disputados">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Game Average (Desempate Oficial CBT)">GA</td><td title="Pontuação">Pts</td></tr>`;
+                <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
                 
                 allPlayers.forEach(p => {
                     let rankClass = p.tempGroupRank === 1 ? 'color: var(--primary); font-weight: 900;' : (p.tempGroupRank === 2 ? 'color: #2196F3; font-weight:bold;' : 'color: #666;');
+                    const winPct = p.games > 0 ? ((p.wins / p.games) * 100).toFixed(0) + '%' : '0%';
                     thHtml += `<tr style="font-size:0.85em">
                         <td style="${rankClass}" title="Posição Geral">${p.tempGroupRank}º</td>
                         <td style="font-weight:bold; font-size:0.8em; color:#555;" title="Grupo de Origem">${p.tempGroupName.replace('GRUPO ', '')}</td>
@@ -1964,6 +2055,10 @@
                         <td title="Jogos Disputados">${p.games}</td>
                         <td title="Vitórias">${p.wins}</td>
                         <td title="Saldo de Games">${p.bal}</td>
+                        <td title="Games Vencidos" style="color:#2e7d32; font-weight:bold;">${p.gamesWon}</td>
+                        <td title="Games Perdidos" style="color:#d32f2f;">${p.gamesPlayed - p.gamesWon}</td>
+                        <td title="Total de Games Disputados" style="color:#0f172a;">${p.gamesPlayed}</td>
+                        <td style="font-weight:bold; color:#1976D2;">${winPct}</td>
                         <td title="Forçar Game Average" onclick="editGA('${p.id}', event)" style="cursor:pointer; ${p.manualGA !== undefined ? 'color:var(--primary); font-weight:bold;' : ''}">${(p.gameAvg||0).toFixed(2)}</td>
                         <td style="font-weight:bold; color:var(--secondary)" title="Pontuação">${p.pts}</td>
                     </tr>`;
@@ -1976,35 +2071,6 @@
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
-    
-    // REGISTRO DO MOTOR DO APLICATIVO (PWA) - DESATIVADO NO LAB
-    /*
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js');
-        });
-    }
-    */
-
-    // CAPTURA DO AVISO DE INSTALAÇÃO DO ANDROID/CHROME
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const btnInstall = document.getElementById('btn-install-app');
-        if(btnInstall) btnInstall.style.display = 'flex';
-    });
-
-    window.installApp = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('btn-install-app').style.display = 'none';
-            }
-            deferredPrompt = null;
-        }
-    };
 </script>
 </body>
 </html>
