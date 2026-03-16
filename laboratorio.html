@@ -172,35 +172,6 @@
         .reg-tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; font-weight: 800; font-size: 0.95em; color: #475569; transition: 0.2s; background: #e2e8f0; }
         .reg-tab.active { background: white; color: var(--primary); }
         .reg-tab:hover:not(.active) { background: #cbd5e1; }
-
-        /* ===== BRACKET TREE (ÁRVORE DE CHAVES) ===== */
-        .bracket-scroll-wrapper { overflow-x: auto; padding-bottom: 20px; }
-        .bracket-tree { display: flex; flex-direction: row; align-items: stretch; gap: 0; min-width: max-content; padding: 10px 20px 20px; }
-        .bracket-round-col { display: flex; flex-direction: column; min-width: 210px; }
-        .bracket-round-title { text-align: center; font-weight: 900; font-size: 0.72em; text-transform: uppercase; color: white; background: var(--secondary); padding: 5px 8px; border-radius: 4px; margin-bottom: 8px; letter-spacing: 1px; }
-        .bracket-round-title.final-title { background: #b8860b; }
-        .bracket-round-title.semi-title { background: #1565c0; }
-        .bracket-round-title.quartas-title { background: #2e7d32; }
-        .bracket-matches-col { display: flex; flex-direction: column; flex: 1; justify-content: space-around; }
-        .bracket-match-wrapper { display: flex; flex-direction: row; align-items: center; flex: 1; }
-        .bracket-match { background: white; border: 2px solid #cbd5e1; border-radius: 8px; width: 190px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; flex-shrink: 0; }
-        .bracket-match.saved { border-color: var(--primary); }
-        .bracket-match.bye-match { border-color: #e0e0e0; opacity: 0.6; }
-        .bracket-team { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; font-size: 0.78em; font-weight: 700; border-bottom: 1px solid #f0f0f0; min-height: 36px; gap: 4px; }
-        .bracket-team:last-of-type { border-bottom: none; }
-        .bracket-team.winner { background: #e8f5e9; color: #1b5e20; }
-        .bracket-team.loser { color: #aaa; }
-        .bracket-team-name { flex: 1; line-height: 1.2; }
-        .bracket-team-seed { font-size: 0.68em; color: #999; font-weight: normal; display: block; }
-        .bracket-team-score { font-size: 1.05em; font-weight: 900; min-width: 20px; text-align: center; }
-        .bracket-score-input { width: 34px; height: 28px; font-size: 0.95em; text-align: center; font-weight: 800; border: 1px dashed #aaa; border-radius: 4px; background: #fff; color: black; }
-        .bracket-match-footer { background: #f8fafc; padding: 3px 6px; display: flex; justify-content: flex-end; gap: 4px; border-top: 1px solid #eee; }
-        .bracket-connector { display: flex; flex-direction: column; width: 24px; flex-shrink: 0; }
-        .bracket-connector-top { flex: 1; border-right: 2px solid #94a3b8; border-bottom: 2px solid #94a3b8; border-radius: 0 0 6px 0; }
-        .bracket-connector-bottom { flex: 1; border-right: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-radius: 0 6px 0 0; }
-        .bracket-connector-line { width: 24px; height: 2px; background: #94a3b8; align-self: center; flex-shrink: 0; }
-        .bracket-third-section { margin-top: 20px; border-top: 2px dashed #664d00; padding-top: 15px; display: flex; flex-direction: column; align-items: flex-start; padding-left: 20px; }
-        .bracket-third-title { font-weight: 900; font-size: 0.72em; text-transform: uppercase; color: white; background: #664d00; padding: 5px 10px; border-radius: 4px; margin-bottom: 10px; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -1754,8 +1725,10 @@
             
             if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
-
-                // ===== BRACKET TREE RENDERER =====
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
+                
+                h += `<div class="ko-list">`;
+                
                 const rounds = {};
                 ms.forEach(m => {
                     if(m.isThirdPlace) {
@@ -1766,146 +1739,160 @@
                         rounds[m.round].push(m);
                     }
                 });
+                
+                let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
+                
+                roundKeys.forEach(rNum => {
+                    let rName = 'Fase ' + rNum;
+                    const count = rounds[rNum].length;
+                    if(count === 8) rName = 'OITAVAS DE FINAL';
+                    if(count === 4) rName = 'QUARTAS DE FINAL';
+                    if(count === 2) rName = 'SEMI-FINAL';
+                    if(count === 1) rName = 'FINAL';
 
-                const roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => Number(a) - Number(b));
+                    h += `<div class="ko-round-header">${rName}</div>`;
+                    
+                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        
+                        const formatName = (pid, name) => {
+                            if (!pid || pid === 'BYE') return name;
+                            const p = appState.players.find(x => x.id === pid);
+                            if(p && p.tempGroupRank && p.tempGroupName) {
+                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
+                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                            }
+                            return name;
+                        };
 
-                const getRoundName = (rNum, count) => {
-                    if(count === 8) return 'OITAVAS DE FINAL';
-                    if(count === 4) return 'QUARTAS DE FINAL';
-                    if(count === 2) return 'SEMI-FINAL';
-                    if(count === 1) return 'FINAL';
-                    return 'Fase ' + rNum;
-                };
+                        const formatAdmin = (pid, name, slot) => {
+                             if (!pid || pid === 'BYE') return name;
+                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
+                        };
 
-                const getRoundTitleClass = (count) => {
-                    if(count === 1) return 'final-title';
-                    if(count === 2) return 'semi-title';
-                    if(count === 4) return 'quartas-title';
-                    return '';
-                };
-
-                const renderMatchCard = (m, isAdmin) => {
-                    const n = (id) => id && id !== 'BYE' && id !== '' ? appState.players.find(x=>x.id===id) : null;
-                    const pA1 = n(m.p1); const pA2 = n(m.p2);
-                    const pB1 = n(m.p3); const pB2 = n(m.p4);
-
-                    const getSeed = (p) => p && p.tempGroupRank && p.tempGroupName
-                        ? `<span class="bracket-team-seed">${p.tempGroupRank}º ${p.tempGroupName.replace('GRUPO ','Gr.')}</span>` : '';
-
-                    const nameA = pA1 ? pA1.name : (m.p1 === 'BYE' ? 'BYE' : '<span style="color:#bbb;font-style:italic;font-size:0.85em;">Aguardando...</span>');
-                    const nameB = pB1 ? pB1.name : (m.p3 === 'BYE' ? 'BYE' : '<span style="color:#bbb;font-style:italic;font-size:0.85em;">Aguardando...</span>');
-
-                    let labelA, labelB;
-                    if(appState.mode === 'fixed') {
-                        labelA = pA1 ? (isAdmin ? `<span style="cursor:pointer;border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}','p1');event.stopPropagation()">${nameA}${getSeed(pA1)}</span>` : `${nameA}${getSeed(pA1)}`) : nameA;
-                        labelB = pB1 ? (isAdmin ? `<span style="cursor:pointer;border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}','p3');event.stopPropagation()">${nameB}${getSeed(pB1)}</span>` : `${nameB}${getSeed(pB1)}`) : nameB;
-                    } else {
-                        const nameA2 = pA2 ? pA2.name : '';
-                        const nameB2 = pB2 ? pB2.name : '';
-                        const pairA = pA1 ? `${nameA}${getSeed(pA1)}${pA2 && m.p1!==m.p2 ? ' / '+nameA2+getSeed(pA2) : ''}` : nameA;
-                        const pairB = pB1 ? `${nameB}${getSeed(pB1)}${pB2 && m.p3!==m.p4 ? ' / '+nameB2+getSeed(pB2) : ''}` : nameB;
-                        if(isAdmin && pA1) {
-                            labelA = `<span style="cursor:pointer;border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}','p1');event.stopPropagation()">${pairA}</span>`;
-                        } else { labelA = pairA; }
-                        if(isAdmin && pB1) {
-                            labelB = `<span style="cursor:pointer;border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}','p3');event.stopPropagation()">${pairB}</span>`;
-                        } else { labelB = pairB; }
-                    }
-
-                    const isEditing = !m.saved && !m.isBye;
-                    const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
-                    const winnerA = m.saved && m.s1 > m.s2;
-                    const winnerB = m.saved && m.s2 > m.s1;
-
-                    const scoreA = isEditing && hasPlayers
-                        ? `<input type="tel" class="bracket-score-input score-input auth-input" placeholder="0">`
-                        : `<span class="bracket-team-score">${m.saved && m.s1 !== '' ? m.s1 : ''}</span>`;
-                    const scoreB = isEditing && hasPlayers
-                        ? `<input type="tel" class="bracket-score-input score-input auth-input" placeholder="0">`
-                        : `<span class="bracket-team-score">${m.saved && m.s2 !== '' ? m.s2 : ''}</span>`;
-
-                    const footerBtns = isAdmin ? `
-                        <div class="bracket-match-footer admin-only">
-                            ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:4px 10px;font-size:0.75em;margin:0;width:auto;" onclick="saveScore('${m.mid}','ko',this)">✓ OK</button>` : ''}
-                            ${m.saved ? `<button class="btn-std btn-dark" style="padding:4px 10px;font-size:0.75em;margin:0;width:auto;" onclick="editS('${m.mid}')">✎</button>` : ''}
-                        </div>` : '';
-
-                    const matchClass = m.saved ? 'bracket-match saved' : (m.isBye ? 'bracket-match bye-match' : 'bracket-match');
-
-                    return `<div class="${matchClass}">
-                        <div class="bracket-team ${winnerA?'winner':(m.saved?'loser':'')}">
-                            <div class="bracket-team-name">${labelA}</div>
-                            ${scoreA}
-                        </div>
-                        <div class="bracket-team ${winnerB?'winner':(m.saved?'loser':'')}">
-                            <div class="bracket-team-name">${labelB}</div>
-                            ${scoreB}
-                        </div>
-                        ${footerBtns}
-                    </div>`;
-                };
-
-                const isAdmin = !document.body.classList.contains('viewer-mode');
-                let bracketHtml = `<div style="background:black; color:white; padding:10px; font-weight:900; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <span>⚔️ ${g.name}</span>
-                    <div class="admin-only" style="display:flex;gap:8px;">
-                        <span onclick="renameGroup('${g.id}', event)" style="cursor:pointer;" title="Renomear">✎</span>
-                        <span onclick="delGroup('${g.id}', event)" style="color:red;cursor:pointer;" title="Excluir Chave">✕</span>
-                    </div>
-                </div>`;
-
-                bracketHtml += `<div class="bracket-scroll-wrapper"><div class="bracket-tree">`;
-
-                roundKeys.forEach((rNum, rIdx) => {
-                    const roundMatches = rounds[rNum].slice().sort((a,b) => a.pos - b.pos);
-                    const rName = getRoundName(rNum, roundMatches.length);
-                    const rClass = getRoundTitleClass(roundMatches.length);
-                    const isLastRound = rIdx === roundKeys.length - 1;
-
-                    bracketHtml += `<div class="bracket-round-col">
-                        <div class="bracket-round-title ${rClass}">${rName}</div>
-                        <div class="bracket-matches-col">`;
-
-                    roundMatches.forEach((m, mIdx) => {
-                        bracketHtml += `<div class="bracket-match-wrapper">
-                            ${renderMatchCard(m, isAdmin)}`;
-                        if(!isLastRound) {
-                            bracketHtml += `<div class="bracket-connector">
-                                <div class="bracket-connector-top"></div>
-                                <div class="bracket-connector-bottom"></div>
-                            </div>`;
+                        let t1 = '', t1_admin = '';
+                        if (appState.mode === 'fixed') {
+                            t1 = formatName(m.p1, p1Name);
+                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
+                        } else {
+                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
                         }
-                        bracketHtml += `</div>`;
+                        
+                        let t2 = '', t2_admin = '';
+                        if (appState.mode === 'fixed') {
+                            t2 = formatName(m.p3, p3Name);
+                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
+                        } else {
+                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
+                        }
+                        
+                        const isEditing = !m.saved && !m.isBye;
+                        const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
+                        
+                        h += `<div class="mobile-match-card">
+                            <div class="mobile-team-row">
+                                <div class="mobile-team-name admin-only">${t1_admin}</div>
+                                <div class="mobile-team-name viewer-only">${t1}</div>
+                                <div class="mobile-team-score">
+                                    ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s1 !== '' ? m.s1 : '-')}
+                                </div>
+                            </div>
+                            <div class="mobile-team-row">
+                                <div class="mobile-team-name admin-only">${t2_admin}</div>
+                                <div class="mobile-team-name viewer-only">${t2}</div>
+                                <div class="mobile-team-score">
+                                    ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s2 !== '' ? m.s2 : '-')}
+                                </div>
+                            </div>
+                            ${document.body.classList.contains('viewer-mode') && !m.saved ? '' : `
+                            <div class="mobile-match-admin admin-only" style="justify-content:flex-end;">
+                                ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'ko', this)">✓ Salvar</button>` : ''}
+                                ${m.saved ? `<button class="btn-std btn-dark" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">✎ Editar</button>` : ''}
+                            </div>
+                            `}
+                        </div>`;
                     });
-
-                    bracketHtml += `</div></div>`;
-
-                    if(rIdx < roundKeys.length - 1) {
-                        const nextCount = rounds[roundKeys[rIdx+1]].length;
-                        bracketHtml += `<div style="display:flex;flex-direction:column;min-width:0;width:0;overflow:visible;">
-                            <div style="height:28px;"></div>
-                            <div style="display:flex;flex-direction:column;flex:1;justify-content:space-around;">`;
-                        for(let i=0; i<nextCount; i++) {
-                            bracketHtml += `<div style="display:flex;flex-direction:row;align-items:center;flex:1;">
-                                <div class="bracket-connector-line"></div>
-                            </div>`;
-                        }
-                        bracketHtml += `</div></div>`;
-                    }
                 });
 
-                bracketHtml += `</div></div>`;
-
                 if(rounds['3rd']) {
+                    h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
                     rounds['3rd'].forEach(m => {
-                        bracketHtml += `<div class="bracket-third-section">
-                            <div class="bracket-third-title">🥉 DISPUTA DE 3º LUGAR</div>
-                            ${renderMatchCard(m, isAdmin)}
+                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...';
+                        const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
+                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
+                        const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
+                        
+                        const formatName = (pid, name) => {
+                            if (!pid || pid === 'BYE') return name;
+                            const p = appState.players.find(x => x.id === pid);
+                            if(p && p.tempGroupRank && p.tempGroupName) {
+                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
+                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                            }
+                            return name;
+                        };
+
+                        const formatAdmin = (pid, name, slot) => {
+                             if (!pid || pid === 'BYE') return name;
+                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
+                        };
+
+                        let t1 = '', t1_admin = '';
+                        if (appState.mode === 'fixed') {
+                            t1 = formatName(m.p1, p1Name);
+                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
+                        } else {
+                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
+                        }
+                        
+                        let t2 = '', t2_admin = '';
+                        if (appState.mode === 'fixed') {
+                            t2 = formatName(m.p3, p3Name);
+                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
+                        } else {
+                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
+                        }
+
+                         const isEditing = !m.saved;
+                         const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
+
+                         h += `<div class="mobile-match-card">
+                            <div class="mobile-team-row">
+                                <div class="mobile-team-name admin-only">${t1_admin}</div>
+                                <div class="mobile-team-name viewer-only">${t1}</div>
+                                <div class="mobile-team-score">
+                                    ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s1 !== '' ? m.s1 : '-')}
+                                </div>
+                            </div>
+                            <div class="mobile-team-row">
+                                <div class="mobile-team-name admin-only">${t2_admin}</div>
+                                <div class="mobile-team-name viewer-only">${t2}</div>
+                                <div class="mobile-team-score">
+                                    ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s2 !== '' ? m.s2 : '-')}
+                                </div>
+                            </div>
+                            ${document.body.classList.contains('viewer-mode') && !m.saved ? '' : `
+                            <div class="mobile-match-admin admin-only" style="justify-content:flex-end;">
+                                ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'ko', this)">✓ Salvar</button>` : ''}
+                                ${m.saved ? `<button class="btn-std btn-dark" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">✎ Editar</button>` : ''}
+                            </div>
+                            `}
                         </div>`;
                     });
                 }
-
-                document.getElementById('bracket-container').innerHTML = bracketHtml;
+                
+                h += `</div>`;
+                document.getElementById('bracket-container').innerHTML = h;
+                return; // ko group: skip gc.appendChild
                 
             } else {
                 h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Grupo">✕</span></div></div><div class="admin-only" style="display:flex; gap:5px; margin-bottom:5px;"><button class="btn-std btn-green" onclick="genMatches('${g.id}'); event.stopPropagation()">⚡ Auto</button><button class="btn-std btn-blue" onclick="addManual('${g.id}'); event.stopPropagation()">🖐</button></div>`;
