@@ -20,7 +20,7 @@
         /* BASE & VARS - CORES DE LABORATÓRIO */
         :root { --primary: #00c853; --secondary: #374151; --bg-body: #f0f4f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         
-        /* FUNDO BLUEPRINT (PAPEL MILIMETRADO) VIA GPU */
+        /* FUNDO BLUEPRINT VIA GPU */
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-body); 
@@ -179,7 +179,7 @@
         .reg-tab.active { background: white; color: var(--primary); }
         .reg-tab:hover:not(.active) { background: #cbd5e1; }
 
-        /* GESTÃO DE QUADRAS (NOVO) */
+        /* GESTÃO DE QUADRAS */
         .court-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .court-card { background: #fff; border: 2px dashed var(--primary); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .court-header { background: var(--primary); color: #111; font-weight: 900; text-align: center; padding: 8px; text-transform: uppercase; font-size: 0.95em; }
@@ -187,7 +187,7 @@
         .court-actions { display: flex; flex-direction: column; gap: 5px; padding: 10px; background: #e2e8f0; border-top: 1px solid #cbd5e1; }
         .badge-delayed { background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: bold; margin-bottom: 5px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;}
         
-        /* CHAVE MATA-MATA (ÁRVORE HORIZONTAL CONVERGENTE) */
+        /* CHAVE MATA-MATA */
         .tournament-bracket-two-sided {
             display: flex;
             flex-direction: row;
@@ -618,7 +618,7 @@
     <h2 style="color:var(--primary); font-size:1.8em; margin-bottom:30px; text-transform:uppercase; letter-spacing:2px;">Sorteio das Chaves</h2>
     <div id="roulette-player" style="font-size:2em; font-weight:700; margin-bottom:10px; text-align:center;">Nome do Atleta</div>
     <div style="font-size:1em; margin-bottom:20px; color:#aaa;">vai para...</div>
-    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#111; background:var(--primary); padding:20px 40px; border-radius:12px; border:3px solid #111; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
+    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#fff; background:#222; padding:20px 40px; border-radius:12px; border:3px solid #555; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
     <button id="btn-skip-roulette" class="btn-std btn-dark" style="margin-top:40px; width:auto; padding:10px 20px;">Pular Animação</button>
 </div>
 
@@ -654,16 +654,14 @@
     let selectingMatch = null; 
     let selectingSlot = null;
 
-    // Helper de Cores para as Fases do Mata-Mata
     const getRoundColor = (name) => {
-        if(name.includes('Oitavas')) return '#3b82f6'; // Azul
-        if(name.includes('Quartas')) return '#10b981'; // Verde
-        if(name.includes('Semi')) return '#8b5cf6';    // Roxo
-        if(name.includes('Final')) return '#ef4444';   // Vermelho
-        return '#0ea5e9'; // Default Secundário
+        if(name.includes('Oitavas')) return '#3b82f6';
+        if(name.includes('Quartas')) return '#10b981';
+        if(name.includes('Semi')) return '#8b5cf6';
+        if(name.includes('Final')) return '#ef4444';
+        return '#0ea5e9';
     };
 
-    // Lógica para alternar as abas do Regulamento
     window.switchReg = (type) => {
         document.getElementById('tab-reg-jap').classList.remove('active');
         document.getElementById('tab-reg-fix').classList.remove('active');
@@ -688,9 +686,9 @@
 
     window.callNextToCourt = (courtIdx) => {
         if(document.body.classList.contains('viewer-mode')) return;
-        let pending = getOptimizedMatchOrder(appState.matches).filter(item => !item.m.court && !item.m.saved && !item.m.delayed);
+        let pending = getOptimizedMatchOrder(appState.matches).filter(item => !item.court && !item.saved && !item.delayed);
         if(pending.length === 0) return alert("Nenhum jogo disponível na fila.");
-        let m = pending[0].m;
+        let m = pending[0];
         m.court = courtIdx;
         save(); renderApp();
     }
@@ -736,7 +734,6 @@
             save(); renderApp();
         }
     }
-    // ------------------------------------
 
     window.hasEditPermission = (ownerUid, managersString) => {
         if (localAdmin) return true;
@@ -772,7 +769,7 @@
                         document.getElementById('title-cat').innerText = sc.val().name; 
                         curCatData = sc.val(); 
                     } else {
-                        curCatData = { points: {} }; // Prevenção de race condition
+                        curCatData = { points: {} };
                     }
                     get(ref(db, `tournaments_meta/${c}/${t}`)).then(st => { 
                         if(st.exists()) enterApp(t, st.val().name, st.val().pwd, st.val().owner); 
@@ -1221,20 +1218,16 @@
 
     function sortPlayersCBT(players, matches) {
         return [...players].sort((a, b) => {
-            // 1. Pontos
             if (b.pts !== a.pts) return b.pts - a.pts;
 
-            // 2. Percentagem de Vitórias
             const aWinPct = a.games > 0 ? a.wins / a.games : 0;
             const bWinPct = b.games > 0 ? b.wins / b.games : 0;
             if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
 
-            // 3. Percentagem de Games Vencidos / Game Average
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
 
-            // Sorteio (Ordem Alfabética)
             return a.name.localeCompare(b.name);
         });
     }
@@ -1938,9 +1931,8 @@
             let idxVisual = 1;
             let pendingCount = 0;
             
-            sortedMatches.forEach((mItem) => {
-                let m = mItem.m;
-                if (m.court && !m.saved) return; // Hide matches currently playing
+            sortedMatches.forEach((m) => {
+                if (m.court && !m.saved) return; 
                 pendingCount++;
                 
                 const g = appState.groups.find(x => x.id === m.gid);
