@@ -20,7 +20,7 @@
         /* BASE & VARS - CORES DE LABORATÓRIO */
         :root { --primary: #00c853; --secondary: #374151; --bg-body: #f0f4f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         
-        /* FUNDO BLUEPRINT (PAPEL MILIMETRADO) VIA GPU */
+        /* FUNDO BLUEPRINT VIA GPU */
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-body); 
@@ -103,12 +103,6 @@
             #groups-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start; }
             .group-box { flex: unset; width: 100%; }
         }
-
-        .match-list-item { background: white; border: 1px solid #ddd; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 10px; padding: 10px; display: grid; grid-template-columns: 40px 1fr 60px; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .match-order-badge { background: #333; color: white; font-weight: 900; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 0.9em; }
-        .match-main-content { padding: 0 10px; }
-        .match-info { font-size: 0.8em; color: #666; display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .match-vs-line { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1em; }
         
         .app-tabs { display: flex; background: #cbd5e1; margin-bottom: 10px; border-radius: 6px; padding: 4px; user-select: none; -webkit-user-select: none; border: 1px solid #94a3b8; }
         .app-tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; font-weight: 800; font-size: 0.9em; border-radius: 4px; color: #475569; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
@@ -137,6 +131,19 @@
         .select-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 60vh; overflow-y: auto; }
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
+
+        /* CARDS MOBILE-FIRST (RESOLVE O PROBLEMA DE ESTICAR A TELA) */
+        .viewer-only { display: none; }
+        .viewer-mode .viewer-only { display: block; }
+        .mobile-match-card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden; width: 100%; }
+        .mobile-team-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f5f9; }
+        .mobile-team-row:last-child { border-bottom: none; }
+        .mobile-team-name { flex: 1; font-weight: 600; font-size: 0.95em; color: #1e293b; line-height: 1.3; }
+        .mobile-team-score { width: 50px; text-align: right; font-weight: 900; font-size: 1.2em; color: var(--primary); }
+        .mobile-match-admin { background: #f8fafc; padding: 10px; display: flex; align-items: center; border-top: 1px solid #e2e8f0; }
+
+        .ko-round-header { background: #1e293b; color: var(--primary); padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; border-bottom: 2px dashed #334155; }
+        .ko-list { background: #f8fafc; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
 
         /* ANIMAÇÃO DE EMPATE ABSOLUTO */
         @keyframes pulse-tie-bg { 
@@ -178,126 +185,6 @@
         .reg-tab { flex: 1; text-align: center; padding: 12px; cursor: pointer; font-weight: 800; font-size: 0.95em; color: #475569; transition: 0.2s; background: #e2e8f0; }
         .reg-tab.active { background: white; color: var(--primary); }
         .reg-tab:hover:not(.active) { background: #cbd5e1; }
-
-        /* NOVA CHAVE MATA-MATA (ÁRVORE HORIZONTAL CONVERGENTE) */
-        .tournament-bracket-two-sided {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            overflow-x: auto;
-            padding: 20px 40px 100px; /* Margem extra no final para o box do campeão */
-            background: #fff;
-            border-radius: 8px;
-            border: 2px dashed #cbd5e1;
-            margin-top: 15px;
-            gap: 40px; /* Distância entre as colunas */
-        }
-        .bracket-column {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            width: 220px;
-            min-width: 220px;
-            position: relative;
-        }
-        .bracket-header {
-            text-align: center;
-            font-weight: 800;
-            color: #475569;
-            margin-bottom: 15px;
-            font-size: 0.85em;
-            text-transform: uppercase;
-            height: 20px;
-            flex-shrink: 0;
-        }
-        .brk-matches-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            justify-content: flex-start;
-            position: relative;
-        }
-        .brk-match-wrapper {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex: 1; /* Força que cada caixa ocupe proporções iguais na coluna */
-            padding: 10px 0;
-        }
-        .bracket-match-box {
-            background: white;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            z-index: 2;
-            position: relative;
-            overflow: hidden;
-        }
-        .bracket-team {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 10px;
-            font-size: 0.85em;
-            font-weight: 600;
-            color: #1e293b;
-            border-bottom: 1px solid #f1f5f9;
-            min-height: 32px;
-        }
-        .bracket-team:last-child { border-bottom: none; }
-        .bracket-seed { font-size: 0.7em; color: #94a3b8; margin-right: 5px; display: inline-block; vertical-align: top;}
-        .bracket-score { font-weight: 900; color: var(--secondary); font-size: 1.1em; width: 30px; text-align: center; }
-        .bracket-name { flex: 1; line-height: 1.2; word-break: break-word; padding-right: 5px;}
-        .bracket-admin-panel { background: #f8fafc; padding: 6px; display: flex; justify-content: center; gap: 5px; border-top: 1px solid #cbd5e1; border-radius: 0 0 4px 4px; }
-        
-        /* CONECTORES LADO ESQUERDO (Avançam para a Direita) */
-        .left-col .brk-match-wrapper:not(:only-child):nth-child(odd)::after {
-            content: ''; position: absolute; right: -20px; top: 50%; height: 50%; width: 20px;
-            border-right: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-top-right-radius: 4px;
-        }
-        .left-col .brk-match-wrapper:not(:only-child):nth-child(even)::after {
-            content: ''; position: absolute; right: -20px; top: 0; height: 50%; width: 20px;
-            border-right: 2px solid #94a3b8; border-bottom: 2px solid #94a3b8; border-bottom-right-radius: 4px;
-        }
-        .left-col .brk-match-wrapper:only-child::after {
-            content: ''; position: absolute; right: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
-        }
-        .left-col:not(:first-child) .brk-match-wrapper::before {
-            content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
-        }
-
-        /* CONECTORES LADO DIREITO (Avançam para a Esquerda) */
-        .right-col .brk-match-wrapper:not(:only-child):nth-child(odd)::before {
-            content: ''; position: absolute; left: -20px; top: 50%; height: 50%; width: 20px;
-            border-left: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-top-left-radius: 4px;
-        }
-        .right-col .brk-match-wrapper:not(:only-child):nth-child(even)::before {
-            content: ''; position: absolute; left: -20px; top: 0; height: 50%; width: 20px;
-            border-left: 2px solid #94a3b8; border-bottom: 2px solid #94a3b8; border-bottom-left-radius: 4px;
-        }
-        .right-col .brk-match-wrapper:only-child::before {
-            content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
-        }
-        .right-col:not(:last-child) .brk-match-wrapper::after {
-            content: ''; position: absolute; right: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
-        }
-
-        /* CONECTORES DA COLUNA CENTRAL (A Final) */
-        .center-col .brk-match-wrapper::before {
-            content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
-        }
-        .center-col .brk-match-wrapper::after {
-            content: ''; position: absolute; right: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
-        }
-        .single-final .center-col .brk-match-wrapper::before,
-        .single-final .center-col .brk-match-wrapper::after { display: none; }
-
-        /* TERCEIRO LUGAR E CAMPEÃO */
-        .champion-box { position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%); width: 100%; text-align: center; animation: pulse-tie-bg 2s infinite; border-radius: 6px; }
-        .third-place-box { width: 100%; max-width: 320px; margin: 30px auto 0; border: 2px dashed #b45309; border-radius: 8px; background: #fffbeb; }
-        .third-place-header { background: #b45309; color: white; padding: 8px; text-align: center; font-weight: bold; font-size: 0.9em; border-radius: 6px 6px 0 0; }
-        .third-col .brk-match-wrapper::before, .third-col .brk-match-wrapper::after { display: none !important; }
     </style>
 </head>
 <body class="viewer-mode">
@@ -318,7 +205,6 @@
 
         <div id="content-reg-jap" style="padding:20px; overflow-y:auto; line-height:1.6; text-align:justify; display:block;">
             <h3 style="text-align:center; margin-top:0; color:var(--primary); font-weight: 900;">FORMATO JAPONÊS</h3>
-            
             <div class="reg-chapter">CAPÍTULO I - DISPOSIÇÕES GERAIS</div>
             <div class="reg-article"><strong>Art. 1º</strong> O torneio será disputado no formato japonês, com fase classificatória em grupos, apuração de classificação individual por atleta e posterior formação de duplas para a fase eliminatória.</div>
             <div class="reg-article"><strong>Art. 2º</strong> Na fase classificatória, os atletas disputarão partidas em duplas formadas por combinações rotativas, sendo a classificação apurada individualmente.</div>
@@ -354,7 +240,6 @@
 
         <div id="content-reg-fix" style="padding:20px; overflow-y:auto; line-height:1.6; text-align:justify; display:none;">
             <h3 style="text-align:center; margin-top:0; color:var(--primary); font-weight: 900;">FORMATO DUPLAS FIXAS</h3>
-            
             <div class="reg-chapter">CAPÍTULO I - DISPOSIÇÕES GERAIS</div>
             <div class="reg-article"><strong>Art. 1º</strong> O torneio será disputado no formato de duplas fixas, onde a mesma parceria de atletas atua em conjunto desde a fase classificatória até a fase eliminatória final.</div>
             
@@ -439,8 +324,7 @@
     <div class="status-bar">
         <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.2em;">arrow_back</span> Sair</div>
         <div style="display:flex; align-items:center; gap:5px;">
-            <button onclick="document.getElementById('modal-regulamento').style.display='flex'" style="background:transparent; border:none; color:white; cursor:pointer; padding: 2px;" title="Ler Regulamento"><span class="material-icons" style="font-size: 1.2em; color: var(--primary);">menu_book</span></button>
-            
+            <button onclick="document.getElementById('modal-regulamento').style.display='flex'" style="background:transparent; border:none; color:white; cursor:pointer; padding: 2px;" title="Ler Regulamento"><span class="material-icons" style="font-size: 1.2em; color: #FFD700;">menu_book</span></button>
             <span class="conn-dot" style="background: var(--primary);"></span> <span id="app-status">ONLINE (TESTE)</span>
             <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Compartilhar Link"><span class="material-icons">link</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px dashed #aaa; padding:2px 5px; color:white;" title="Acesso Admin">🔒</button>
@@ -612,7 +496,7 @@
     <h2 style="color:var(--primary); font-size:1.8em; margin-bottom:30px; text-transform:uppercase; letter-spacing:2px;">Sorteio das Chaves</h2>
     <div id="roulette-player" style="font-size:2em; font-weight:700; margin-bottom:10px; text-align:center;">Nome do Atleta</div>
     <div style="font-size:1em; margin-bottom:20px; color:#aaa;">vai para...</div>
-    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#111; background:var(--primary); padding:20px 40px; border-radius:12px; border:3px solid #111; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
+    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#fff; background:#222; padding:20px 40px; border-radius:12px; border:3px solid #555; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
     <button id="btn-skip-roulette" class="btn-std btn-dark" style="margin-top:40px; width:auto; padding:10px 20px;">Pular Animação</button>
 </div>
 
@@ -1331,7 +1215,6 @@
             [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); 
         } 
         else if(ps.length===6) {
-            // Matriz fixa e determinística para 6 jogadores (Gera sempre 7 jogos exatos)
             [[0,1,2,3],[0,2,4,5],[0,3,1,4],[0,4,2,5],[0,5,1,3],[1,5,2,4],[3,5,1,2]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); });
         }
         else { 
@@ -1682,9 +1565,7 @@
 
         let container = btnElement.parentElement;
         if (btnElement.closest('tr')) container = btnElement.closest('tr');
-        if (btnElement.closest('.bracket-match-box')) container = btnElement.closest('.bracket-match-box');
-        if (btnElement.closest('.queue-match-item')) container = btnElement.closest('.queue-match-item');
-        if (btnElement.closest('.ko-match-item')) container = btnElement.closest('.ko-match-item');
+        if (btnElement.closest('.mobile-match-card')) container = btnElement.closest('.mobile-match-card');
         
         let inputs = container.querySelectorAll('input[type="tel"]');
         let val1 = inputs[0] ? inputs[0].value : '';
@@ -1801,46 +1682,36 @@
                 queueContainer.innerHTML = '<div style="text-align:center; color:#999; padding: 20px;">Nenhum jogo de grupo pendente ou gerado.</div>';
             } else {
                 let qHtml = '';
-                sortedMatches.forEach((m, idx) => {
+                sortedMatches.forEach((mItem, idx) => {
+                    let m = mItem.m;
                     const g = appState.groups.find(x => x.id === m.gid);
                     const n = (id) => appState.players.find(x=>x.id===id)?.name || '...';
-                    const p1Name = m.p1 ? n(m.p1) : '...'; const p2Name = m.p2 ? n(m.p2) : '...';
-                    const p3Name = m.p3 ? n(m.p3) : '...'; const p4Name = m.p4 ? n(m.p4) : '...';
-                    const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
-                    const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                    const t1 = appState.mode==='fixed' ? n(m.p1) : `${n(m.p1)} / ${n(m.p2)}`;
+                    const t2 = appState.mode==='fixed' ? n(m.p3) : `${n(m.p3)} / ${n(m.p4)}`;
                     
                     let isEditing = !m.saved;
-                    let opacity = m.saved ? '0.6' : '1';
+                    let opacity = m.saved ? '0.5' : '1';
                     
                     qHtml += `
-                    <div class="queue-match-item" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0; opacity: ${opacity};">
-                        <div style="font-weight:900; color:#333; width:35px; font-size:1.1em;" title="Ordem do Jogo">#${idx+1}</div>
-                        <div style="flex:1; display:flex; flex-direction:column;">
-                            <div style="font-size:0.75em; color:var(--primary); font-weight:800; text-transform:uppercase; margin-bottom:2px;">${g ? g.name : ''}</div>
-                            <div style="display:flex; justify-content:center; align-items:center; padding-right:5px; font-weight:700; font-size:0.95em;">
-                                <div style="text-align:right; flex:1; line-height:1.2;">${t1}</div>
-                                
-                                <div style="display:flex; align-items:center; margin: 0 10px;">
-                                    ${isEditing ? 
-                                        `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
-                                         <span style="color:#aaa; font-size:0.9em;">X</span>
-                                         <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
-                                        : 
-                                        `<div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s1}</div>
-                                         <span style="color:#aaa; font-size:0.9em; margin:0 5px;">X</span>
-                                         <div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s2}</div>`
-                                    }
-                                </div>
-                                
-                                <div style="text-align:left; flex:1; line-height:1.2;">${t2}</div>
+                    <div class="mobile-match-card" style="opacity: ${opacity};">
+                        <div style="background:#f8fafc; padding: 8px 10px; font-size: 0.75em; font-weight: 900; color: var(--primary); text-transform: uppercase; border-bottom: 1px solid #e2e8f0; display:flex; justify-content:space-between;">
+                            <span>${g ? g.name : ''}</span>
+                            <span style="color:#64748b;">JOGO #${idx+1}</span>
+                        </div>
+                        <div class="mobile-team-row">
+                            <div class="mobile-team-name">${t1}</div>
+                            <div class="mobile-team-score">
+                                ${isEditing ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s1 !== '' ? m.s1 : '-')}
                             </div>
                         </div>
-                        <div class="admin-only" style="display:flex; align-items:center; width:35px; justify-content:flex-end;">
-                             ${isEditing ? 
-                                `<button class="btn-icon-circle" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'queue', this)" title="Salvar Placar">✓</button>` 
-                                : 
-                                `<button class="btn-icon-circle" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>`
-                            }
+                        <div class="mobile-team-row">
+                            <div class="mobile-team-name">${t2}</div>
+                            <div class="mobile-team-score">
+                                ${isEditing ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s2 !== '' ? m.s2 : '-')}
+                            </div>
+                        </div>
+                        <div class="mobile-match-admin admin-only" style="justify-content:flex-end;">
+                            ${isEditing ? `<button class="btn-std btn-green" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'queue', this)">✓ Salvar</button>` : `<button class="btn-std btn-dark" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">✎ Editar</button>`}
                         </div>
                     </div>`;
                 });
@@ -1850,57 +1721,6 @@
         
         let h = ''; 
 
-        const renderBrkMatch = (m, slot1='p1', slot2='p2', slot3='p3', slot4='p4') => {
-            const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
-            const getBrkName = (pid1, pid2) => {
-                if(pid1 === 'BYE') return 'BYE';
-                if(!pid1) return '<span style="color:#94a3b8;font-style:italic;">Aguardando...</span>';
-                const pObj = appState.players.find(x => x.id === pid1);
-                const seedHtml = pObj && pObj.tempGroupRank && pObj.tempGroupName ? `<div class="bracket-seed" title="${pObj.tempGroupRank}º do ${pObj.tempGroupName.replace('GRUPO ', 'Gr. ')}">${pObj.tempGroupRank}º</div>` : `<div class="bracket-seed"></div>`;
-                if (appState.mode === 'fixed') return `${seedHtml} ${n(pid1)}`;
-                return `${seedHtml} ${n(pid1)}<br><div style="margin-left:19px;">${n(pid2)}</div>`;
-            };
-            const getBrkNameAdmin = (pid1, pid2, s1, s2) => {
-                if(pid1 === 'BYE') return 'BYE';
-                if(!pid1) return `<span style="color:var(--primary);font-style:italic;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${s1}')">Selecionar...</span>`;
-                const pObj = appState.players.find(x => x.id === pid1);
-                const seedHtml = pObj && pObj.tempGroupRank && pObj.tempGroupName ? `<div class="bracket-seed" title="${pObj.tempGroupRank}º do ${pObj.tempGroupName.replace('GRUPO ', 'Gr. ')}">${pObj.tempGroupRank}º</div>` : `<div class="bracket-seed"></div>`;
-                if (appState.mode === 'fixed') return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${s1}')">${seedHtml} ${n(pid1)}</span>`;
-                return `<span style="cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${s1}')">${seedHtml} ${n(pid1)}</span><br><div style="margin-left:19px;cursor:pointer;" onclick="openPlayerSelect('${m.mid}', '${s2}')">${n(pid2)}</div>`;
-            };
-
-            let t1 = getBrkName(m.p1, m.p2); let t1_admin = getBrkNameAdmin(m.p1, m.p2, slot1, slot2);
-            let t2 = getBrkName(m.p3, m.p4); let t2_admin = getBrkNameAdmin(m.p3, m.p4, slot3, slot4);
-            const isEditing = !m.saved && !m.isBye;
-            const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
-
-            return `
-            <div class="brk-match-wrapper">
-                <div class="bracket-match-box">
-                    <div class="bracket-team">
-                        <div class="bracket-name admin-only">${t1_admin}</div>
-                        <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
-                        <div style="display:flex; align-items:center;">
-                            ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:28px;height:28px;font-size:0.9em;padding:0;border:1px solid var(--primary);" placeholder="0">` : `<span class="bracket-score">${m.s1!==''?m.s1:'-'}</span>`}
-                        </div>
-                    </div>
-                    <div class="bracket-team">
-                        <div class="bracket-name admin-only">${t2_admin}</div>
-                        <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t2}</div>
-                        <div style="display:flex; align-items:center;">
-                            ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:28px;height:28px;font-size:0.9em;padding:0;border:1px solid var(--primary);" placeholder="0">` : `<span class="bracket-score">${m.s2!==''?m.s2:'-'}</span>`}
-                        </div>
-                    </div>
-                    ${document.body.classList.contains('viewer-mode') ? '' : `
-                    <div class="bracket-admin-panel admin-only">
-                        ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:4px 8px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'ko', this)">Salvar</button>` : ''}
-                        ${m.saved ? `<button class="btn-std btn-dark" style="padding:4px 8px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">Editar</button>` : ''}
-                    </div>
-                    `}
-                </div>
-            </div>`;
-        };
-
         appState.groups.forEach((g,i) => {
             let ps = appState.players.filter(p=>p.groupId===g.id);
             ps = sortPlayersCBT(ps, appState.matches);
@@ -1909,7 +1729,9 @@
             
             if(g.id.includes('ko-')) { 
                 col.style.gridColumn = '1 / -1'; 
-                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:var(--secondary); color:var(--primary); border: 2px dashed var(--primary);"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
+                h = `<div onclick="moveSel('${g.id}')" class="group-header" style="margin-bottom:5px; background:black; color:white;"><span>${g.name}</span><div class="admin-only"><span onclick="renameGroup('${g.id}', event)" style="margin-right:10px;" title="Renomear">✎</span><span onclick="delGroup('${g.id}', event)" style="color:red; cursor:pointer;" title="Excluir Chave">✕</span></div></div>`;
+                
+                h += `<div class="ko-list">`;
                 
                 const rounds = {};
                 ms.forEach(m => {
@@ -1924,81 +1746,155 @@
                 
                 let roundKeys = Object.keys(rounds).filter(k => k !== '3rd').sort((a,b) => a - b);
                 
-                if(roundKeys.length > 0) {
-                    const getRoundName = (count) => {
-                        if(count === 16) return 'Oitavas';
-                        if(count === 8) return 'Quartas';
-                        if(count === 4) return 'Semifinal';
-                        if(count === 2) return 'Final';
-                        return 'Fase';
-                    };
+                roundKeys.forEach(rNum => {
+                    let rName = 'Fase ' + rNum;
+                    const count = rounds[rNum].length;
+                    if(count === 8) rName = 'OITAVAS DE FINAL';
+                    if(count === 4) rName = 'QUARTAS DE FINAL';
+                    if(count === 2) rName = 'SEMI-FINAL';
+                    if(count === 1) rName = 'FINAL';
 
-                    let extraClass = (roundKeys.length === 1) ? 'single-final' : '';
-                    let colsHTML = '';
+                    h += `<div class="ko-round-header">${rName}</div>`;
+                    
+                    rounds[rNum].sort((a,b) => a.pos - b.pos).forEach(m => {
+                        const n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        const p1Name = m.p1 && m.p1!=='BYE' ? n(m.p1) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p2Name = m.p2 && m.p2!=='BYE' ? n(m.p2) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p3Name = m.p3 && m.p3!=='BYE' ? n(m.p3) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        const p4Name = m.p4 && m.p4!=='BYE' ? n(m.p4) : (m.isBye ? 'BYE' : 'Aguardando...');
+                        
+                        const formatName = (pid, name) => {
+                            if (!pid || pid === 'BYE') return name;
+                            const p = appState.players.find(x => x.id === pid);
+                            if(p && p.tempGroupRank && p.tempGroupName) {
+                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
+                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                            }
+                            return name;
+                        };
 
-                    // LEFT COLS
-                    for(let i=0; i<roundKeys.length - 1; i++) {
-                        let rNum = roundKeys[i];
-                        let rName = getRoundName(rounds[rNum].length * 2);
-                        let matchArray = rounds[rNum].sort((a,b) => a.pos - b.pos);
-                        let half = matchArray.slice(0, matchArray.length / 2);
+                        const formatAdmin = (pid, name, slot) => {
+                             if (!pid || pid === 'BYE') return name;
+                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
+                        };
 
-                        colsHTML += `<div class="bracket-column left-col"><div class="bracket-header">${rName}</div><div class="brk-matches-container">`;
-                        half.forEach(m => colsHTML += renderBrkMatch(m));
-                        colsHTML += `</div></div>`;
-                    }
-
-                    // CENTER COL
-                    let finalRNum = roundKeys[roundKeys.length - 1];
-                    let finalMatchArray = rounds[finalRNum];
-                    colsHTML += `<div class="bracket-column center-col"><div class="bracket-header">Final</div><div class="brk-matches-container" style="position:relative;">`;
-                    if (finalMatchArray && finalMatchArray.length > 0) {
-                         const fM = finalMatchArray[0];
-                         colsHTML += renderBrkMatch(fM);
-                         
-                         if(fM.saved && !fM.isBye) {
-                             const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
-                             let champName = '';
-                             if (fM.s1 > fM.s2) {
-                                 champName = appState.mode === 'fixed' ? n(fM.p1) : n(fM.p1) + '<br>' + n(fM.p2);
-                             } else {
-                                 champName = appState.mode === 'fixed' ? n(fM.p3) : n(fM.p3) + '<br>' + n(fM.p4);
-                             }
-                             colsHTML += `
-                             <div class="champion-box">
-                               <div style="font-weight: 800; color: #b45309; font-size: 0.85em; text-transform: uppercase;">🏆 Campeão</div>
-                               <div style="background: #fffdf0; border: 2px solid #FFD700; border-radius: 6px; padding: 10px; font-weight: 900; font-size: 1.1em; color: #b8860b;">
-                                   ${champName}
-                               </div>
-                             </div>`;
-                         }
-                    }
-                    colsHTML += `</div></div>`;
-
-                    // RIGHT COLS
-                    for(let i = roundKeys.length - 2; i >= 0; i--) {
-                        let rNum = roundKeys[i];
-                        let rName = getRoundName(rounds[rNum].length * 2);
-                        let matchArray = rounds[rNum].sort((a,b) => a.pos - b.pos);
-                        let half = matchArray.slice(matchArray.length / 2);
-
-                        colsHTML += `<div class="bracket-column right-col"><div class="bracket-header">${rName}</div><div class="brk-matches-container">`;
-                        half.forEach(m => colsHTML += renderBrkMatch(m));
-                        colsHTML += `</div></div>`;
-                    }
-
-                    h += `<div class="tournament-bracket-two-sided ${extraClass}">${colsHTML}</div>`;
-                }
-
-                // THIRD PLACE
-                if(rounds['3rd']) {
-                    h += `<div class="third-place-box"><div class="third-place-header">🥉 DISPUTA DE 3º LUGAR</div><div class="bracket-column third-col" style="padding:15px; width:100%; margin:0 auto;">`;
-                    rounds['3rd'].forEach(m => {
-                        h += renderBrkMatch(m, 'p1', 'p2', 'p3', 'p4');
+                        let t1 = '', t1_admin = '';
+                        if (appState.mode === 'fixed') {
+                            t1 = formatName(m.p1, p1Name);
+                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
+                        } else {
+                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
+                        }
+                        
+                        let t2 = '', t2_admin = '';
+                        if (appState.mode === 'fixed') {
+                            t2 = formatName(m.p3, p3Name);
+                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
+                        } else {
+                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
+                        }
+                        
+                        const isEditing = !m.saved && !m.isBye;
+                        const hasPlayers = (m.p1 && m.p1!=='BYE' && m.p1!=='') && (m.p3 && m.p3!=='BYE' && m.p3!=='');
+                        
+                        h += `<div class="mobile-match-card">
+                            <div class="mobile-team-row">
+                                <div class="mobile-team-name admin-only">${t1_admin}</div>
+                                <div class="mobile-team-name viewer-only">${t1}</div>
+                                <div class="mobile-team-score">
+                                    ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s1 !== '' ? m.s1 : '-')}
+                                </div>
+                            </div>
+                            <div class="mobile-team-row">
+                                <div class="mobile-team-name admin-only">${t2_admin}</div>
+                                <div class="mobile-team-name viewer-only">${t2}</div>
+                                <div class="mobile-team-score">
+                                    ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s2 !== '' ? m.s2 : '-')}
+                                </div>
+                            </div>
+                            ${document.body.classList.contains('viewer-mode') && !m.saved ? '' : `
+                            <div class="mobile-match-admin admin-only" style="justify-content:flex-end;">
+                                ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'ko', this)">✓ Salvar</button>` : ''}
+                                ${m.saved ? `<button class="btn-std btn-dark" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">✎ Editar</button>` : ''}
+                            </div>
+                            `}
+                        </div>`;
                     });
-                    h += `</div></div>`;
+                });
+
+                if(rounds['3rd']) {
+                    h += `<div class="ko-round-header" style="background:#664d00;">DISPUTA DE 3º LUGAR</div>`;
+                    rounds['3rd'].forEach(m => {
+                         const n = (id) => appState.players.find(x=>x.id===id)?.name;
+                        const p1Name = m.p1 ? n(m.p1) : 'Aguardando perdedor da Semi...';
+                        const p2Name = m.p2 ? n(m.p2) : 'Aguardando perdedor da Semi...';
+                        const p3Name = m.p3 ? n(m.p3) : 'Aguardando perdedor da Semi...';
+                        const p4Name = m.p4 ? n(m.p4) : 'Aguardando perdedor da Semi...';
+                        
+                        const formatName = (pid, name) => {
+                            if (!pid || pid === 'BYE') return name;
+                            const p = appState.players.find(x => x.id === pid);
+                            if(p && p.tempGroupRank && p.tempGroupName) {
+                                const seed = `${p.tempGroupRank}º do ${p.tempGroupName.replace('GRUPO ', 'Gr. ')}`;
+                                return `${name}<br><span style="font-size:0.75em; color:#777; font-weight:normal; line-height:1.2; display:inline-block; margin-top:2px;">(${seed})</span>`;
+                            }
+                            return name;
+                        };
+
+                        const formatAdmin = (pid, name, slot) => {
+                             if (!pid || pid === 'BYE') return name;
+                             return `<span style="cursor:pointer; border-bottom:1px dashed #999;" onclick="openPlayerSelect('${m.mid}', '${slot}'); event.stopPropagation()">${formatName(pid, name)}</span>`;
+                        };
+
+                        let t1 = '', t1_admin = '';
+                        if (appState.mode === 'fixed') {
+                            t1 = formatName(m.p1, p1Name);
+                            t1_admin = formatAdmin(m.p1, p1Name, 'p1');
+                        } else {
+                            t1 = (m.p1 === m.p2) ? formatName(m.p1, p1Name) : `${formatName(m.p1, p1Name)} / ${formatName(m.p2, p2Name)}`;
+                            t1_admin = (m.p1 === m.p2) ? formatAdmin(m.p1, p1Name, 'p1') : `${formatAdmin(m.p1, p1Name, 'p1')} / ${formatAdmin(m.p2, p2Name, 'p2')}`;
+                        }
+                        
+                        let t2 = '', t2_admin = '';
+                        if (appState.mode === 'fixed') {
+                            t2 = formatName(m.p3, p3Name);
+                            t2_admin = formatAdmin(m.p3, p3Name, 'p3');
+                        } else {
+                            t2 = (m.p3 === m.p4) ? formatName(m.p3, p3Name) : `${formatName(m.p3, p3Name)} / ${formatName(m.p4, p4Name)}`;
+                            t2_admin = (m.p3 === m.p4) ? formatAdmin(m.p3, p3Name, 'p3') : `${formatAdmin(m.p3, p3Name, 'p3')} / ${formatAdmin(m.p4, p4Name, 'p4')}`;
+                        }
+
+                         const isEditing = !m.saved;
+                         const hasPlayers = (m.p1 && m.p1!=='') && (m.p3 && m.p3!=='');
+
+                         h += `<div class="mobile-match-card">
+                            <div class="mobile-team-row">
+                                <div class="mobile-team-name admin-only">${t1_admin}</div>
+                                <div class="mobile-team-name viewer-only">${t1}</div>
+                                <div class="mobile-team-score">
+                                    ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s1 !== '' ? m.s1 : '-')}
+                                </div>
+                            </div>
+                            <div class="mobile-team-row">
+                                <div class="mobile-team-name admin-only">${t2_admin}</div>
+                                <div class="mobile-team-name viewer-only">${t2}</div>
+                                <div class="mobile-team-score">
+                                    ${isEditing && hasPlayers ? `<input type="tel" class="tbl-input score-input auth-input" style="width:40px;height:35px;margin:0;" placeholder="0">` : (m.s2 !== '' ? m.s2 : '-')}
+                                </div>
+                            </div>
+                            ${document.body.classList.contains('viewer-mode') && !m.saved ? '' : `
+                            <div class="mobile-match-admin admin-only" style="justify-content:flex-end;">
+                                ${isEditing && hasPlayers ? `<button class="btn-std btn-green" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="saveScore('${m.mid}', 'ko', this)">✓ Salvar</button>` : ''}
+                                ${m.saved ? `<button class="btn-std btn-dark" style="padding:6px 12px; font-size:0.8em; margin:0; width:auto;" onclick="editS('${m.mid}')">✎ Editar</button>` : ''}
+                            </div>
+                            `}
+                        </div>`;
+                    });
                 }
                 
+                h += `</div>`;
                 document.getElementById('bracket-container').innerHTML = h;
                 
             } else {
@@ -2057,7 +1953,7 @@
                 genCol.style.margin = '0 auto';
                 genCol.style.width = '100%';
                 
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:#111; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
                 <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
                 
