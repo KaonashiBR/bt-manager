@@ -20,7 +20,7 @@
         /* BASE & VARS - CORES DE LABORATÓRIO */
         :root { --primary: #00c853; --secondary: #374151; --bg-body: #f0f4f8; --text-dark: #333; --blue-masc: #2196F3; --pink-fem: #E91E63; --fav-color: #ff3b30; --font-base: 17px; }
         
-        /* FUNDO BLUEPRINT VIA GPU */
+        /* FUNDO BLUEPRINT (PAPEL MILIMETRADO) VIA GPU */
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-body); 
@@ -179,26 +179,18 @@
         .reg-tab.active { background: white; color: var(--primary); }
         .reg-tab:hover:not(.active) { background: #cbd5e1; }
 
-        /* GESTÃO DE QUADRAS */
-        .court-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .court-card { background: #fff; border: 2px dashed var(--primary); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .court-header { background: var(--primary); color: #111; font-weight: 900; text-align: center; padding: 8px; text-transform: uppercase; font-size: 0.95em; }
-        .court-body { padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; background: #fafafa; }
-        .court-actions { display: flex; flex-direction: column; gap: 5px; padding: 10px; background: #e2e8f0; border-top: 1px solid #cbd5e1; }
-        .badge-delayed { background: #ef4444; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: bold; margin-bottom: 5px; display: inline-block; text-transform: uppercase; letter-spacing: 1px;}
-        
-        /* CHAVE MATA-MATA */
+        /* NOVA CHAVE MATA-MATA (ÁRVORE HORIZONTAL CONVERGENTE) */
         .tournament-bracket-two-sided {
             display: flex;
             flex-direction: row;
             justify-content: center;
             overflow-x: auto;
-            padding: 20px 40px 100px; 
+            padding: 20px 40px 100px; /* Margem extra no final para o box do campeão */
             background: #fff;
             border-radius: 8px;
             border: 2px dashed #cbd5e1;
             margin-top: 15px;
-            gap: 40px; 
+            gap: 40px; /* Distância entre as colunas */
         }
         .bracket-column {
             display: flex;
@@ -211,11 +203,11 @@
         .bracket-header {
             text-align: center;
             font-weight: 800;
+            color: #475569;
             margin-bottom: 15px;
             font-size: 0.85em;
             text-transform: uppercase;
-            padding: 6px;
-            border-radius: 6px;
+            height: 20px;
             flex-shrink: 0;
         }
         .brk-matches-container {
@@ -230,17 +222,17 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            flex: 1; 
+            flex: 1; /* Força que cada caixa ocupe proporções iguais na coluna */
             padding: 10px 0;
         }
         .bracket-match-box {
             background: white;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
             z-index: 2;
             position: relative;
             overflow: hidden;
-            border: 1px solid #cbd5e1;
         }
         .bracket-team {
             display: flex;
@@ -259,7 +251,7 @@
         .bracket-name { flex: 1; line-height: 1.2; word-break: break-word; padding-right: 5px;}
         .bracket-admin-panel { background: #f8fafc; padding: 6px; display: flex; justify-content: center; gap: 5px; border-top: 1px solid #cbd5e1; border-radius: 0 0 4px 4px; }
         
-        /* CONECTORES LADO ESQUERDO */
+        /* CONECTORES LADO ESQUERDO (Avançam para a Direita) */
         .left-col .brk-match-wrapper:not(:only-child):nth-child(odd)::after {
             content: ''; position: absolute; right: -20px; top: 50%; height: 50%; width: 20px;
             border-right: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-top-right-radius: 4px;
@@ -275,7 +267,7 @@
             content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
         }
 
-        /* CONECTORES LADO DIREITO */
+        /* CONECTORES LADO DIREITO (Avançam para a Esquerda) */
         .right-col .brk-match-wrapper:not(:only-child):nth-child(odd)::before {
             content: ''; position: absolute; left: -20px; top: 50%; height: 50%; width: 20px;
             border-left: 2px solid #94a3b8; border-top: 2px solid #94a3b8; border-top-left-radius: 4px;
@@ -291,7 +283,7 @@
             content: ''; position: absolute; right: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
         }
 
-        /* CONECTORES DA COLUNA CENTRAL */
+        /* CONECTORES DA COLUNA CENTRAL (A Final) */
         .center-col .brk-match-wrapper::before {
             content: ''; position: absolute; left: -20px; top: 50%; width: 20px; border-top: 2px solid #94a3b8;
         }
@@ -382,8 +374,8 @@
             <div class="reg-article"><strong>Art. 7º</strong> Em caso de empate em 5x5, a partida prosseguirá até 7 games. Se empatar em 6x6, haverá tie-break decisivo até 7 pontos.</div>
         </div>
         
-        <div style="text-align:center; margin-top:10px; margin-bottom: 20px;">
-            <button class="btn-std btn-dark" onclick="document.getElementById('modal-regulamento').style.display='none'" style="width: auto; padding: 10px 30px;">Fechar</button>
+        <div style="padding: 15px; text-align:center; border-top: 1px solid #ccc; background:#f8f9fa;">
+            <button class="btn-std btn-dark" onclick="document.getElementById('modal-regulamento').style.display='none'">Fechar Regulamento</button>
         </div>
     </div>
 </div>
@@ -448,6 +440,7 @@
         <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.2em;">arrow_back</span> Sair</div>
         <div style="display:flex; align-items:center; gap:5px;">
             <button onclick="document.getElementById('modal-regulamento').style.display='flex'" style="background:transparent; border:none; color:white; cursor:pointer; padding: 2px;" title="Ler Regulamento"><span class="material-icons" style="font-size: 1.2em; color: var(--primary);">menu_book</span></button>
+            
             <span class="conn-dot" style="background: var(--primary);"></span> <span id="app-status">ONLINE (TESTE)</span>
             <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Compartilhar Link"><span class="material-icons">link</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px dashed #aaa; padding:2px 5px; color:white;" title="Acesso Admin">🔒</button>
@@ -486,8 +479,9 @@
     </div>
 
     <div id="view-queue" class="view-section">
-        <div style="max-width:900px; margin:0 auto;">
-            <div id="queue-container"></div>
+        <div class="group-box" style="border-color:var(--primary); max-width:800px; margin:0 auto;">
+            <div class="group-header" style="background:var(--primary); color:#111; justify-content:center;">🎾 FILA DA FASE DE GRUPOS</div>
+            <div id="queue-container" style="padding: 10px; background: white; border-radius: 0 0 8px 8px;"></div>
         </div>
     </div>
 
@@ -618,7 +612,7 @@
     <h2 style="color:var(--primary); font-size:1.8em; margin-bottom:30px; text-transform:uppercase; letter-spacing:2px;">Sorteio das Chaves</h2>
     <div id="roulette-player" style="font-size:2em; font-weight:700; margin-bottom:10px; text-align:center;">Nome do Atleta</div>
     <div style="font-size:1em; margin-bottom:20px; color:#aaa;">vai para...</div>
-    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#fff; background:#222; padding:20px 40px; border-radius:12px; border:3px solid #555; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
+    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#111; background:var(--primary); padding:20px 40px; border-radius:12px; border:3px solid #111; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
     <button id="btn-skip-roulette" class="btn-std btn-dark" style="margin-top:40px; width:auto; padding:10px 20px;">Pular Animação</button>
 </div>
 
@@ -648,20 +642,13 @@
     let user = null;
     let localAdmin = false;
     let curArenaId = null; let curArenaData = null; let curCatId = null; let curCatData = null; let curTourneyId = null; let appRef = null;
-    let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, courtCount:3, pwd:'123', owner:'' };
+    let appState = { players:[], groups:[], matches:[], mode:'individual', groupCount:0, pwd:'123', owner:'' };
     let selectedPid = null;
     let favorites = {}; 
     let selectingMatch = null; 
     let selectingSlot = null;
 
-    const getRoundColor = (name) => {
-        if(name.includes('Oitavas')) return '#3b82f6';
-        if(name.includes('Quartas')) return '#10b981';
-        if(name.includes('Semi')) return '#8b5cf6';
-        if(name.includes('Final')) return '#ef4444';
-        return '#0ea5e9';
-    };
-
+    // Lógica para alternar as abas do Regulamento
     window.switchReg = (type) => {
         document.getElementById('tab-reg-jap').classList.remove('active');
         document.getElementById('tab-reg-fix').classList.remove('active');
@@ -674,64 +661,6 @@
         } else {
             document.getElementById('tab-reg-fix').classList.add('active');
             document.getElementById('content-reg-fix').style.display = 'block';
-        }
-    }
-
-    // --- LÓGICA DE GESTÃO DE QUADRAS ---
-    window.changeCourtCount = (delta) => {
-        if(document.body.classList.contains('viewer-mode')) return;
-        appState.courtCount = Math.max(1, (appState.courtCount || 3) + delta);
-        save(); renderApp();
-    }
-
-    window.callNextToCourt = (courtIdx) => {
-        if(document.body.classList.contains('viewer-mode')) return;
-        let pending = getOptimizedMatchOrder(appState.matches).filter(item => !item.court && !item.saved && !item.delayed);
-        if(pending.length === 0) return alert("Nenhum jogo disponível na fila.");
-        let m = pending[0];
-        m.court = courtIdx;
-        save(); renderApp();
-    }
-
-    window.callSpecificToCourt = (mid, courtIdx) => {
-        if(document.body.classList.contains('viewer-mode')) return;
-        let m = appState.matches.find(x => x.mid === mid);
-        if(m) { m.court = courtIdx; m.delayed = false; save(); renderApp(); }
-    }
-
-    window.delayMatch = (mid) => {
-        if(document.body.classList.contains('viewer-mode')) return;
-        let m = appState.matches.find(x => x.mid === mid);
-        if(m) { m.court = null; m.delayed = true; save(); renderApp(); }
-    }
-
-    window.undelayMatch = (mid) => {
-        if(document.body.classList.contains('viewer-mode')) return;
-        let m = appState.matches.find(x => x.mid === mid);
-        if(m) { m.delayed = false; save(); renderApp(); }
-    }
-
-    window.removeCourtMatch = (mid) => {
-         if(document.body.classList.contains('viewer-mode')) return;
-         let m = appState.matches.find(x => x.mid === mid);
-         if(m) { m.court = null; save(); renderApp(); }
-    }
-
-    window.saveScoreBtn = (mid, id1, id2) => {
-        const v1 = document.getElementById(id1).value;
-        const v2 = document.getElementById(id2).value;
-        if(v1 === '' || v2 === '') return alert("Preencha o placar completo.");
-        let s1 = parseInt(v1); let s2 = parseInt(v2);
-        if((s1 < 6 && s2 < 6) || (Math.abs(s1-s2) < 2 && s1 < 7 && s2 < 7)) { 
-            if(!confirm("Jogo parece não ter acabado. Salvar?")) return; 
-        }
-        
-        let m = appState.matches.find(x => x.mid === mid);
-        if(m) {
-            m.s1 = s1; m.s2 = s2; m.saved = true; m.court = null; 
-            recalc();
-            if(m.gid.includes('ko')) advanceWinner(mid, m, s1, s2);
-            save(); renderApp();
         }
     }
 
@@ -769,7 +698,7 @@
                         document.getElementById('title-cat').innerText = sc.val().name; 
                         curCatData = sc.val(); 
                     } else {
-                        curCatData = { points: {} };
+                        curCatData = { points: {} }; // Prevenção de race condition
                     }
                     get(ref(db, `tournaments_meta/${c}/${t}`)).then(st => { 
                         if(st.exists()) enterApp(t, st.val().name, st.val().pwd, st.val().owner); 
@@ -912,7 +841,7 @@
             else {
                 data.createdAt = Date.now();
                 const newRef = push(ref(db, path), data);
-                if(type === 'tournament') { await set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, courtCount:3, pwd: data.pwd, owner: user?user.uid:'local' }); }
+                if(type === 'tournament') { await set(ref(db, `tournaments_data/${newRef.key}`), { mode: 'individual', players:[], groups:[], matches:[], groupCount:0, pwd: data.pwd, owner: user?user.uid:'local' }); }
             }
             closeModal();
         } catch(e) { console.error(e); alert("Erro ao salvar: " + e.message); }
@@ -1056,13 +985,10 @@
                     else if(!Array.isArray(appState[k])) appState[k] = Object.values(appState[k]);
                 });
             } else { 
-                appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, courtCount:3, pwd:pwd, owner:ownerId }; 
+                appState = {mode:'individual',players:[],groups:[],matches:[],groupCount:0, pwd:pwd, owner:ownerId }; 
             }
             if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
                 appState.groupCount = appState.groups ? appState.groups.length : 0;
-            }
-            if(appState.courtCount === undefined || isNaN(appState.courtCount)) {
-                appState.courtCount = 3;
             }
             recalc(); 
             renderApp();
@@ -1218,16 +1144,20 @@
 
     function sortPlayersCBT(players, matches) {
         return [...players].sort((a, b) => {
+            // 1. Pontos
             if (b.pts !== a.pts) return b.pts - a.pts;
 
+            // 2. Percentagem de Vitórias
             const aWinPct = a.games > 0 ? a.wins / a.games : 0;
             const bWinPct = b.games > 0 ? b.wins / b.games : 0;
             if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
 
+            // 3. Percentagem de Games Vencidos / Game Average
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
 
+            // Sorteio (Ordem Alfabética)
             return a.name.localeCompare(b.name);
         });
     }
@@ -1401,6 +1331,7 @@
             [[0,1,2,3],[0,2,3,4],[0,3,1,4],[0,4,1,2],[1,3,2,4]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); }); 
         } 
         else if(ps.length===6) {
+            // Matriz fixa e determinística para 6 jogadores (Gera sempre 7 jogos exatos)
             [[0,1,2,3],[0,2,4,5],[0,3,1,4],[0,4,2,5],[0,5,1,3],[1,5,2,4],[3,5,1,2]].forEach(r=>{ roundMatches.push({p1:ps[r[0]].id, p2:ps[r[1]].id, p3:ps[r[2]].id, p4:ps[r[3]].id}); });
         }
         else { 
@@ -1865,140 +1796,61 @@
 
         const queueContainer = document.getElementById('queue-container');
         if(queueContainer) {
-            
-            let qHtml = '';
-            
-            // Renderizar as Quadras de Gestão (Court Box)
-            let cCount = appState.courtCount || 3;
-            qHtml += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <div style="font-weight:900; color: #111;">QUADRAS EM ANDAMENTO</div>
-                <div class="admin-only" style="display:flex; gap:5px;">
-                    <button class="btn-std btn-dark" style="width:auto; padding:4px 8px; margin:0;" onclick="changeCourtCount(-1)">-</button>
-                    <div style="font-weight:bold; background: #fff; padding: 4px 10px; border-radius: 4px; border: 1px solid #ccc;">${cCount}</div>
-                    <button class="btn-std btn-dark" style="width:auto; padding:4px 8px; margin:0;" onclick="changeCourtCount(1)">+</button>
-                </div>
-            </div>`;
-            
-            qHtml += `<div class="court-grid">`;
-            for(let c=1; c<=cCount; c++) {
-                let mOnCourt = appState.matches.find(x => x.court === c && !x.saved);
-                
-                qHtml += `<div class="court-card">
-                    <div class="court-header">QUADRA ${c}</div>
-                    <div class="court-body">`;
-                    
-                if(mOnCourt) {
-                    const g = appState.groups.find(x => x.id === mOnCourt.gid);
+            let sortedMatches = getOptimizedMatchOrder(appState.matches);
+            if (sortedMatches.length === 0) {
+                queueContainer.innerHTML = '<div style="text-align:center; color:#999; padding: 20px;">Nenhum jogo de grupo pendente ou gerado.</div>';
+            } else {
+                let qHtml = '';
+                sortedMatches.forEach((m, idx) => {
+                    const g = appState.groups.find(x => x.id === m.gid);
                     const n = (id) => appState.players.find(x=>x.id===id)?.name || '...';
-                    const t1 = appState.mode==='fixed' ? n(mOnCourt.p1) : `${n(mOnCourt.p1)} / ${n(mOnCourt.p2)}`;
-                    const t2 = appState.mode==='fixed' ? n(mOnCourt.p3) : `${n(mOnCourt.p3)} / ${n(mOnCourt.p4)}`;
+                    const p1Name = m.p1 ? n(m.p1) : '...'; const p2Name = m.p2 ? n(m.p2) : '...';
+                    const p3Name = m.p3 ? n(m.p3) : '...'; const p4Name = m.p4 ? n(m.p4) : '...';
+                    const t1 = appState.mode==='fixed' ? p1Name : `${p1Name} / ${p2Name}`;
+                    const t2 = appState.mode==='fixed' ? p3Name : `${p3Name} / ${p4Name}`;
+                    
+                    let isEditing = !m.saved;
+                    let opacity = m.saved ? '0.6' : '1';
                     
                     qHtml += `
-                        <div style="font-size:0.7em; color:var(--primary); font-weight:900; margin-bottom:5px;">${g ? g.name : ''}</div>
-                        <div style="font-weight:800; font-size:0.95em; color: #1e293b;">${t1}</div>
-                        <div style="font-size:0.8em; color:#999; margin: 2px 0;">VS</div>
-                        <div style="font-weight:800; font-size:0.95em; color: #1e293b;">${t2}</div>
-                    `;
-                    qHtml += `</div>`;
-                    qHtml += `<div class="court-actions admin-only">
-                        <div style="display:flex; justify-content:center; align-items:center; gap:5px; margin-bottom:5px;">
-                            <input type="tel" id="score1-${mOnCourt.mid}" class="tbl-input auth-input score-input" style="width:35px;height:35px;" placeholder="0">
-                            <span style="font-weight:bold; color: #555;">X</span>
-                            <input type="tel" id="score2-${mOnCourt.mid}" class="tbl-input auth-input score-input" style="width:35px;height:35px;" placeholder="0">
-                            <button class="btn-std btn-green" style="padding:6px 12px; margin:0; width:auto; font-size:0.8em;" onclick="saveScoreBtn('${mOnCourt.mid}', 'score1-${mOnCourt.mid}', 'score2-${mOnCourt.mid}')">Salvar</button>
+                    <div class="queue-match-item" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:10px 0; opacity: ${opacity};">
+                        <div style="font-weight:900; color:#333; width:35px; font-size:1.1em;" title="Ordem do Jogo">#${idx+1}</div>
+                        <div style="flex:1; display:flex; flex-direction:column;">
+                            <div style="font-size:0.75em; color:var(--primary); font-weight:800; text-transform:uppercase; margin-bottom:2px;">${g ? g.name : ''}</div>
+                            <div style="display:flex; justify-content:center; align-items:center; padding-right:5px; font-weight:700; font-size:0.95em;">
+                                <div style="text-align:right; flex:1; line-height:1.2;">${t1}</div>
+                                
+                                <div style="display:flex; align-items:center; margin: 0 10px;">
+                                    ${isEditing ? 
+                                        `<input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">
+                                         <span style="color:#aaa; font-size:0.9em;">X</span>
+                                         <input type="tel" class="tbl-input score-input auth-input" style="width:35px;height:35px;margin:0 5px;" placeholder="0">` 
+                                        : 
+                                        `<div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s1}</div>
+                                         <span style="color:#aaa; font-size:0.9em; margin:0 5px;">X</span>
+                                         <div style="width:35px; text-align:center; font-size:1.2em; color:var(--primary); font-weight:900;">${m.s2}</div>`
+                                    }
+                                </div>
+                                
+                                <div style="text-align:left; flex:1; line-height:1.2;">${t2}</div>
+                            </div>
                         </div>
-                        <div style="display:flex; gap:5px;">
-                            <button class="btn-std btn-red" style="padding:6px; margin:0; font-size:0.75em;" onclick="delayMatch('${mOnCourt.mid}')">Pular (Faltou)</button>
-                            <button class="btn-std btn-dark" style="padding:6px; margin:0; font-size:0.75em;" onclick="removeCourtMatch('${mOnCourt.mid}')">Tirar da Quadra</button>
+                        <div class="admin-only" style="display:flex; align-items:center; width:35px; justify-content:flex-end;">
+                             ${isEditing ? 
+                                `<button class="btn-icon-circle" style="background:#4CAF50;color:white;border:none;" onclick="saveScore('${m.mid}', 'queue', this)" title="Salvar Placar">✓</button>` 
+                                : 
+                                `<button class="btn-icon-circle" style="background:#999;color:white;border:none;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>`
+                            }
                         </div>
                     </div>`;
-                } else {
-                    qHtml += `<div style="color:#94a3b8; font-style:italic; font-weight:600;">Livre</div>`;
-                    qHtml += `</div>`;
-                    qHtml += `<div class="court-actions admin-only">
-                        <button class="btn-std btn-blue" style="padding:10px; margin:0; width:100%; font-size:0.85em;" onclick="callNextToCourt(${c})">Chamar Próximo</button>
-                    </div>`;
-                }
-                
-                qHtml += `</div>`; 
+                });
+                queueContainer.innerHTML = qHtml;
             }
-            qHtml += `</div>`;
-            
-            // Renderizar a Lista de Próximos Jogos
-            qHtml += `<div style="font-weight:900; margin:25px 0 10px 0; color: #111;">FILA DE PRÓXIMOS JOGOS</div>`;
-
-            let sortedMatches = getOptimizedMatchOrder(appState.matches);
-            let idxVisual = 1;
-            let pendingCount = 0;
-            
-            sortedMatches.forEach((m) => {
-                if (m.court && !m.saved) return; 
-                pendingCount++;
-                
-                const g = appState.groups.find(x => x.id === m.gid);
-                const n = (id) => appState.players.find(x=>x.id===id)?.name || '...';
-                const t1 = appState.mode==='fixed' ? n(m.p1) : `${n(m.p1)} / ${n(m.p2)}`;
-                const t2 = appState.mode==='fixed' ? n(m.p3) : `${n(m.p3)} / ${n(m.p4)}`;
-                
-                let isEditing = !m.saved;
-                let opacity = m.saved ? '0.5' : '1';
-                
-                let delayedBadge = m.delayed ? `<div class="badge-delayed">⏳ Atrasado (Faltou Jogador)</div>` : '';
-                
-                let adminAssignHtml = '';
-                if (isEditing && !m.court) {
-                    let options = `<option value="">Chamar p/ Quadra...</option>`;
-                    for(let i=1; i<=(appState.courtCount||3); i++) options += `<option value="${i}">Quadra ${i}</option>`;
-                    adminAssignHtml = `
-                        <select class="inp-std auth-input" style="width:160px; padding:6px; font-size:0.8em; margin:0; border: 1px solid #94a3b8;" onchange="if(this.value) callSpecificToCourt('${m.mid}', parseInt(this.value))">
-                            ${options}
-                        </select>
-                    `;
-                }
-                
-                let delayActionHtml = '';
-                if (isEditing && m.delayed) {
-                    delayActionHtml = `<button class="btn-std btn-green" style="width:auto; padding:6px 12px; margin:0; font-size:0.8em;" onclick="undelayMatch('${m.mid}')">Jogador Chegou!</button>`;
-                }
-
-                qHtml += `
-                <div class="queue-match-item" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding:12px 0; opacity: ${opacity};">
-                    <div style="font-weight:900; color:#475569; width:35px; font-size:1.1em;" title="Ordem do Jogo">#${idxVisual++}</div>
-                    <div style="flex:1; display:flex; flex-direction:column;">
-                        ${delayedBadge}
-                        <div style="font-size:0.75em; color:var(--primary); font-weight:800; text-transform:uppercase; margin-bottom:2px;">${g ? g.name : ''}</div>
-                        <div style="display:flex; align-items:center; padding-right:5px; font-weight:700; font-size:0.95em;">
-                            <div style="text-align:right; flex:1; line-height:1.2; color: #1e293b;">${t1}</div>
-                            <div style="margin: 0 10px; color:#94a3b8; font-size:0.8em;">VS</div>
-                            <div style="text-align:left; flex:1; line-height:1.2; color: #1e293b;">${t2}</div>
-                        </div>
-                        
-                        <div class="admin-only" style="display:flex; gap:10px; margin-top:8px;">
-                            ${adminAssignHtml}
-                            ${delayActionHtml}
-                        </div>
-                    </div>
-                    <div style="display:flex; align-items:center; justify-content:flex-end;">
-                         ${m.saved ? 
-                            `<div style="display:flex; gap:5px; font-weight:900; color:var(--primary); font-size:1.2em;"><span>${m.s1}</span><span style="color:#aaa;font-size:0.8em;">X</span><span>${m.s2}</span></div>
-                             <button class="btn-icon-circle admin-only" style="background:#94a3b8;color:white;border:none;margin-left:10px;width:26px;height:26px;font-size:0.8em;" onclick="editS('${m.mid}')" title="Editar Placar">✎</button>`
-                            : 
-                            `<div style="color: #94a3b8; font-size: 0.85em; font-weight: bold; font-style: italic;">Aguardando</div>`
-                         }
-                    </div>
-                </div>`;
-            });
-            
-            if(pendingCount === 0) {
-                 qHtml += `<div style="text-align:center; color:#94a3b8; padding: 20px; font-weight:bold;">Nenhum jogo na fila.</div>`;
-            }
-            
-            queueContainer.innerHTML = qHtml;
         }
         
         let h = ''; 
 
-        const renderBrkMatch = (m, roundColor, slot1='p1', slot2='p2', slot3='p3', slot4='p4') => {
+        const renderBrkMatch = (m, slot1='p1', slot2='p2', slot3='p3', slot4='p4') => {
             const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
             const getBrkName = (pid1, pid2) => {
                 if(pid1 === 'BYE') return 'BYE';
@@ -2024,7 +1876,7 @@
 
             return `
             <div class="brk-match-wrapper">
-                <div class="bracket-match-box" style="border-left: 4px solid ${roundColor};">
+                <div class="bracket-match-box">
                     <div class="bracket-team">
                         <div class="bracket-name admin-only">${t1_admin}</div>
                         <div class="bracket-name" style="display:${document.body.classList.contains('viewer-mode')?'block':'none'}">${t1}</div>
@@ -2074,8 +1926,8 @@
                 
                 if(roundKeys.length > 0) {
                     const getRoundName = (count) => {
-                        if(count === 16) return 'Oitavas de Final';
-                        if(count === 8) return 'Quartas de Final';
+                        if(count === 16) return 'Oitavas';
+                        if(count === 8) return 'Quartas';
                         if(count === 4) return 'Semifinal';
                         if(count === 2) return 'Final';
                         return 'Fase';
@@ -2088,26 +1940,22 @@
                     for(let i=0; i<roundKeys.length - 1; i++) {
                         let rNum = roundKeys[i];
                         let rName = getRoundName(rounds[rNum].length * 2);
-                        let rColor = getRoundColor(rName);
                         let matchArray = rounds[rNum].sort((a,b) => a.pos - b.pos);
                         let half = matchArray.slice(0, matchArray.length / 2);
 
-                        colsHTML += `<div class="bracket-column left-col"><div class="bracket-header" style="background: ${rColor}15; color: ${rColor}; border: 1px solid ${rColor}40; border-bottom: 3px solid ${rColor};">${rName}</div><div class="brk-matches-container">`;
-                        half.forEach(m => colsHTML += renderBrkMatch(m, rColor));
+                        colsHTML += `<div class="bracket-column left-col"><div class="bracket-header">${rName}</div><div class="brk-matches-container">`;
+                        half.forEach(m => colsHTML += renderBrkMatch(m));
                         colsHTML += `</div></div>`;
                     }
 
                     // CENTER COL
                     let finalRNum = roundKeys[roundKeys.length - 1];
                     let finalMatchArray = rounds[finalRNum];
-                    let finalColor = getRoundColor('Final');
-                    
-                    colsHTML += `<div class="bracket-column center-col"><div class="bracket-header" style="background: ${finalColor}15; color: ${finalColor}; border: 1px solid ${finalColor}40; border-bottom: 3px solid ${finalColor};">Final</div><div class="brk-matches-container" style="position:relative;">`;
+                    colsHTML += `<div class="bracket-column center-col"><div class="bracket-header">Final</div><div class="brk-matches-container" style="position:relative;">`;
                     if (finalMatchArray && finalMatchArray.length > 0) {
                          const fM = finalMatchArray[0];
-                         colsHTML += renderBrkMatch(fM, finalColor);
+                         colsHTML += renderBrkMatch(fM);
                          
-                         // Champion Rendering
                          if(fM.saved && !fM.isBye) {
                              const n = (id) => appState.players.find(x=>x.id===id)?.name || '';
                              let champName = '';
@@ -2131,12 +1979,11 @@
                     for(let i = roundKeys.length - 2; i >= 0; i--) {
                         let rNum = roundKeys[i];
                         let rName = getRoundName(rounds[rNum].length * 2);
-                        let rColor = getRoundColor(rName);
                         let matchArray = rounds[rNum].sort((a,b) => a.pos - b.pos);
                         let half = matchArray.slice(matchArray.length / 2);
 
-                        colsHTML += `<div class="bracket-column right-col"><div class="bracket-header" style="background: ${rColor}15; color: ${rColor}; border: 1px solid ${rColor}40; border-bottom: 3px solid ${rColor};">${rName}</div><div class="brk-matches-container">`;
-                        half.forEach(m => colsHTML += renderBrkMatch(m, rColor));
+                        colsHTML += `<div class="bracket-column right-col"><div class="bracket-header">${rName}</div><div class="brk-matches-container">`;
+                        half.forEach(m => colsHTML += renderBrkMatch(m));
                         colsHTML += `</div></div>`;
                     }
 
@@ -2145,10 +1992,9 @@
 
                 // THIRD PLACE
                 if(rounds['3rd']) {
-                    let thirdColor = '#b45309'; // Bronze
                     h += `<div class="third-place-box"><div class="third-place-header">🥉 DISPUTA DE 3º LUGAR</div><div class="bracket-column third-col" style="padding:15px; width:100%; margin:0 auto;">`;
                     rounds['3rd'].forEach(m => {
-                        h += renderBrkMatch(m, thirdColor, 'p1', 'p2', 'p3', 'p4');
+                        h += renderBrkMatch(m, 'p1', 'p2', 'p3', 'p4');
                     });
                     h += `</div></div>`;
                 }
@@ -2211,7 +2057,7 @@
                 genCol.style.margin = '0 auto';
                 genCol.style.width = '100%';
                 
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:#111; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
                 <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
                 
