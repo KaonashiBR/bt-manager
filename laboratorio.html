@@ -132,31 +132,6 @@
         .select-item { padding: 12px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; font-weight: 600; text-align: left; }
         .select-item:hover { background: #e0e0e0; }
 
-        /* CARDS MOBILE-FIRST (RESOLVE O PROBLEMA DE ESTICAR A TELA) */
-        .viewer-only { display: none; }
-        .viewer-mode .viewer-only { display: block; }
-        .mobile-match-card { background: white; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden; width: 100%; }
-        .mobile-team-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f5f9; }
-        .mobile-team-row:last-child { border-bottom: none; }
-        .mobile-team-name { flex: 1; font-weight: 600; font-size: 0.95em; color: #1e293b; line-height: 1.3; }
-        .mobile-team-score { width: 50px; text-align: right; font-weight: 900; font-size: 1.2em; color: var(--primary); }
-        .mobile-match-admin { background: #f8fafc; padding: 10px; display: flex; align-items: center; border-top: 1px solid #e2e8f0; }
-
-        .ko-round-header { background: #1e293b; color: var(--primary); padding: 10px; font-weight: bold; margin-top: 15px; border-radius: 6px 6px 0 0; text-align: center; border-bottom: 2px dashed #334155; }
-        .ko-list { background: #f8fafc; border: 1px solid #ccc; border-radius: 0 0 6px 6px; padding: 10px; }
-
-        /* ANIMAÇÃO DE EMPATE ABSOLUTO */
-        @keyframes pulse-tie-bg { 
-            0% { background-color: transparent; } 
-            50% { background-color: rgba(0, 200, 83, 0.35); border-radius: 4px; } 
-            100% { background-color: transparent; } 
-        }
-        .blink-tie-bg { 
-            animation: pulse-tie-bg 1.5s infinite; 
-            padding: 3px 6px;
-            display: inline-block;
-        }
-
         /* TEXTO FANTASMA DO SANDBOX */
         .ghost-watermark {
             position: fixed;
@@ -171,6 +146,18 @@
             white-space: nowrap;
             letter-spacing: 15px;
             user-select: none;
+        }
+
+        /* ANIMAÇÃO DE EMPATE ABSOLUTO */
+        @keyframes pulse-tie-bg { 
+            0% { background-color: transparent; } 
+            50% { background-color: rgba(0, 200, 83, 0.35); border-radius: 4px; } 
+            100% { background-color: transparent; } 
+        }
+        .blink-tie-bg { 
+            animation: pulse-tie-bg 1.5s infinite; 
+            padding: 3px 6px;
+            display: inline-block;
         }
 
         /* TOOLTIPS E REGULAMENTO */
@@ -205,6 +192,7 @@
 
         <div id="content-reg-jap" style="padding:20px; overflow-y:auto; line-height:1.6; text-align:justify; display:block;">
             <h3 style="text-align:center; margin-top:0; color:var(--primary); font-weight: 900;">FORMATO JAPONÊS</h3>
+            
             <div class="reg-chapter">CAPÍTULO I - DISPOSIÇÕES GERAIS</div>
             <div class="reg-article"><strong>Art. 1º</strong> O torneio será disputado no formato japonês, com fase classificatória em grupos, apuração de classificação individual por atleta e posterior formação de duplas para a fase eliminatória.</div>
             <div class="reg-article"><strong>Art. 2º</strong> Na fase classificatória, os atletas disputarão partidas em duplas formadas por combinações rotativas, sendo a classificação apurada individualmente.</div>
@@ -240,6 +228,7 @@
 
         <div id="content-reg-fix" style="padding:20px; overflow-y:auto; line-height:1.6; text-align:justify; display:none;">
             <h3 style="text-align:center; margin-top:0; color:var(--primary); font-weight: 900;">FORMATO DUPLAS FIXAS</h3>
+            
             <div class="reg-chapter">CAPÍTULO I - DISPOSIÇÕES GERAIS</div>
             <div class="reg-article"><strong>Art. 1º</strong> O torneio será disputado no formato de duplas fixas, onde a mesma parceria de atletas atua em conjunto desde a fase classificatória até a fase eliminatória final.</div>
             
@@ -324,7 +313,7 @@
     <div class="status-bar">
         <div onclick="exitApp()" style="cursor:pointer; display:flex; align-items:center;"><span class="material-icons" style="font-size:1.2em;">arrow_back</span> Sair</div>
         <div style="display:flex; align-items:center; gap:5px;">
-            <button onclick="document.getElementById('modal-regulamento').style.display='flex'" style="background:transparent; border:none; color:white; cursor:pointer; padding: 2px;" title="Ler Regulamento"><span class="material-icons" style="font-size: 1.2em; color: #FFD700;">menu_book</span></button>
+            <button onclick="document.getElementById('modal-regulamento').style.display='flex'" style="background:transparent; border:none; color:white; cursor:pointer; padding: 2px;" title="Ler Regulamento"><span class="material-icons" style="font-size: 1.2em; color: var(--primary);">menu_book</span></button>
             <span class="conn-dot" style="background: var(--primary);"></span> <span id="app-status">ONLINE (TESTE)</span>
             <button onclick="shareLink()" style="background:transparent; border:none; color:white; cursor:pointer;" title="Compartilhar Link"><span class="material-icons">link</span></button>
             <button onclick="tryAdmin()" id="btn-lock" style="background:transparent; border:1px dashed #aaa; padding:2px 5px; color:white;" title="Acesso Admin">🔒</button>
@@ -496,7 +485,7 @@
     <h2 style="color:var(--primary); font-size:1.8em; margin-bottom:30px; text-transform:uppercase; letter-spacing:2px;">Sorteio das Chaves</h2>
     <div id="roulette-player" style="font-size:2em; font-weight:700; margin-bottom:10px; text-align:center;">Nome do Atleta</div>
     <div style="font-size:1em; margin-bottom:20px; color:#aaa;">vai para...</div>
-    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#fff; background:#222; padding:20px 40px; border-radius:12px; border:3px solid #555; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
+    <div id="roulette-group" style="font-size:3em; font-weight:900; color:#111; background:var(--primary); padding:20px 40px; border-radius:12px; border:3px solid #111; transition: all 0.1s; text-align:center; min-width: 250px;">?</div>
     <button id="btn-skip-roulette" class="btn-std btn-dark" style="margin-top:40px; width:auto; padding:10px 20px;">Pular Animação</button>
 </div>
 
@@ -506,8 +495,9 @@
     import { getDatabase, ref, set, push, onValue, off, remove, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
     const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
+    const MASTER_PASS = "lucas10";
 
-    // CONFIGURAÇÃO DO AMBIENTE DE TESTES (LABORATÓRIO)
+    // V172: CONFIGURAÇÃO DE LABORATÓRIO (TESTES)
     const firebaseConfig = {
         apiKey: "AIzaSyCttgr7SLeDU92pcMs5wcNGvLc7joZvw00",
         authDomain: "bt-manager-testes.firebaseapp.com",
@@ -874,6 +864,12 @@
             if(appState.groupCount === undefined || isNaN(appState.groupCount)) {
                 appState.groupCount = appState.groups ? appState.groups.length : 0;
             }
+            
+            // SANITIZER: REMOVE JOGOS FANTASMAS (CORROMPIDOS) ANTES DE RENDERIZAR
+            if(appState.matches) {
+                appState.matches = appState.matches.filter(m => m && m.mid && m.gid);
+            }
+            
             recalc(); 
             renderApp();
         });
@@ -1953,7 +1949,7 @@
                 genCol.style.margin = '0 auto';
                 genCol.style.width = '100%';
                 
-                let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
+                let thHtml = `<div class="group-header" style="background:var(--primary); color:#111; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
                 <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
                 
@@ -1983,35 +1979,6 @@
 
         if (focusedId) { const el = document.getElementById(focusedId); if(el) el.focus(); }
     }
-    
-    // REGISTRO DO MOTOR DO APLICATIVO (PWA) - DESATIVADO NO LAB
-    /*
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js');
-        });
-    }
-    */
-
-    // CAPTURA DO AVISO DE INSTALAÇÃO DO ANDROID/CHROME
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        const btnInstall = document.getElementById('btn-install-app');
-        if(btnInstall) btnInstall.style.display = 'flex';
-    });
-
-    window.installApp = async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('btn-install-app').style.display = 'none';
-            }
-            deferredPrompt = null;
-        }
-    };
 </script>
 </body>
 </html>
