@@ -1216,7 +1216,17 @@
     }
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString(36).substring(2,7), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
-
+window.addManual = (gid) => { 
+        const isFixed = appState.mode === 'fixed';
+        appState.matches.push({ 
+            mid: 'm' + Date.now() + Math.random().toString(36).substring(2,7), 
+            gid: gid, 
+            p1: '', p2: isFixed ? 'd' : '', p3: '', p4: isFixed ? 'd' : '', 
+            s1: '', s2: '', saved: false, isBye: false 
+        }); 
+        save(); 
+        renderApp(); 
+    };
     window.editGA = (pid, e) => {
         e.stopPropagation();
         if(document.body.classList.contains('viewer-mode')) return;
