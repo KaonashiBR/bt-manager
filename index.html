@@ -1811,13 +1811,34 @@
                 
                 let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
-                <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
+                <tr style="background:#ccc; font-size:0.8em">
+                    <td title="Ranking Geral do Torneio" style="background:#111; color:white;">RG</td>
+                    <td title="Posição no Grupo">Pos</td>
+                    <td title="Grupo de Origem">Grupo</td>
+                    <td title="Nome do Jogador">Nome</td>
+                    <td title="Partidas Jogadas">J</td>
+                    <td title="Vitórias">V</td>
+                    <td title="Saldo de Games">S</td>
+                    <td title="Games Vencidos" style="color:#2e7d32">GV</td>
+                    <td title="Games Perdidos" style="color:#d32f2f">GP</td>
+                    <td title="Total de Games" style="color:#0f172a">TG</td>
+                    <td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td>
+                    <td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td>
+                    <td title="Pontuação">Pts</td>
+                </tr>`;
                 
-                allPlayers.forEach(p => {
+                allPlayers.forEach((p, idx) => {
                     let rankClass = p.tempGroupRank === 1 ? 'color: var(--primary); font-weight: 900;' : (p.tempGroupRank === 2 ? 'color: #2196F3; font-weight:bold;' : 'color: #666;');
                     const winPct = p.games > 0 ? ((p.wins / p.games) * 100).toFixed(0) + '%' : '0%';
-                    thHtml += `<tr style="font-size:0.85em">
-                        <td style="${rankClass}" title="Posição Geral">${p.tempGroupRank}º</td>
+                    
+                    let rowBorder = "";
+                    if (idx === 15) {
+                        rowBorder = "border-bottom: 3px solid #ff3b30;";
+                    }
+
+                    thHtml += `<tr style="font-size:0.85em; ${rowBorder}">
+                        <td style="font-weight:900; background:#e2e8f0; color:#0f172a; border-right: 2px solid #cbd5e1;" title="Ranking Geral">${idx + 1}º</td>
+                        <td style="${rankClass}" title="Posição no Grupo">${p.tempGroupRank}º</td>
                         <td style="font-weight:bold; font-size:0.8em; color:#555;" title="Grupo de Origem">${p.tempGroupName.replace('GRUPO ', '')}</td>
                         <td style="text-align:left; font-weight:bold;" title="${p.name}">${p.name}</td>
                         <td title="Partidas Jogadas">${p.games}</td>
