@@ -489,7 +489,6 @@
     const ADMIN_EMAILS = ["lucas.sibie@gmail.com", "lucassibie@gmail.com"]; 
     const MASTER_PASS = "lucas10";
 
-    // V172: DE VOLTA PARA A PRODUÇÃO OFICIAL
     const firebaseConfig = {
         apiKey: "AIzaSyDWWZqUI_afdZWUbEKp9qelddskmpQPxqk",
         authDomain: "beach-tennis-manager-92f17.firebaseapp.com",
@@ -513,7 +512,6 @@
     let selectingMatch = null; 
     let selectingSlot = null;
 
-    // Lógica para alternar as abas do Regulamento
     window.switchReg = (type) => {
         document.getElementById('tab-reg-jap').classList.remove('active');
         document.getElementById('tab-reg-fix').classList.remove('active');
@@ -1009,20 +1007,16 @@
 
     function sortPlayersCBT(players, matches) {
         return [...players].sort((a, b) => {
-            // 1. Pontos
-            if (b.pts !== a.pts) return b.pts - a.pts;
-
-            // 2. Percentagem de Vitórias
             const aWinPct = a.games > 0 ? a.wins / a.games : 0;
             const bWinPct = b.games > 0 ? b.wins / b.games : 0;
             if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
 
-            // 3. Percentagem de Games Vencidos / Game Average
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
 
-            // Sorteio (Ordem Alfabética)
+            if (b.pts !== a.pts) return b.pts - a.pts;
+
             return a.name.localeCompare(b.name);
         });
     }
@@ -1056,12 +1050,8 @@
         if(qualified.length < 2) return alert("Mínimo 2 jogadores.");
 
         qualified.sort((a,b) => {
-            if (a.tempGroupRank !== b.tempGroupRank) {
-                return a.tempGroupRank - b.tempGroupRank;
-            }
-
-            if (b.pts !== a.pts) return b.pts - a.pts;
-
+            if (a.tempGroupRank !== b.tempGroupRank) return a.tempGroupRank - b.tempGroupRank;
+            
             const aWinPct = a.games > 0 ? a.wins / a.games : 0;
             const bWinPct = b.games > 0 ? b.wins / b.games : 0;
             if (Math.abs(bWinPct - aWinPct) > 0.001) return bWinPct - aWinPct;
@@ -1069,6 +1059,8 @@
             const aGA = a.gameAvg || 0;
             const bGA = b.gameAvg || 0;
             if (Math.abs(bGA - aGA) > 0.001) return bGA - aGA;
+
+            if (b.pts !== a.pts) return b.pts - a.pts;
 
             return a.name.localeCompare(b.name);
         });
@@ -1083,16 +1075,29 @@
             let unpaired = [...qualified];
             while (unpaired.length > 0) {
                 let pA = unpaired.shift(); 
-                let pB = unpaired.shift(); 
+                let partnerIdx = unpaired.findIndex(p => p.groupId !== pA.groupId);
+                
+                let pB;
+                if (partnerIdx !== -1) {
+                    pB = unpaired.splice(partnerIdx, 1)[0];
+                } else {
+                    pB = unpaired.shift();
+                }
                 
                 finalSeeds.push({
                     isPair: true,
                     pA: pA,
-                    pB: pB
+                    pB: pB,
+                    groups: [pA?.groupId, pB?.groupId].filter(Boolean) 
                 });
             }
         } else {
-            finalSeeds = qualified.map(q => ({ isPair: false, pA: q, pB: null }));
+            finalSeeds = qualified.map(q => ({ 
+                isPair: false, 
+                pA: q, 
+                pB: null, 
+                groups: [q?.groupId].filter(Boolean) 
+            }));
         }
 
         let size = 2;
@@ -1104,11 +1109,67 @@
         let seeds = new Array(size).fill(null);
         for(let i=0; i<finalSeeds.length; i++) seeds[i] = finalSeeds[i];
 
+        let half = size / 2;
+        let matchups = [];
+        for (let i = 0; i < half; i++) {
+            matchups.push({ top: i, bottom: size - 1 - i });
+        }
+
+        // LÓGICA DE SWAP GULOSO (GREEDY SWAP)
+        for (let i = 0; i < half; i++) {
+            let m1 = matchups[i];
+            let seedA = seeds[m1.top];
+            let seedB = seeds[m1.bottom];
+
+            let hasConflict = (a, b) => {
+                if (!a || !b || !a.groups || !b.groups) return false;
+                return a.groups.some(g => b.groups.includes(g));
+            };
+
+            // Se o jogo atual tem conflito
+            if (hasConflict(seedA, seedB)) {
+                // Procura nos próximos jogos disponíveis para trocar
+                for (let j = i + 1; j < half; j++) {
+                    let m2 = matchups[j];
+                    let candidateB = seeds[m2.bottom];
+
+                    // Se a troca com o adversário deste jogo não tiver conflito, efetua a troca
+                    if (!hasConflict(seedA, candidateB)) {
+                        let temp = m1.bottom;
+                        m1.bottom = m2.bottom;
+                        m2.bottom = temp;
+                        break; // Conflito resolvido
+                    }
+                }
+            }
+        }
+
+        let assignedPairs = {};
+        for (let m of matchups) {
+            assignedPairs[m.top] = m.bottom;
+        }
+
+        let standardPairingOrder = [];
+        if(size === 2) standardPairingOrder = [0, 1];
+        else if(size === 4) standardPairingOrder = [0, 3, 1, 2]; 
+        else if(size === 8) standardPairingOrder = [0, 7, 3, 4, 2, 5, 1, 6]; 
+        else if(size === 16) standardPairingOrder = [0, 15, 7, 8, 4, 11, 3, 12, 2, 13, 5, 10, 6, 9, 1, 14];
+        else if(size === 32) standardPairingOrder = [0, 31, 15, 16, 7, 24, 8, 23, 3, 28, 12, 19, 4, 27, 11, 20, 1, 30, 14, 17, 6, 25, 9, 22, 2, 29, 13, 18, 5, 26, 10, 21];
+
         let pairingOrder = [];
-        if(size === 2) pairingOrder = [0, 1];
-        else if(size === 4) pairingOrder = [0, 3, 1, 2]; 
-        else if(size === 8) pairingOrder = [0, 7, 3, 4, 2, 5, 1, 6]; 
-        else if(size === 16) pairingOrder = [0, 15, 7, 8, 4, 11, 3, 12, 2, 13, 5, 10, 6, 9, 1, 14];
+        for (let i = 0; i < standardPairingOrder.length; i += 2) {
+            let s1 = standardPairingOrder[i];
+            let s2 = standardPairingOrder[i+1];
+            
+            let top = s1 < half ? s1 : s2;
+            let bottom = assignedPairs[top];
+
+            if (s1 < half) {
+                pairingOrder.push(top, bottom);
+            } else {
+                pairingOrder.push(bottom, top);
+            }
+        }
 
         let koMatches = [];
         let totalRounds = Math.log2(size);
@@ -1122,10 +1183,10 @@
                 gid: gid, 
                 round: 1,
                 pos: i/2, 
-                p1: seedA ? seedA.pA.id : 'BYE', 
-                p2: seedA ? (seedA.isPair ? seedA.pB.id : seedA.pA.id) : 'BYE',
-                p3: seedB ? seedB.pA.id : 'BYE', 
-                p4: seedB ? (seedB.isPair ? seedB.pB.id : seedB.pA.id) : 'BYE',
+                p1: seedA && seedA.pA ? seedA.pA.id : 'BYE', 
+                p2: seedA ? (seedA.isPair && seedA.pB ? seedA.pB.id : seedA.pA.id) : 'BYE',
+                p3: seedB && seedB.pA ? seedB.pA.id : 'BYE', 
+                p4: seedB ? (seedB.isPair && seedB.pB ? seedB.pB.id : seedB.pA.id) : 'BYE',
                 s1:'', s2:'', saved: false, isBye: false
             };
             if (!seedA || !seedB) m.isBye = true;
@@ -1172,7 +1233,7 @@
         
         document.getElementById('modal-knockout').style.display = 'none';
         save();
-        alert("Chave Gerada!");
+        alert("Chave Gerada com Trava de Conflitos Ativada!");
         switchAppView('bracket');
     }
 
@@ -1216,7 +1277,7 @@
     }
 
     function addMatch(gid, p1, p2, p3, p4, isBye=false) { appState.matches.push({ mid:'m'+Date.now()+Math.random().toString(36).substring(2,7), gid, p1, p2, p3, p4, s1:'', s2:'', saved:false, isBye }); }
-window.addManual = (gid) => { 
+    window.addManual = (gid) => { 
         const isFixed = appState.mode === 'fixed';
         appState.matches.push({ 
             mid: 'm' + Date.now() + Math.random().toString(36).substring(2,7), 
@@ -1227,6 +1288,7 @@ window.addManual = (gid) => {
         save(); 
         renderApp(); 
     };
+    
     window.editGA = (pid, e) => {
         e.stopPropagation();
         if(document.body.classList.contains('viewer-mode')) return;
@@ -1821,13 +1883,34 @@ window.addManual = (gid) => {
                 
                 let thHtml = `<div class="group-header" style="background:var(--primary); color:white; justify-content:center;">🏆 CLASSIFICAÇÃO GERAL (CABEÇAS DE CHAVE)</div>
                 <table class="bt-table" style="margin-top:0; border-top:none;">
-                <tr style="background:#ccc; font-size:0.8em"><td title="Posição Geral">Pos</td><td title="Grupo de Origem">Grupo</td><td title="Nome do Jogador">Nome</td><td title="Partidas Jogadas">J</td><td title="Vitórias">V</td><td title="Saldo de Games">S</td><td title="Games Vencidos" style="color:#2e7d32">GV</td><td title="Games Perdidos" style="color:#d32f2f">GP</td><td title="Total de Games" style="color:#0f172a">TG</td><td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td><td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td><td title="Pontuação">Pts</td></tr>`;
+                <tr style="background:#ccc; font-size:0.8em">
+                    <td title="Ranking Geral do Torneio" style="background:#111; color:white;">RG</td>
+                    <td title="Posição no Grupo">Pos</td>
+                    <td title="Grupo de Origem">Grupo</td>
+                    <td title="Nome do Jogador">Nome</td>
+                    <td title="Partidas Jogadas">J</td>
+                    <td title="Vitórias">V</td>
+                    <td title="Saldo de Games">S</td>
+                    <td title="Games Vencidos" style="color:#2e7d32">GV</td>
+                    <td title="Games Perdidos" style="color:#d32f2f">GP</td>
+                    <td title="Total de Games" style="color:#0f172a">TG</td>
+                    <td title="Aproveitamento de Vitórias">%V <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Percentagem de Vitórias (Vitórias ÷ Jogos).</span></div></td>
+                    <td title="Game Average (Desempate Oficial CBT)">GA <div class="tooltip"><span class="material-icons" style="font-size:11px;vertical-align:middle;color:#555;">help</span><span class="tooltiptext">Game Average (Games Vencidos ÷ Total de Games).</span></div></td>
+                    <td title="Pontuação">Pts</td>
+                </tr>`;
                 
-                allPlayers.forEach(p => {
+                allPlayers.forEach((p, idx) => {
                     let rankClass = p.tempGroupRank === 1 ? 'color: var(--primary); font-weight: 900;' : (p.tempGroupRank === 2 ? 'color: #2196F3; font-weight:bold;' : 'color: #666;');
                     const winPct = p.games > 0 ? ((p.wins / p.games) * 100).toFixed(0) + '%' : '0%';
-                    thHtml += `<tr style="font-size:0.85em">
-                        <td style="${rankClass}" title="Posição Geral">${p.tempGroupRank}º</td>
+                    
+                    let rowStyle = "font-size:0.85em;";
+                    if (idx === 15) {
+                        rowStyle += " border-bottom: 4px solid darkred;";
+                    }
+
+                    thHtml += `<tr style="${rowStyle}">
+                        <td style="font-weight:900; background:#e2e8f0; color:#0f172a; border-right: 2px solid #cbd5e1;" title="Ranking Geral">${idx + 1}º</td>
+                        <td style="${rankClass}" title="Posição no Grupo">${p.tempGroupRank}º</td>
                         <td style="font-weight:bold; font-size:0.8em; color:#555;" title="Grupo de Origem">${p.tempGroupName.replace('GRUPO ', '')}</td>
                         <td style="text-align:left; font-weight:bold;" title="${p.name}">${p.name}</td>
                         <td title="Partidas Jogadas">${p.games}</td>
